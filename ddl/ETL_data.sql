@@ -1940,7 +1940,7 @@ begin
 					,vd.split_allocation_pct
 					,vd.start_date
 					,vd.end_date
-					,case when d.hub_dept_id is not null then 'Y' else 'N' end as hpr_flag
+					,case when d.hub_dept_id is not null and d.level_01 = 'Headquarters Project Ramapo' then 'Y' else 'N' end as hpr_flag
 					,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
 					,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
 					,case when ( vd.wed_AM_Flag = 'Y' or vd.wed_PM_Flag = 'Y' ) then 'Y' else 'N' end as wed_flag
@@ -1980,7 +1980,7 @@ begin
 					,vd.split_allocation_pct
 					,vd.start_date
 					,vd.end_date
-					,case when d.hub_dept_id is not null then 'Y' else 'N' end as hpr_flag
+					,case when d.hub_dept_id is not null and d.level_01 = 'Headquarters Project Ramapo' then 'Y' else 'N' end as hpr_flag
 					,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
 					,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
 					,case when ( vd.wed_AM_Flag = 'Y' or vd.wed_PM_Flag = 'Y' ) then 'Y' else 'N' end as wed_flag
@@ -2019,7 +2019,7 @@ begin
 					,vd.split_allocation_pct
 					,vd.start_date
 					,vd.end_date
-					,case when d.hub_dept_id is not null then 'Y' else 'N' end as hpr_flag
+					,case when d.hub_dept_id is not null and d.level_01 = 'Headquarters Project Ramapo' then 'Y' else 'N' end as hpr_flag
 					,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
 					,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
 					,case when ( vd.wed_AM_Flag = 'Y' or vd.wed_PM_Flag = 'Y' ) then 'Y' else 'N' end as wed_flag
@@ -2101,7 +2101,8 @@ begin
 			inner join dbo.HPR_Dept d
 				on vd.hub_dept_id = d.hub_dept_id
 				and d.Active_Flag = 'Y'
-				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS' )				
+				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS' )	
+				and d.level_01 = 'Headquarters Project Ramapo'
 			where 1=1
 				and v.volunteer_key not in ( select volunteer_key from dbo.volunteer_dept_rpt where hpr_flag = 'Y' group by volunteer_key )
 				and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
@@ -2184,7 +2185,8 @@ begin
 		  	left join dbo.HPR_Dept d
 				on vd.hub_dept_id = d.hub_dept_id
 				and d.Active_Flag = 'Y'
-				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS' )				
+				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS' )	
+				and d.level_01 = 'Headquarters Project Ramapo'
 			where 1=1
 				and v.volunteer_key not in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
 				and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
