@@ -728,6 +728,31 @@ select
 go
 
 
+if object_id('dbo.Volunteer_Dept_Orphaned_Records_v', 'V') is not null
+	drop view dbo.Volunteer_Dept_Orphaned_Records_v
+go 
+create view dbo.Volunteer_Dept_Orphaned_Records_v
+as
+with rvd as (
+	select full_name, dept_name, start_date, person_id, notes, temp_flag, primary_flag, site_code, volunteer_dept_key
+	from dbo.Volunteer_Dept_v
+	where active_flag = 'Y' ),
+
+hub as (
+	select person_id, department_name, start_date
+	from stg.stg_Person_Dept_History
+	where end_date is null or end_date > getdate() )
+
+select rvd.full_name, rvd.dept_name, rvd.start_date, rvd.person_id, notes, temp_flag, primary_flag, volunteer_dept_key 
+from rvd
+left join hub 
+	on rvd.person_id = hub.person_id
+	and rvd.Dept_Name = hub.Department_Name
+	and rvd.Start_Date = hub.Start_Date
+where hub.person_id is null
+go
+
+
 if object_id('dbo.Volunteer_Enrollment_v', 'V') is not null
 	drop view dbo.Volunteer_Enrollment_v
 go 

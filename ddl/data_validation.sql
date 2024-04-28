@@ -484,7 +484,11 @@ begin
 					group by volunteer_key having count(*) > 1 )
 			insert into dbo.App_Data_Validation( table_name, test_name, status_code )
 			values( @table, @test, @fail );	
-			
+
+		set @Test = 'Orphaned Work Assignment Record'
+		if exists ( select * from dbo.Volunteer_Dept_Orphaned_Records_v )
+			insert into dbo.App_Data_Validation( table_name, test_name, status_code )
+			values( @table, @test, @fail );				
 
 		-- VOLUNTEER ENROLLMENT
 		set @Table = 'Volunteer_Enrollment'
