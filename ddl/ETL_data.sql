@@ -4281,7 +4281,14 @@ begin
 				where app_status_code not in ('PNDC','PNDE') and x.attribute_value = x.attrib_pursued_by_val )
 		
 		set @Upd = @Upd + @@rowcount
+		
+		-- MULTIPLE ACTIVE PURSUIT HISTORY FOR A VOLUNTEER
+		delete
+		from dbo.volunteer_pursuit_hist
+		where volunteer_pursuit_hist_key in ( select min( volunteer_pursuit_hist_key ) as min_key from dbo.Volunteer_Pursuit_Hist where active_flag = 'Y' group by volunteer_key having count(*) > 1 )
 
+		set @Del = @Del + @@rowcount
+		
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
