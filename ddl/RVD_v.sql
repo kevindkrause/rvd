@@ -741,7 +741,7 @@ with rvd as (
 hub as (
 	select person_id, department_name, start_date
 	from stg.stg_Person_Dept_History
-	where end_date is null or end_date > getdate() )
+	where end_date is null or cast( end_date as date ) >= cast( getdate() as date ) )
 
 select rvd.full_name, rvd.dept_name, rvd.start_date, rvd.person_id, notes, temp_flag, primary_flag, volunteer_dept_key 
 from rvd
@@ -771,6 +771,7 @@ select
 	,ve.site_code as site_code_orig	 
 	,ve.notes
 	,ve.applicant_id
+	,v.hub_person_id
 	,ve.start_date
 	,ve.end_date
 	,ve.active_flag
@@ -782,6 +783,32 @@ inner join dbo.enrollment e
 	on ve.enrollment_key = e.enrollment_key
 go
 
+
+if object_id('dbo.Volunteer_Enrollment_Orphaned_Records_v', 'V') is not null
+	drop view dbo.Volunteer_Enrollment_Orphaned_Records_v
+go 
+create view dbo.Volunteer_Enrollment_Orphaned_Records_v
+as
+with rvd as (
+	select full_name, enrollment_code, start_date, hub_person_id as person_id, site_code, volunteer_enrollment_key
+	from dbo.Volunteer_enrollment_v
+	where active_flag = 'Y' ),
+
+hub as (
+	select person_id, enrollment_code, start_date
+	from stg.stg_Person_enrollment
+	where end_date is null or cast( end_date as date ) >= cast( getdate() as date ) )
+
+select rvd.full_name, rvd.enrollment_code, rvd.start_date, rvd.person_id, volunteer_enrollment_key 
+from rvd
+left join hub 
+	on rvd.person_id = hub.person_id
+	and rvd.enrollment_code = hub.enrollment_code
+	and rvd.Start_Date = cast( hub.Start_Date as date )
+where hub.person_id is null
+	and rvd.enrollment_code not in ( 'HPR', 'BA' )
+go
+	
 
 if object_id('dbo.Volunteer_Enrollment_Schools_v', 'V') is not null
 	drop view dbo.Volunteer_Enrollment_Schools_v

@@ -512,6 +512,11 @@ begin
 		if exists ( select count(*) from stg.stg_person_enrollment where enrollment_code not in ( select enrollment_code from dbo.enrollment where active_flag = 'Y' ) group by enrollment_code having count(*) > 1 )
 			insert into dbo.App_Data_Validation( table_name, test_name, status_code )
 			values( @table, @test, @fail );			
+			
+		set @Test = 'Orphaned Enrollment Record'
+		if exists ( select * from dbo.Volunteer_Enrollment_Orphaned_Records_v )
+			insert into dbo.App_Data_Validation( table_name, test_name, status_code )
+			values( @table, @test, @fail );				
 
 		-- VOLUNTEER EVENT
 		set @Table = 'Volunteer_Event'
