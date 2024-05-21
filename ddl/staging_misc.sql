@@ -249,6 +249,284 @@ where 1=1
 go		
 
 
+if object_id('stg.stg_prp_cpc_v', 'V') is not null
+	drop view stg.stg_prp_cpc_v
+go 
+create view stg.stg_prp_cpc_v
+as
+select
+	 cpc_code
+	,max( teamcode ) as pc_code
+	,coalesce( sum( [Jan-20] ), 0 ) as jan_20
+	,coalesce( sum( [Feb-20] ), 0 ) as feb_20
+	,coalesce( sum( [Mar-20] ), 0 ) as mar_20
+	,coalesce( sum( [Apr-20] ), 0 ) as apr_20
+	,coalesce( sum( [May-20] ), 0 ) as may_20
+	,coalesce( sum( [Jun-20] ), 0 ) as jun_20
+	,coalesce( sum( [Jul-20] ), 0 ) as jul_20
+	,coalesce( sum( [Aug-20] ), 0 ) as aug_20
+	,coalesce( sum( [Sep-20] ), 0 ) as sep_20
+	,coalesce( sum( [Oct-20] ), 0 ) as oct_20
+	,coalesce( sum( [Nov-20] ), 0 ) as nov_20
+	,coalesce( sum( [Dec-20] ), 0 ) as dec_20
+	,coalesce( sum( [Jan-21] ), 0 ) as jan_21
+	,coalesce( sum( [Feb-21] ), 0 ) as feb_21
+	,coalesce( sum( [Mar-21] ), 0 ) as mar_21
+	,coalesce( sum( [Apr-21] ), 0 ) as apr_21
+	,coalesce( sum( [May-21] ), 0 ) as may_21
+	,coalesce( sum( [Jun-21] ), 0 ) as jun_21
+	,coalesce( sum( [Jul-21] ), 0 ) as jul_21
+	,coalesce( sum( [Aug-21] ), 0 ) as aug_21
+	,coalesce( sum( [Sep-21] ), 0 ) as sep_21
+	,coalesce( sum( [Oct-21] ), 0 ) as oct_21
+	,coalesce( sum( [Nov-21] ), 0 ) as nov_21
+	,coalesce( sum( [Dec-21] ), 0 ) as dec_21
+	,coalesce( sum( [Jan-22] ), 0 ) as jan_22
+	,coalesce( sum( [Feb-22] ), 0 ) as feb_22
+	,coalesce( sum( [Mar-22] ), 0 ) as mar_22
+	,coalesce( sum( [Apr-22] ), 0 ) as apr_22
+	,coalesce( sum( [May-22] ), 0 ) as may_22
+	,coalesce( sum( [Jun-22] ), 0 ) as jun_22
+	,coalesce( sum( [Jul-22] ), 0 ) as jul_22
+	,coalesce( sum( [Aug-22] ), 0 ) as aug_22
+	,coalesce( sum( [Sep-22] ), 0 ) as sep_22
+	,coalesce( sum( [Oct-22] ), 0 ) as oct_22
+	,coalesce( sum( [Nov-22] ), 0 ) as nov_22
+	,coalesce( sum( [Dec-22] ), 0 ) as dec_22
+	,coalesce( sum( [Jan-23] ), 0 ) as jan_23
+	,coalesce( sum( [Feb-23] ), 0 ) as feb_23
+	,coalesce( sum( [Mar-23] ), 0 ) as mar_23
+	,coalesce( sum( [Apr-23] ), 0 ) as apr_23
+	,coalesce( sum( [May-23] ), 0 ) as may_23
+	,coalesce( sum( [Jun-23] ), 0 ) as jun_23
+	,coalesce( sum( [Jul-23] ), 0 ) as jul_23
+	,coalesce( sum( [Aug-23] ), 0 ) as aug_23
+	,coalesce( sum( [Sep-23] ), 0 ) as sep_23
+	,coalesce( sum( [Oct-23] ), 0 ) as oct_23
+	,coalesce( sum( [Nov-23] ), 0 ) as nov_23
+	,coalesce( sum( [Dec-23] ), 0 ) as dec_23
+	,coalesce( sum( [Jan-24] ), 0 ) as jan_24
+	,coalesce( sum( [Feb-24] ), 0 ) as feb_24
+	,coalesce( sum( [Mar-24] ), 0 ) as mar_24
+	,coalesce( sum( [Apr-24] ), 0 ) as apr_24
+	,coalesce( sum( [May-24] ), 0 ) as may_24
+	,coalesce( sum( [Jun-24] ), 0 ) as jun_24
+	,coalesce( sum( [Jul-24] ), 0 ) as jul_24
+	,coalesce( sum( [Aug-24] ), 0 ) as aug_24
+	,coalesce( sum( [Sep-24] ), 0 ) as sep_24
+	,coalesce( sum( [Oct-24] ), 0 ) as oct_24
+	,coalesce( sum( [Nov-24] ), 0 ) as nov_24
+	,coalesce( sum( [Dec-24] ), 0 ) as dec_24
+	,coalesce( sum( [Jan-25] ), 0 ) as jan_25
+	,coalesce( sum( [Feb-25] ), 0 ) as feb_25
+	,coalesce( sum( [Mar-25] ), 0 ) as mar_25
+	,coalesce( sum( [Apr-25] ), 0 ) as apr_25
+	,coalesce( sum( [May-25] ), 0 ) as may_25
+	,coalesce( sum( [Jun-25] ), 0 ) as jun_25
+	,coalesce( sum( [Jul-25] ), 0 ) as jul_25
+	,coalesce( sum( [Aug-25] ), 0 ) as aug_25
+	,coalesce( sum( [Sep-25] ), 0 ) as sep_25
+	,coalesce( sum( [Oct-25] ), 0 ) as oct_25
+	,coalesce( sum( [Nov-25] ), 0 ) as nov_25
+	,coalesce( sum( [Dec-25] ), 0 ) as dec_25
+	,coalesce( sum( [Jan-26] ), 0 ) as jan_26
+	,coalesce( sum( [Feb-26] ), 0 ) as feb_26
+	,coalesce( sum( [Mar-26] ), 0 ) as mar_26
+	,coalesce( sum( [Apr-26] ), 0 ) as apr_26
+	,coalesce( sum( [May-26] ), 0 ) as may_26
+	,coalesce( sum( [Jun-26] ), 0 ) as jun_26
+	,coalesce( sum( [Jul-26] ), 0 ) as jul_26
+	,coalesce( sum( [Aug-26] ), 0 ) as aug_26
+	,coalesce( sum( [Sep-26] ), 0 ) as sep_26
+	,coalesce( sum( [Oct-26] ), 0 ) as oct_26
+	,coalesce( sum( [Nov-26] ), 0 ) as nov_26
+	,coalesce( sum( [Dec-26] ), 0 ) as dec_26
+	,coalesce( sum( [Jan-27] ), 0 ) as jan_27
+	,coalesce( sum( [Feb-27] ), 0 ) as feb_27
+	,coalesce( sum( [Mar-27] ), 0 ) as mar_27
+	,coalesce( sum( [Apr-27] ), 0 ) as apr_27
+	,coalesce( sum( [May-27] ), 0 ) as may_27
+	,coalesce( sum( [Jun-27] ), 0 ) as jun_27
+	,coalesce( sum( [Jul-27] ), 0 ) as jul_27
+	,coalesce( sum( [Aug-27] ), 0 ) as aug_27
+	,coalesce( sum( [Sep-27] ), 0 ) as sep_27
+	,coalesce( sum( [Oct-27] ), 0 ) as oct_27
+	,coalesce( sum( [Nov-27] ), 0 ) as nov_27
+	,coalesce( sum( [Dec-27] ), 0 ) as dec_27
+	,coalesce( sum( [Jan-28] ), 0 ) as jan_28
+	,coalesce( sum( [Feb-28] ), 0 ) as feb_28
+	,coalesce( sum( [Mar-28] ), 0 ) as mar_28
+	,coalesce( sum( [Apr-28] ), 0 ) as apr_28
+	,coalesce( sum( [May-28] ), 0 ) as may_28
+	,coalesce( sum( [Jun-28] ), 0 ) as jun_28
+	,coalesce( sum( [Jul-28] ), 0 ) as jul_28
+	,coalesce( sum( [Aug-28] ), 0 ) as aug_28
+	,coalesce( sum( [Sep-28] ), 0 ) as sep_28
+	,coalesce( sum( [Oct-28] ), 0 ) as oct_28
+	,coalesce( sum( [Nov-28] ), 0 ) as nov_28
+	,coalesce( sum( [Dec-28] ), 0 ) as dec_28
+	,coalesce( sum( [Jan-29] ), 0 ) as jan_29
+	,coalesce( sum( [Feb-29] ), 0 ) as feb_29
+	,coalesce( sum( [Mar-29] ), 0 ) as mar_29
+	,coalesce( sum( [Apr-29] ), 0 ) as apr_29
+	,coalesce( sum( [May-29] ), 0 ) as may_29
+	,coalesce( sum( [Jun-29] ), 0 ) as jun_29
+	,coalesce( sum( [Jul-29] ), 0 ) as jul_29
+	,coalesce( sum( [Aug-29] ), 0 ) as aug_29
+	,coalesce( sum( [Sep-29] ), 0 ) as sep_29
+	,coalesce( sum( [Oct-29] ), 0 ) as oct_29
+	,coalesce( sum( [Nov-29] ), 0 ) as nov_29
+	,coalesce( sum( [Dec-29] ), 0 ) as dec_29	
+	,coalesce( sum( [Jan-30] ), 0 ) as jan_30
+	,coalesce( sum( [Feb-30] ), 0 ) as feb_30
+	,coalesce( sum( [Mar-30] ), 0 ) as mar_30	
+from
+	( select 
+		 department
+		,teamtrade
+		,replace( teamcode, ' ',  '-' ) as teamcode
+		,case
+			when teamcode = 'HPR CO' then 'CO'
+			when teamcode = 'HPR DD' then 'DD'
+			when teamcode = 'HPR PCC' then 'PCC'
+			when teamcode = 'HPR PS' then 'PS'
+			else 'CI'
+		 end as cpc_code
+		,parentcode
+		,hubgroup
+		,deskrequired
+		,[Jan-20]
+		,[Feb-20]
+		,[Mar-20]
+		,[Apr-20]
+		,[May-20]
+		,[Jun-20]
+		,[Jul-20]
+		,[Aug-20]
+		,[Sep-20]
+		,[Oct-20]
+		,[Nov-20]
+		,[Dec-20]
+		,[Jan-21]
+		,[Feb-21]
+		,[Mar-21]
+		,[Apr-21]
+		,[May-21]
+		,[Jun-21]
+		,[Jul-21]
+		,[Aug-21]
+		,[Sep-21]
+		,[Oct-21]
+		,[Nov-21]
+		,[Dec-21]
+		,[Jan-22]
+		,[Feb-22]
+		,[Mar-22]
+		,[Apr-22]
+		,[May-22]
+		,[Jun-22]
+		,[Jul-22]
+		,[Aug-22]
+		,[Sep-22]
+		,[Oct-22]
+		,[Nov-22]
+		,[Dec-22]
+		,[Jan-23]
+		,[Feb-23]
+		,[Mar-23]
+		,[Apr-23]
+		,[May-23]
+		,[Jun-23]
+		,[Jul-23]
+		,[Aug-23]
+		,[Sep-23]
+		,[Oct-23]
+		,[Nov-23]
+		,[Dec-23]
+		,[Jan-24]
+		,[Feb-24]
+		,[Mar-24]
+		,[Apr-24]
+		,[May-24]
+		,[Jun-24]
+		,[Jul-24]
+		,[Aug-24]
+		,[Sep-24]
+		,[Oct-24]
+		,[Nov-24]
+		,[Dec-24]
+		,[Jan-25]
+		,[Feb-25]
+		,[Mar-25]
+		,[Apr-25]
+		,[May-25]
+		,[Jun-25]
+		,[Jul-25]
+		,[Aug-25]
+		,[Sep-25]
+		,[Oct-25]
+		,[Nov-25]
+		,[Dec-25]
+		,[Jan-26]
+		,[Feb-26]
+		,[Mar-26]
+		,[Apr-26]
+		,[May-26]
+		,[Jun-26]
+		,[Jul-26]
+		,[Aug-26]
+		,[Sep-26]
+		,[Oct-26]
+		,[Nov-26]
+		,[Dec-26]
+		,[Jan-27]
+		,[Feb-27]
+		,[Mar-27]
+		,[Apr-27]
+		,[May-27]
+		,[Jun-27]
+		,[Jul-27]
+		,[Aug-27]
+		,[Sep-27]
+		,[Oct-27]
+		,[Nov-27]
+		,[Dec-27]
+		,[Jan-28]
+		,[Feb-28]
+		,[Mar-28]
+		,[Apr-28]
+		,[May-28]
+		,[Jun-28]
+		,[Jul-28]
+		,[Aug-28]
+		,[Sep-28]
+		,[Oct-28]
+		,[Nov-28]
+		,[Dec-28]
+		,[Jan-29]
+		,[Feb-29]
+		,[Mar-29]
+		,[Apr-29]
+		,[May-29]
+		,[Jun-29]
+		,[Jul-29]
+		,[Aug-29]
+		,[Sep-29]
+		,[Oct-29]
+		,[Nov-29]
+		,[Dec-29]
+		,[Jan-30]
+		,[Feb-30]
+		,[Mar-30]
+	  from stg.stg_PRP_Dept
+	  where 1=1
+		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI' )
+		and teamtrade like 'Total%'
+		) core
+group by cpc_code
+go
+
+
 if object_id('stg.stg_prp_dept_v', 'V') is not null
 	drop view stg.stg_prp_dept_v
 go 
