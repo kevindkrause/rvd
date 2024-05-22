@@ -4222,7 +4222,143 @@ begin
 				else 'Unknown'
 			end
 
-		set @Upd = @Upd + @@rowcount			
+		set @Upd = @Upd + @@rowcount
+
+		-- DELETE CPC LEVEL DATA
+		truncate table dbo.PRP_CPC
+		
+		set @Del = @Del + @@rowcount		
+		
+		-- INSERT CPC LEVEL DATA
+		insert into dbo.PRP_CPC( cpc_code, cal_dt, bed_cnt, pc_code )
+		select cpc_code, cal_dt, bed_cnt, pc_code
+		from (
+			select cpc_code, cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_28', 3 ) +  ' 01 ' + '20' + right( 'mar_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_28', 3 ) +  ' 01 ' + '20' + right( 'dec_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_29', 3 ) +  ' 01 ' + '20' + right( 'mar_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'dec_29', 3 ) +  ' 01 ' + '20' + right( 'dec_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'mar_30', 3 ) +  ' 01 ' + '20' + right( 'mar_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x
+		) core
+
+		set @Ins = @Ins + @@rowcount
 		
 		set @End = getdate()
 
