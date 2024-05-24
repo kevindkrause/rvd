@@ -627,6 +627,20 @@ inner join dbo.cal_dim c
 	and c.cal_dt = c.wk_start_dt
 go
 	
+	
+if object_id('rpt.PRP_CPC_v', 'V') is not null
+	drop view rpt.PRP_CPC_v
+go 
+create view rpt.PRP_CPC_v
+as
+select 
+	 cpc_code
+	,cal_dt as start_dt
+	,eomonth( cal_dt ) as end_dt
+	,bed_cnt
+from dbo.prp_cpc
+go	
+	
 
 if object_id('rpt.User_Permissions_v', 'V') is not null
 	drop view rpt.User_Permissions_v
