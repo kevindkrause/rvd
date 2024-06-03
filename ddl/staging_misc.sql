@@ -794,6 +794,7 @@ from
 		--and teamcode like 'HPR DD%'
 		and ParentCode is not null 
 		and teamtrade not like 'Total%'
+		and teamtrade not like 'Subtotal%'		
 		) core
 group by teamcode
 go

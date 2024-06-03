@@ -4451,6 +4451,63 @@ go
 
 
 /***********************************************************
+**				   BAD DATA CLEANUP
+***********************************************************/
+if object_id('dbo.ETL_Bad_Data_Cleanup_proc') is null
+    exec( 'create procedure dbo.ETL_Bad_Data_Cleanup_proc as set nocount on;' )
+go
+
+alter procedure dbo.ETL_Bad_Data_Cleanup_proc
+as
+begin
+	set nocount on
+	
+	declare 
+		@Table nvarchar(150) = 'Bad Data Cleanup', 
+		@Ins integer = 0,
+		@Upd integer = 0,
+		@Del integer = 0,
+		@Start datetime = getdate(), 
+		@End datetime
+	
+	begin try		
+		-- ORPHANED WORK ASSIGNMENTS
+		update volunteer_dept set end_date = getdate(), active_flag = 'N' where volunteer_dept_key in ( select volunteer_dept_key from dbo.Volunteer_Dept_Orphaned_Records_v )
+		
+		set @Upd = @Upd + @@rowcount
+		
+		-- ORPHANED ENROLLMENTS
+		delete from volunteer_enrollment where volunteer_enrollment_key in ( select volunteer_enrollment_key from dbo.Volunteer_enrollment_Orphaned_Records_v )
+		
+		set @Del = @Del + @@rowcount
+		
+		set @End = getdate()
+
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End
+	end try
+		
+	begin catch
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End,
+			@Status_Code = 'F'
+	end catch		
+end
+go
+
+
+
+/***********************************************************
 **					PARENT - DATA TABLES
 ***********************************************************/
 if object_id('dbo.ETL_data_proc') is null
@@ -4481,5 +4538,6 @@ begin
 	exec dbo.ETL_RVD_Banner_proc
 	exec dbo.ETL_PRP_Data_proc
 	exec dbo.ETL_App_Attributes_Cleanup_proc
+	exec dbo.ETL_Bad_Data_Cleanup_proc
 end
 go
