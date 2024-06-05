@@ -939,7 +939,7 @@ select
 	,coalesce( prp.mar_30, 0 ) as mar_30	
 from dbo.hpr_dept d
 left join stg.stg_prp_dept_v prp
-	on d.pc_code = prp.pc_code
+	on d.pc_code_full = prp.pc_code
 where 1=1
 	and d.active_flag = 'Y'
 	and d.NYC_Flag = 'N'

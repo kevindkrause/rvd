@@ -3938,6 +3938,13 @@ begin
 		@End datetime
 	
 	begin try
+		-- FIX PRP DATA
+		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TE' where teamtrade = 'Site Logistics - Telehandler' 
+		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL CR' where teamtrade = 'Site Logistics - Crane Operator'
+		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL RI' where teamtrade = 'Site Logistics - Rigger'
+		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TC' where teamtrade = 'Site Logistics - Traffic Management'
+		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL BP' where teamtrade = 'Batch Plant'
+
 		-- DELETE BED DATA
 		truncate table dbo.PRP
 		
