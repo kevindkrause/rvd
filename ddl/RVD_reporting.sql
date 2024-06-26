@@ -1122,42 +1122,63 @@ from (
 		and v.room_site_code = 'RMP'
 		and v.volunteer_key not in ( select volunteer_key from rpt.volunteer_rpt_v )
 		
---	union all
+	union all
 	
---	select 
---		 r.volunteer_name
---		,r.volunteer_number as hub_volunteer_num
---		,r.room_site_code as enrollment_1_site_code
---		,v.current_enrollment_code as enrollment_1_code
---		,null as enrollment_1_start_date
---		,null as enrollment_2_site_code
---		,null as enrollment_2_code
---		,null as enrollment_2_start_date
---		,r.Guest_Info + ' - Woodgrove Rooming' as dept_1_parent_dept_name
---		,null as dept_1_dept_name
---		,'' as dept_1_ovsr_name
---		,null as dept_1_temp_flag
---		,null as dept_1_primary_flag
---		,r.First_Night as dept_1_start_date
---		,r.Last_Night as dept_1_end_date
---		,null as dept_2_parent_dept_name
---		,null as dept_2_dept_name
---		,'' as dept_2_ovsr_name
---		,null as dept_2_temp_flag
---		,null as dept_2_primary_flag
---		,null as dept_2_start_date
---		,null as dept_2_end_date
---		,r.room_number as room
---		,v.alt_email as bethel_email
---		,'N' as hpr_flag
---		,5 as work_days		
---		,v.volunteer_key
---	from stg.stg_rooming r
---	left join dbo.volunteer_v v
---		on r.person_id = v.hub_person_id
---	where 1=1
---		and r.type = 'WoodgroveGuestRooming'
---		and not exists ( select 1 from stg.stg_rooming r2 where r2.type = 'Rooming' and r.person_id = r2.person_id )	
+	select 
+		 v.full_name as volunteer_name
+		,v.hub_volunteer_num
+		,v.gender_code
+		,ms.marital_status_code
+		,v.cong_servant_code
+		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
+		,ve1.enrollment_site_code as enrollment_1_site_code
+		,ve1.Enrollment_Code as enrollment_1_code
+		,ve1.Start_Date as enrollment_1_start_date
+		,ve2.enrollment_site_code as enrollment_2_site_code
+		,ve2.Enrollment_Code as enrollment_2_code
+		,ve2.Start_Date as enrollment_2_start_date
+		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
+		,vd1.Dept_Name as dept_1_dept_name
+		,'' as dept_1_ovsr_name
+		,vd1.temp_flag as dept_1_temp_flag
+		,vd1.primary_flag as dept_1_primary_flag
+		,vd1.split_allocation_pct as dept_1_split_allocation_pct
+		,vd1.start_date as dept_1_start_date
+		,vd1.end_date as dept_1_end_date
+		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
+		,vd2.Dept_Name as dept_2_dept_name
+		,'' as dept_1_ovsr_name		
+		,vd2.temp_flag as dept_2_temp_flag
+		,vd2.primary_flag as dept_2_primary_flag
+		,vd2.split_allocation_pct as dept_2_split_allocation_pct
+		,vd2.start_date as dept_2_start_date
+		,vd2.end_date as dept_2_end_date
+		,v.tentative_end_date
+		,v.room
+		,v.alt_Email as bethel_email
+		,'N' as hpr_flag
+		,5 as work_days
+		,v.volunteer_key
+	from dbo.volunteer v
+	inner join dbo.marital_status ms 
+		on v.marital_status_key = ms.marital_status_key	
+	inner join dbo.volunteer_enrollment_rpt ve1
+		on v.volunteer_key = ve1.volunteer_key
+		and ve1.row_num = 1
+	inner join stg.stg_rooming r
+		on r.person_id = v.hub_person_id
+	left join dbo.volunteer_enrollment_rpt ve2
+		on v.volunteer_key = ve2.volunteer_key
+		and ve2.row_num = 2
+	inner join dbo.volunteer_dept_rpt vd1
+		on v.volunteer_key = vd1.volunteer_key
+		and vd1.Row_Num = 1
+	left join dbo.volunteer_dept_rpt vd2
+		on v.volunteer_key = vd2.volunteer_key
+		and vd2.Row_Num = 2
+	where 1=1
+		and r.overnight_guest_category is not null
+		and v.volunteer_key not in ( select volunteer_key from rpt.volunteer_rpt_v )
 	) core
 go
 
@@ -1200,6 +1221,7 @@ select
 	,enrollment_2_site_code
 	,enrollment_2_start_date
 	,enrollment_2_end_date
+	,dept_1_hpr_dept_key
 	,dept_1_hub_dept_id
 	,dept_1_cpc_code
 	,dept_1_parent_dept_name
@@ -1219,6 +1241,7 @@ select
 	,dept_1_fri_flag
 	,dept_1_sat_flag
 	,dept_1_sun_flag
+	,dept_2_hpr_dept_key
 	,dept_2_hub_dept_id
 	,dept_2_cpc_code
 	,dept_2_parent_dept_name
@@ -1269,6 +1292,7 @@ from (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_date as enrollment_2_end_date
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
 		,vd1.hub_dept_id as dept_1_hub_dept_id
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
@@ -1288,6 +1312,7 @@ from (
 		,vd1.fri_flag as dept_1_fri_flag
 		,vd1.sat_flag as dept_1_sat_flag
 		,vd1.sun_flag as dept_1_sun_flag
+		,d2.hpr_dept_key as dept_2_hpr_dept_key
 		,vd2.hub_dept_id as dept_2_hub_dept_id
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
@@ -1383,6 +1408,7 @@ from (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_date as enrollment_2_end_date
+		,d1.hpr_dept_key as dept_1_hpr_dept_key		
 		,vd1.hub_dept_id as dept_1_hub_dept_id
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
@@ -1402,6 +1428,7 @@ from (
 		,vd1.fri_flag as dept_1_fri_flag
 		,vd1.sat_flag as dept_1_sat_flag
 		,vd1.sun_flag as dept_1_sun_flag
+		,d2.hpr_dept_key as dept_2_hpr_dept_key
 		,vd2.hub_dept_id as dept_2_hub_dept_id
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
