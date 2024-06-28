@@ -469,7 +469,61 @@ begin
 		where active_flag = 'Y'
 			and cong_number not in ( select cong_number from stg.stg_cong )
 
-		set @Upd = @Upd + @@rowcount	
+		set @Upd = @Upd + @@rowcount
+		
+		-- CONGREGATION ACTIVITY / EVENTS
+		-- DELETE
+		delete from dbo.cong_activity
+		
+		set @Del = @Del + @@rowcount;
+		
+		with co as (
+			select c.cong_key, c.cong_number, 'CO Visit' as event_type, cast( co.[Event Start] as date ) as start_dt, cast( co.[Event End] as date ) as end_dt
+			from dbo.cong c
+			inner join stg.stg_Cong_CO_Visit co
+				on c.Cong_Number = co.[Congregation Group Number] ),
+
+		conv as (
+			select c.cong_key, c.cong_number, 'Convention' as event_type, cast( conv.[Start Date] as date ) as start_dt, cast( conv.[End Date] as date ) as end_dt
+			from dbo.cong c
+			inner join stg.[stg_Cong_Convention] conv
+				on c.Cong_Number = conv.[Cong Num] ),
+
+		ca as (
+			select c.cong_key, c.cong_number, case when ca.[Event Type Desc] = 'Circuit Assembly with Branch Representative' then 'CA-BR' else 'CA-CO' end as event_type, cast( ca.[Event Start] as date ) as start_dt, cast( ca.[Event End] as date ) as end_dt
+			from dbo.cong c
+			inner join stg.[stg_Cong_CA] ca
+				on substring( c.circuit, 1, charindex( '-', c.circuit ) - 1 ) + '-' + trim( substring( c.circuit, charindex( '-', c.circuit ) + 1, 2 ) ) = ca.Circuit ),	
+
+		base as (
+			select * from co
+			union all
+			select * from conv
+			union all
+			select * from ca )
+
+		insert into dbo.cong_activity(
+			 cong_key
+			,cong_number
+			,activity_code
+			,activity_desc
+			,start_date
+			,end_date )
+		select 
+			 cong_key
+			,cong_number
+			,event_type as activity_code
+			,case 
+				when event_type = 'CO Visit' then 'Circuit Overseer Visit'
+				when event_type = 'Convention' then 'Regional Convention'
+				when event_type = 'CA-BR' then 'Circuit Assembly with Branch Representative'
+				when event_type = 'CA-CO' then 'Circuit Assembly with Circuit Overseer'
+			 end as activity_desc
+			,start_dt as start_date
+			,end_dt as end_date
+		from base
+		
+		set @Ins = @Ins + @@rowcount		
 
 		set @End = getdate()
 
