@@ -245,6 +245,145 @@ from
 go
 
 
+if object_id('rpt.BA_Event_Invite_v', 'V') is not null
+	drop view rpt.BA_Event_Invite_v
+go 
+create view rpt.BA_Event_Invite_v
+as
+select 
+	 volunteer_name
+	,ba_volunteer_num
+	,event_name
+	,event_id
+	,start_date
+	,start_dow
+	,num_days
+	,dateadd( day, num_days - 1, start_date ) as end_date
+	,case 
+		when start_dow = 'Mon' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Sun' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Sat' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Fri' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Thu' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Wed' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Tue' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as mon
+	,case 
+		when start_dow = 'Tue' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Mon' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Sun' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Sat' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Fri' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Thu' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Wed' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as tue
+	,case 
+		when start_dow = 'Wed' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Tue' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Mon' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Sun' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Sat' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Fri' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Thu' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as wed
+	,case 
+		when start_dow = 'Thu' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Wed' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Tue' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Mon' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Sun' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Sat' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Fri' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as thu
+	,case 
+		when start_dow = 'Fri' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Thu' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Wed' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Tue' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Mon' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Sun' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Sat' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as fri
+	,case 
+		when start_dow = 'Sat' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Fri' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Thu' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Wed' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Tue' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Mon' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Sun' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as sat
+	,case 
+		when start_dow = 'Sun' and status_day_1 = 'C' then 'Y'
+		when start_dow = 'Sat' and status_day_2 = 'C' then 'Y'
+		when start_dow = 'Fri' and status_day_3 = 'C' then 'Y'
+		when start_dow = 'Thu' and status_day_4 = 'C' then 'Y'
+		when start_dow = 'Wed' and status_day_5 = 'C' then 'Y'
+		when start_dow = 'Tue' and status_day_6 = 'C' then 'Y'
+		when start_dow = 'Mon' and status_day_7 = 'C' then 'Y'
+		else '' 
+	 end as sun
+	,comments
+	,case
+		when   status_day_1 = 'C'
+			or status_day_2 = 'C'
+			or status_day_3 = 'C'
+			or status_day_4 = 'C'
+			or status_day_5 = 'C'
+			or status_day_6 = 'C'
+			or status_day_7 = 'C' then 'Y' 
+		else 'N' 
+	 end as confirmed_flag
+from 
+	( select 
+		 v.full_Name as volunteer_name
+		,v.ba_volunteer_num
+		,ba.event_name
+		,ba.event_id
+		,convert( date, ba.start_date ) as start_date
+		,format( ba.start_date, 'ddd' ) as start_dow
+		,( case when ba.status_day_1 = '-' then 0 else 1 end +
+		   case when ba.status_day_2 = '-' then 0 else 1 end +
+		   case when ba.status_day_3 = '-' then 0 else 1 end +
+		   case when ba.status_day_4 = '-' then 0 else 1 end +
+		   case when ba.status_day_5 = '-' then 0 else 1 end +
+		   case when ba.status_day_6 = '-' then 0 else 1 end +
+		   case when ba.status_day_7 = '-' then 0 else 1 end ) as num_days
+		,ba.status_day_1
+		,ba.status_day_2
+		,ba.status_day_3
+		,ba.status_day_4
+		,ba.status_day_5
+		,ba.status_day_6
+		,ba.status_day_7
+		,ba.comments
+	  from dbo.ba_event_volunteer_invite ba
+	  inner join dbo.volunteer v
+		on ba.person_guid = v.hub_person_guid
+	  where 1=1
+		and start_date >= 1 + dateadd( week, datediff( week, 0, getdate() ), -42 )	  
+		--and (    start_date = 1 + dateadd( week, datediff( week, 0, getdate() ), -1 ) -- CURRENT WK
+		--	  or start_date = 1 + dateadd( week, datediff( week, 0, getdate() ), -8 ) -- PRIOR WK
+		--	  or start_date >= dateadd( week, datediff( week, 0, getdate() ), 7 ) 	  -- NEXT WK		  
+		--	)
+		and (
+				 event_name like 'HPR - %'
+			  or event_name like 'HPR – %' -- long dash				 
+			  or event_name like 'HPR-%'			 
+			  or event_name like 'Tuxedo %'
+			  or event_name like 'Ramapo %'		  
+			)
+	
+	) x
+go
+
+
 if object_id('rpt.Cong_v', 'V') is not null
 	drop view rpt.Cong_v
 go 
@@ -640,6 +779,106 @@ select
 	,bed_cnt
 from dbo.prp_cpc
 go	
+
+
+if object_id('rpt.Resource_Plan_Dept_v', 'V') is not null
+	drop view rpt.Resource_Plan_Dept_v
+go 
+create view rpt.Resource_Plan_Dept_v
+as
+with project_beds as (
+	select 
+		'Project Beds' as prp_type
+		,c.cal_dt
+		,sum( case when reporting_category like 'Bed Capacity%' then bed_cnt else 0 end ) as project_available_bed_cnt
+		,sum( case when reporting_category = 'Bed Space Required Total' then bed_cnt else 0 end ) as project_required_bed_cnt
+		,sum( case when reporting_category = 'Commuter Forecast' then bed_cnt else 0 end ) as project_commuter_forecast_cnt
+	from rpt.PRP_Bed_Space_v b
+	inner join dbo.cal_dim c
+		on c.cal_dt between b.cal_dt and dateadd(dd, 6-(datepart( dw, b.cal_dt ) -1 ), b.cal_dt ) 
+	group by c.cal_dt ),
+
+cpc_beds as (
+	select 'CPC Beds' as prp_type, c.cal_dt, p.cpc_code, '' as PC_Code, p.bed_cnt as cpc_bed_cnt
+	from rpt.PRP_CPC_v p
+	inner join dbo.cal_dim c
+		on c.cal_dt between p.start_dt and p.end_dt ),
+
+dept_beds as (
+	select 'Dept Beds' as prp_type, p.hpr_dept_key, c.cal_dt, p.cpc_code, p.bed_cnt as dept_avail_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+		case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
+	from rpt.PRP_v p
+	inner join dbo.cal_dim c
+		on c.cal_dt between p.cal_dt and dateadd(dd, 6-(datepart( dw, p.cal_dt ) -1 ), p.cal_dt )
+	inner join dbo.hpr_dept d
+		on p.hpr_dept_key = d.hpr_dept_key
+		and d.active_flag = 'Y' ),
+
+dept_req_base as (
+	select a.hpr_dept_key, c.cal_dt, count(*) as requested_bed_cnt
+	from dbo.dept_asgn_v a
+	inner join dbo.cal_dim c
+		on c.cal_dt between a.ps_start_date and coalesce( a.ps_end_date, '2031-12-31' )
+	where a.active_flag = 'Y'
+		and a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+	group by a.hpr_dept_key, c.cal_dt ),
+
+dept_req as (
+	select 'Dept Beds' as prp_type, a.hpr_dept_key, a.cal_dt, d.cpc_code, a.requested_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+		case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
+	from dept_req_base a
+	inner join dbo.hpr_dept d
+		on a.hpr_dept_key = d.hpr_dept_key
+		and d.active_flag = 'Y' ),
+
+dept_used_base as (
+	select hpr_dept_key, cal_dt, count( distinct volunteer_key ) as used_bed_cnt
+	from rpt.CVC_v
+	where used_bed_cnt <> 0
+	group by hpr_dept_key, cal_dt ),
+
+
+dept_used as (
+	select 'Dept Beds' as prp_type, u.hpr_dept_key, u.cal_dt, d.cpc_code, u.used_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+		case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
+	from dept_used_base u
+	inner join dbo.hpr_dept d
+		on u.hpr_dept_key = d.hpr_dept_key
+		and d.active_flag = 'Y' ),
+
+dept_avail as (
+	select 'Dept Beds' as prp_type, p.hpr_dept_key, c.cal_dt, p.cpc_code, p.bed_cnt as dept_avail_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+			case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
+		from rpt.PRP_v p
+		inner join dbo.cal_dim c
+			on c.cal_dt between p.cal_dt and dateadd(dd, 6-(datepart( dw, p.cal_dt ) -1 ), p.cal_dt )
+		inner join dbo.hpr_dept d
+			on p.hpr_dept_key = d.hpr_dept_key
+			and d.active_flag = 'Y' ),
+
+final as (
+	select prp_type, 'Available' as prp_subtype, cal_dt, null as cpc_code, null as hpr_dept_key, null as dept_name, null as dept_level, project_available_bed_cnt as bed_cnt from project_beds
+	union all
+	select prp_type, 'Required' as prp_subtype, cal_dt, null as cpc_code, null as hpr_dept_key, null as dept_name, null as dept_level, project_required_bed_cnt as bed_cnt from project_beds
+	union all
+	select prp_type, 'Commuter Forecast' as prp_subtype, cal_dt, null as cpc_code, null as hpr_dept_key, null as dept_name, null as dept_level, project_commuter_forecast_cnt as bed_cnt from project_beds
+	union all
+	select prp_type, 'Approved' as prp_subtype, cal_dt, cpc_code, null as hpr_dept_key, null as dept_name, null as dept_level, cpc_bed_cnt as bed_cnt from cpc_beds
+	union all
+	select prp_type, 'Available' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, dept_avail_bed_cnt as bed_cnt from dept_beds 
+	union all
+	select prp_type, 'Requested' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, requested_bed_cnt as bed_cnt from dept_req
+	union all
+	select prp_type, 'Used' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, used_bed_cnt as bed_cnt from dept_used 
+	)
+
+select *
+from final
+where 1=1
+	--and cal_dt = '2024-06-30' 
+	--and cpc_code = 'PS'
+--order by cal_dt, prp_type, prp_subtype, cpc_code, dept_name
+go
 	
 
 if object_id('rpt.User_Permissions_v', 'V') is not null

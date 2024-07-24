@@ -1654,11 +1654,32 @@ begin
 
 	begin try	
 		-- DELETE
-	 	delete from dbo.volunteer_dept 
-		where exists ( select 1 from stg.stg_person_dept_history p where volunteer_dept.person_id = p.person_id and volunteer_dept.start_date = p.start_date )
-			and split_allocation_pct is null -- A BETTER OPTION IS WRITE THIS TO TEMP TABLE AND THEN UPDATE AFTER INSERT
+	 	--delete from dbo.volunteer_dept 
+		--where exists ( select 1 from stg.stg_person_dept_history p where volunteer_dept.person_id = p.person_id and volunteer_dept.start_date = p.start_date )
+		--	and split_allocation_pct is null -- A BETTER OPTION IS WRITE THIS TO TEMP TABLE AND THEN UPDATE AFTER INSERT
 		
-		set @Del = @@rowcount	
+		--set @Del = @@rowcount		
+
+		-- UPDATE
+		update dbo.volunteer_dept
+		set 
+			end_date = src.end_date,
+			update_date = getdate()
+		from dbo.volunteer_dept tgt
+		inner join stg.stg_person_dept_history src
+			on tgt.person_id = src.person_id
+			and coalesce( tgt.site_code, 'x' ) = coalesce( src.site_code, 'x' )
+			and tgt.parent_dept_name = src.parent_department_name
+			and tgt.dept_name = src.department_name
+			and tgt.temp_flag = case when src.temporary_flag = 1 then 'Y' else 'N' end
+			and tgt.primary_flag = case when src.primary_flag = 1 then 'Y' else 'N' end
+			and coalesce( tgt.enrollment_code, 'x' ) = coalesce( src.effective_enrollment_code, 'x' )
+			and coalesce( tgt.dept_role, 'x' ) = coalesce( src.role, 'x' )			
+			and tgt.start_date = src.start_date
+			and coalesce( tgt.notes, 'x' ) = coalesce( src.notes, 'x' )
+		where coalesce( tgt.end_date, '2999-12-31' ) <> coalesce( src.end_date, '2999-12-31' )
+
+		set @Upd = @@rowcount		
 	
 		-- INSERT
 		insert into dbo.volunteer_dept( 
@@ -1712,27 +1733,6 @@ begin
 				and coalesce( vd.notes, 'x' ) = coalesce( d.notes, 'x' ) )
 
 		set @Ins = @@rowcount
-
-		-- UPDATE
-		update dbo.volunteer_dept
-		set 
-			end_date = src.end_date,
-			update_date = getdate()
-		from dbo.volunteer_dept tgt
-		inner join stg.stg_person_dept_history src
-			on tgt.person_id = src.person_id
-			and coalesce( tgt.site_code, 'x' ) = coalesce( src.site_code, 'x' )
-			and tgt.parent_dept_name = src.parent_department_name
-			and tgt.dept_name = src.department_name
-			and tgt.temp_flag = case when src.temporary_flag = 1 then 'Y' else 'N' end
-			and tgt.primary_flag = case when src.primary_flag = 1 then 'Y' else 'N' end
-			and coalesce( tgt.enrollment_code, 'x' ) = coalesce( src.effective_enrollment_code, 'x' )
-			and coalesce( tgt.dept_role, 'x' ) = coalesce( src.role, 'x' )			
-			and tgt.start_date = src.start_date
-			and coalesce( tgt.notes, 'x' ) = coalesce( src.notes, 'x' )
-		where coalesce( tgt.end_date, '2999-12-31' ) <> coalesce( src.end_date, '2999-12-31' )
-
-		set @Upd = @@rowcount
 
 		-- UPDATE - FLAG
 		update dbo.volunteer_dept
