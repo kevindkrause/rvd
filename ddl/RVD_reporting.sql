@@ -585,6 +585,7 @@ from dbo.hpr_dept
 where 1=1
 	and active_flag = 'Y' 
 	and nyc_flag = 'N'
+	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI' ) 
 go
 
 
@@ -690,9 +691,11 @@ select
 	,enrollment_1_site_code
 	,enrollment_1_code
 	,enrollment_1_start_date
+	,enrollment_1_end_date
 	,enrollment_2_site_code
 	,enrollment_2_code
 	,enrollment_2_start_date
+	,enrollment_2_end_date
 	,dept_1_parent_dept_name
 	,dept_1_dept_name
 	,dept_1_ovsr_name
@@ -1229,9 +1232,11 @@ select
 	,enrollment_1_site_code
 	,enrollment_1_code
 	,enrollment_1_start_date
+	,coalesce( convert( varchar, enrollment_1_end_date, 23 ), '' ) as enrollment_1_end_date
 	,coalesce( enrollment_2_site_code, '' ) as enrollment_2_site_code
 	,coalesce( enrollment_2_code, '' ) as enrollment_2_code
 	,coalesce( convert( varchar, enrollment_2_start_date, 23 ), '' ) as enrollment_2_start_date
+	,coalesce( convert( varchar, enrollment_2_end_date, 23 ), '' ) as enrollment_2_end_date
 	,case 
 		when dept_1_parent_dept_name like '%Committee' then dept_1_dept_name
 		else dept_1_parent_dept_name
@@ -1271,9 +1276,11 @@ from (
 		,enrollment_1_site_code
 		,enrollment_1_code
 		,enrollment_1_start_date
+		,enrollment_1_end_date
 		,enrollment_2_site_code
 		,enrollment_2_code
 		,enrollment_2_start_date
+		,enrollment_2_end_date
 		,dept_1_parent_dept_name
 		,dept_1_dept_name
 		,dept_1_ovsr_name
@@ -1317,9 +1324,11 @@ from (
 		,ve1.enrollment_site_code as enrollment_1_site_code
 		,ve1.Enrollment_Code as enrollment_1_code
 		,ve1.Start_Date as enrollment_1_start_date
+		,ve1.End_Date as enrollment_1_end_date
 		,ve2.enrollment_site_code as enrollment_2_site_code
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
+		,ve2.end_date as enrollment_2_end_date
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
 		,'' as dept_1_ovsr_name
@@ -1373,9 +1382,11 @@ from (
 		,ve1.enrollment_site_code as enrollment_1_site_code
 		,ve1.Enrollment_Code as enrollment_1_code
 		,ve1.Start_Date as enrollment_1_start_date
+		,ve1.end_Date as enrollment_1_end_date
 		,ve2.enrollment_site_code as enrollment_2_site_code
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
+		,ve2.end_Date as enrollment_2_end_date
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
 		,'' as dept_1_ovsr_name

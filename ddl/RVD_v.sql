@@ -150,6 +150,7 @@ select
 	,da.ps_end_date
 	,datediff( month, ps_start_date, coalesce( ps_end_date, '2027-12-31' ) ) as duration_in_months
 	,da.ps_notes
+	,da.job_description
 	,da.invite_chart_comments
 	,ms.marital_status_code
 	,v.cong_servant_code
@@ -167,6 +168,29 @@ select
 	,da.enrollment_key
 	,da.dept_asgn_status_key	
 	,da.volunteer_key
+	,da.Job_Description
+	,da.Num_Weeks
+	,da.Num_Months
+	,da.Until_Not_Needed
+	,da.Short_Term_OK
+	,da.Trade_To_Qualify
+	,da.Candidate_1_Vol_key
+	,da.Candidate_2_Vol_key
+	,da.Candidate_3_Vol_key
+	,da.Quantity_To_Replicate
+	,da.Multiple_Record_Number
+	,da.Current_Sync_Status
+	,da.HPR_Dept_Role_Sharepoint_Key
+	,da.HPR_Dept_Sharepoint_Key
+	,da.HPR_Crew_Sharepoint_Key
+	,da.ID_SP
+	,das.Sort_Trade_Request
+	,CASE 
+		WHEN [Dept_Asgn_Status_Code] IN ('PLANNING', 'REQUESTED', 'PROSPECTS') THEN 1 
+		WHEN [Dept_Asgn_Status_Code] IN ('PROCESSING', 'RELEASED') THEN 2 
+		WHEN [Dept_Asgn_Status_Code] IN ('ARRIVED') THEN 3 
+		ELSE 4 
+	END AS Dept_Asgn_Status_SortOrder
 from dbo.dept_asgn da
 inner join dbo.hpr_dept d
 	on da.hpr_dept_key = d.hpr_dept_key
@@ -227,6 +251,7 @@ select
 	,dr.ps_start_date
 	,dr.ps_end_date
 	,dr.ps_notes
+	,dr.job_description
 	,dr.active_flag
 	,dr.test_data_flag
 	,dr.sync_data_flag
@@ -237,6 +262,21 @@ select
 	,dr.Full_Name
 	,dr.marital_status_code
 	,dr.cong_servant_code
+	,dr.Job_Description
+	,dr.Num_Weeks
+	,dr.Num_Months
+	,dr.Until_Not_Needed
+	,dr.Short_Term_OK
+	,dr.Trade_To_Qualify
+	,dr.Candidate_1_Vol_Key
+	,dr.Candidate_2_Vol_Key
+	,dr.Candidate_3_Vol_Key
+	,dr.Quantity_To_Replicate
+	,dr.Multiple_Record_Number
+	,dr.Sort_Trade_Request
+	,u.VTC_Level_03
+	,u.VTC_CPC_Code
+	,dr.Dept_Asgn_Status_SortOrder
 from dbo.Dept_asgn_v dr
 inner join dbo.[User] u
 	on dr.cpc_code = u.VTC_CPC_Code
@@ -1303,6 +1343,7 @@ select
 	,v.tcg_contact_notes
 	,v.vol_desk_notes
 	,v.trade_ovsr_notes
+	,cong.cong_key
 	,cong.cong_number
 	,cast( cong.cong_number as varchar(10) ) as cong_number_str
 	,cong.cong_fullname as cong_name
