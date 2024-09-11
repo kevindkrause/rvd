@@ -1654,21 +1654,60 @@ begin
 
 	begin try	
 		-- DELETE
-	 	--delete from dbo.volunteer_dept 
-		--where exists ( select 1 from stg.stg_person_dept_history p where volunteer_dept.person_id = p.person_id and volunteer_dept.start_date = p.start_date )
-		--	and split_allocation_pct is null -- A BETTER OPTION IS WRITE THIS TO TEMP TABLE AND THEN UPDATE AFTER INSERT
+		if object_id('stg.tmp_vol_dept', 'U') is not null
+			drop table stg.tmp_vol_dept
+
+		if object_id('stg.tmp_vol_dept_rvd', 'U') is not null
+			drop table stg.tmp_vol_dept_rvd;
+
+		-- GET RECORDCOUNT AND MINIMUM DATE FROM HUB FEED FOR A PERSON
+		-- COMPARE TO WHAT EXISTS IN RVD
+		with src as (
+			select person_id, min(start_date) as min_dt, count(*) as cnt
+			from stg.stg_Person_Dept_History
+			--where person_id = 46057
+			group by person_id ),
+
+		rvd as (
+			select vd.person_id, count(*) as rvd_cnt, max( src.cnt ) as src_cnt, max( src.min_dt ) as src_dt
+			from dbo.Volunteer_Dept vd
+			inner join src 
+				on vd.Person_ID = src.Person_ID
+				and vd.Start_Date >= src.min_dt
+			--where vd.person_id = 46057
+			group by vd.person_id )
+
+		select *
+		into stg.tmp_vol_dept
+		from rvd
+		where rvd_cnt != src_cnt 
+
+		--select * from stg.tmp_vol_dept
+
+		select vd.*
+		into stg.tmp_vol_dept_rvd
+		from dbo.Volunteer_Dept vd
+		inner join stg.tmp_vol_dept tmp 
+			on vd.person_id = tmp.person_id 
+			and vd.start_date >= tmp.src_dt 
+
+		--select count(*) from stg.tmp_vol_dept_rvd
+
+		delete from dbo.volunteer_dept
+		where volunteer_dept_key in ( select volunteer_dept_key from stg.tmp_vol_dept_rvd )
 		
-		--set @Del = @@rowcount		
+		set @Del = @@rowcount		
 
 		-- UPDATE
 		update dbo.volunteer_dept
 		set 
+			site_code = src.site_code,
 			end_date = src.end_date,
 			update_date = getdate()
 		from dbo.volunteer_dept tgt
 		inner join stg.stg_person_dept_history src
 			on tgt.person_id = src.person_id
-			and coalesce( tgt.site_code, 'x' ) = coalesce( src.site_code, 'x' )
+			--and coalesce( tgt.site_code, 'x' ) = coalesce( src.site_code, 'x' )
 			and tgt.parent_dept_name = src.parent_department_name
 			and tgt.dept_name = src.department_name
 			and tgt.temp_flag = case when src.temporary_flag = 1 then 'Y' else 'N' end
@@ -2340,6 +2379,52 @@ begin
 		@End datetime
 
 	begin try	
+		-- GET RECORDCOUNT AND MINIMUM DATE FROM HUB FEED FOR A PERSON
+		-- COMPARE TO WHAT EXISTS IN RVD	
+		if object_id('stg.tmp_vol_enrl', 'U') is not null
+			drop table stg.tmp_vol_enrl;
+		
+		if object_id('stg.tmp_vol_enrl_rvd', 'U') is not null
+			drop table stg.tmp_vol_enrl_rvd;
+		
+		with src as (
+			select person_id, min(start_date) as min_dt, count(*) as cnt
+			from stg.stg_person_enrollment
+			--where person_id = 545801
+			group by person_id ),
+
+		rvd as (
+			select ve.hub_Person_ID as person_id, count(*) as rvd_cnt, max( src.cnt ) as src_cnt, max( src.min_dt ) as src_dt
+			from dbo.Volunteer_enrollment_v ve
+			inner join src 
+				on ve.hub_Person_ID = src.Person_ID
+				and ve.Start_Date >= src.min_dt
+			where 1=1
+				and ( ve.end_date is null or ve.end_date > getdate() )
+				and ve.enrollment_key not in ( 137, 138 )
+				--and ve.hub_Person_ID = 545801
+			group by ve.hub_Person_ID )
+
+		select *
+		into stg.tmp_vol_enrl
+		from rvd
+		where rvd_cnt != src_cnt 
+
+		select ve.*
+		into stg.tmp_vol_enrl_rvd
+		from dbo.Volunteer_enrollment_v ve
+		inner join stg.tmp_vol_enrl tmp 
+			on ve.hub_Person_ID = tmp.person_id 
+			and ( ve.end_date is null or ve.end_date > getdate() )
+			and ve.enrollment_key not in ( 137, 138 )
+			and ve.start_date >= tmp.src_dt 
+
+		delete
+		from dbo.volunteer_enrollment
+			where volunteer_enrollment_key in ( select volunteer_enrollment_key from stg.tmp_vol_enrl_rvd )
+
+		set @Del = @@rowcount	
+	
 		-- INSERT
 		insert into dbo.volunteer_enrollment( 
 			 volunteer_key
@@ -2674,7 +2759,7 @@ begin
 			,end_date
 			,row_num
 		from 
-			( -- MOST RECENT START DATE NOT IN FUTURE
+			( -- MOST RECENT START DATE NOT IN FUTURE  NEW LOGIC = OLDEST ACTIVE START DATE
 			  select *
 			  from 
 				( select 
@@ -2685,7 +2770,7 @@ begin
 					,ve.Site_Code as enrollment_site_code
 					,ve.start_date
 					,ve.end_date
-					,row_number() over( partition by ve.volunteer_key order by ve.start_date desc ) as row_num
+					,row_number() over( partition by ve.volunteer_key order by ve.start_date ) as row_num
 				  from dbo.volunteer_enrollment ve
 				  inner join dbo.enrollment e
 					on ve.Enrollment_Key = e.Enrollment_Key

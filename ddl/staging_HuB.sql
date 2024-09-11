@@ -324,7 +324,7 @@ create table stg.stg_Person_Role(
        Person_GUID   uniqueidentifier		not null, 
        Person_ID     integer       			not null, 
        Role_Code     nvarchar(20), 
-       Role_Data     nvarchar(50), 
+       Role_Data     nvarchar(100), 
        Start_Date    datetime, 
        End_Date      datetime, 
        Load_Date     datetime      			not null default getdate() )
