@@ -1773,7 +1773,7 @@ begin
 
 		set @Ins = @@rowcount
 
-		-- UPDATE - FLAG
+		-- UPDATE - FLAG INACTIVE
 		update dbo.volunteer_dept
 		set 
 			active_flag = 'N',
@@ -1782,6 +1782,16 @@ begin
 			and getdate() > coalesce( end_date, '2999-12-31' )
 
 		set @Upd = @Upd + @@rowcount	
+		
+		-- UPDATE - FLAG ACTIVE
+		update dbo.volunteer_dept
+		set 
+			active_flag = 'Y',
+			update_date = getdate()
+		where active_flag = 'N'
+			and ( end_date is null or end_date > getdate() )
+
+		set @Upd = @Upd + @@rowcount			
 
 		-- UPDATE - WORKDAYS FOR COMMUTERS
 		update dbo.volunteer_dept
@@ -2831,7 +2841,7 @@ begin
 					,ve.Site_Code as enrollment_site_code
 					,ve.start_date
 					,ve.end_date
-					,row_number() over( partition by ve.volunteer_key order by ve.start_date desc ) as row_num
+					,row_number() over( partition by ve.volunteer_key order by ve.start_date ) as row_num
 				  from dbo.volunteer_enrollment ve
 				  inner join dbo.enrollment e
 					on ve.Enrollment_Key = e.Enrollment_Key
