@@ -232,6 +232,7 @@ select
 	,coalesce( [Jan-30], 0 ) as jan_30
 	,coalesce( [Feb-30], 0 ) as feb_30
 	,coalesce( [Mar-30], 0 ) as mar_30
+	,coalesce( [Apr-30], 0 ) as apr_30
 from stg.stg_PRP_Dept
 where 1=1
 	and (
@@ -380,6 +381,7 @@ select
 	,coalesce( sum( [Jan-30] ), 0 ) as jan_30
 	,coalesce( sum( [Feb-30] ), 0 ) as feb_30
 	,coalesce( sum( [Mar-30] ), 0 ) as mar_30	
+	,coalesce( sum( [Apr-30] ), 0 ) as apr_30		
 from
 	( select 
 		 department
@@ -519,6 +521,7 @@ from
 		,[Jan-30]
 		,[Feb-30]
 		,[Mar-30]
+		,[Apr-30]
 	  from stg.stg_PRP_Dept
 	  where 1=1
 		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR HQ', 'HPR PU' )
@@ -659,6 +662,7 @@ select
 	,coalesce( sum( [Jan-30] ), 0 ) as jan_30
 	,coalesce( sum( [Feb-30] ), 0 ) as feb_30
 	,coalesce( sum( [Mar-30] ), 0 ) as mar_30	
+	,coalesce( sum( [Apr-30] ), 0 ) as apr_30		
 from
 	( select 
 		 department
@@ -790,6 +794,7 @@ from
 		,[Jan-30]
 		,[Feb-30]
 		,[Mar-30]
+		,[Apr-30]
 	  from stg.stg_PRP_Dept
 	  where 1=1
 		--and teamcode like 'HPR DD%'
@@ -937,7 +942,8 @@ select
 	,coalesce( prp.dec_29, 0 ) as dec_29	
 	,coalesce( prp.jan_30, 0 ) as jan_30
 	,coalesce( prp.feb_30, 0 ) as feb_30
-	,coalesce( prp.mar_30, 0 ) as mar_30	
+	,coalesce( prp.mar_30, 0 ) as mar_30
+	,coalesce( prp.apr_30, 0 ) as apr_30	
 from dbo.hpr_dept d
 left join stg.stg_prp_dept_v prp
 	on d.pc_code_full = prp.pc_code
