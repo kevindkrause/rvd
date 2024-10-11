@@ -184,13 +184,22 @@ select
 	,da.HPR_Dept_Sharepoint_Key
 	,da.HPR_Crew_Sharepoint_Key
 	,da.ID_SP
-	,das.Sort_Trade_Request
+	,CASE WHEN isnull([das.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [das.Sort_Trade_Request] END AS Sort_Trade_Request
 	,CASE 
 		WHEN [Dept_Asgn_Status_Code] IN ('PLANNING', 'REQUESTED', 'PROSPECTS') THEN 1 
 		WHEN [Dept_Asgn_Status_Code] IN ('PROCESSING', 'RELEASED') THEN 2 
 		WHEN [Dept_Asgn_Status_Code] IN ('ARRIVED') THEN 3 
 		ELSE 4 
-	END AS Dept_Asgn_Status_SortOrder
+	 END AS Dept_Asgn_Status_SortOrder
+	,da.Candidate_1_Vol_key
+	,da.Candidate_2_Vol_key
+	,da.Candidate_3_Vol_key
+	,da.Quantity_To_Replicate
+	,da.Multiple_Record_Number
+	,da.Candidate_1_Next_Step
+	,da.Candidate_2_Next_Step
+	,da.Candidate_3_Next_Step
+	,da.Possible_Sister	
 from dbo.dept_asgn da
 inner join dbo.hpr_dept d
 	on da.hpr_dept_key = d.hpr_dept_key
@@ -259,6 +268,7 @@ select
 	,dr.update_date
 	,u.user_key
 	,u.vtc_level_02	
+	,u.VTC_Level_03	
 	,dr.Full_Name
 	,dr.marital_status_code
 	,dr.cong_servant_code
@@ -273,10 +283,15 @@ select
 	,dr.Candidate_3_Vol_Key
 	,dr.Quantity_To_Replicate
 	,dr.Multiple_Record_Number
-	,dr.Sort_Trade_Request
-	,u.VTC_Level_03
+	,CASE WHEN isnull([dr.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [dr.Sort_Trade_Request] END AS Sort_Trade_Request, 
 	,u.VTC_CPC_Code
 	,dr.Dept_Asgn_Status_SortOrder
+	,dr.Quantity_To_Replicate
+	,dr.Multiple_Record_Number
+	,dr.Candidate_1_Next_Step
+	,dr.Candidate_2_Next_Step
+	,dr.Candidate_3_Next_Step
+	,dr.Possible_Sister	
 from dbo.Dept_asgn_v dr
 inner join dbo.[User] u
 	on dr.cpc_code = u.VTC_CPC_Code
