@@ -185,12 +185,6 @@ select
 	,da.HPR_Crew_Sharepoint_Key
 	,da.ID_SP
 	,CASE WHEN isnull([das.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [das.Sort_Trade_Request] END AS Sort_Trade_Request
-	,CASE 
-		WHEN [Dept_Asgn_Status_Code] IN ('PLANNING', 'REQUESTED', 'PROSPECTS') THEN 1 
-		WHEN [Dept_Asgn_Status_Code] IN ('PROCESSING', 'RELEASED') THEN 2 
-		WHEN [Dept_Asgn_Status_Code] IN ('ARRIVED') THEN 3 
-		ELSE 4 
-	 END AS Dept_Asgn_Status_SortOrder
 	,da.Candidate_1_Vol_key
 	,da.Candidate_2_Vol_key
 	,da.Candidate_3_Vol_key
@@ -285,7 +279,6 @@ select
 	,dr.Multiple_Record_Number
 	,CASE WHEN isnull([dr.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [dr.Sort_Trade_Request] END AS Sort_Trade_Request, 
 	,u.VTC_CPC_Code
-	,dr.Dept_Asgn_Status_SortOrder
 	,dr.Quantity_To_Replicate
 	,dr.Multiple_Record_Number
 	,dr.Candidate_1_Next_Step
