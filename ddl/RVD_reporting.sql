@@ -2056,21 +2056,26 @@ go
 create view rpt.Volunteer_Training_v
 as
 select  
-	 volunteer_name
-	,parent_dept_name
-	,dept_name
+	 v.hub_volunteer_num as volunteer_number
+	,v.volunteer_name
+	,v.bethel_email
+	,v.parent_dept_code
+	,v.parent_dept_name
+	,v.dept_name
+	,v.enrollment_code
+	,v.enrollment_start_date
+	,v.enrollment_end_date
+	,t.class_number
+	,t.class_name
+	,t.host_branch_code	
 	,t.course_type
 	,t.course_name
 	,t.course_desc
-	,t.class_number
-	,t.class_name	
-	,t.host_branch_code	
 	,t.assign_date
 	,t.complete_date
 	,t.attendance_status	
 	,t.active_flag
 	,v.volunteer_key
-	,v.enrollment_code
 from rpt.volunteer_v v
 left join dbo.Volunteer_Training t
 	on v.volunteer_key = t.volunteer_key
