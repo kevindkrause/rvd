@@ -215,7 +215,17 @@ left join dbo.enrollment e2
 	on v.current_enrollment_key = e2.enrollment_key
 	and e2.active_flag = 'Y'
 go
-	
+
+
+CREATE VIEW [dbo].[Dept_Asgn_LeadTime_v]
+AS
+SELECT        dbo.Dept_Asgn_LeadTime.Dept_Asgn_LeadTime_Key, dbo.Dept_Asgn_LeadTime.Enrollment_Key, dbo.Enrollment.Enrollment_Code, dbo.Dept_Asgn_LeadTime.New_No_Earlier, dbo.Dept_Asgn_LeadTime.New_No_Later, 
+                         dbo.Dept_Asgn_LeadTime.Transfer_No_Earlier, dbo.Dept_Asgn_LeadTime.Transfer_No_Later, dbo.Dept_Asgn_LeadTime.Active_Flag
+FROM            dbo.Dept_Asgn_LeadTime INNER JOIN
+                         dbo.Enrollment ON dbo.Dept_Asgn_LeadTime.Enrollment_Key = dbo.Enrollment.Enrollment_Key
+WHERE        (dbo.Enrollment.Active_Flag = N'Y') AND (dbo.Dept_Asgn_LeadTime.Active_Flag = N'Y')
+GO
+
 	
 if object_id('dbo.Dept_Asgn_VTC_v', 'V') is not null
 	drop view dbo.Dept_Asgn_VTC_v

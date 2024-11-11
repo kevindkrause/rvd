@@ -1237,6 +1237,7 @@ select
 	,coalesce( enrollment_2_code, '' ) as enrollment_2_code
 	,coalesce( convert( varchar, enrollment_2_start_date, 23 ), '' ) as enrollment_2_start_date
 	,coalesce( convert( varchar, enrollment_2_end_date, 23 ), '' ) as enrollment_2_end_date
+	,dept_1_hpr_dept_key
 	,case 
 		when dept_1_parent_dept_name like '%Committee' then dept_1_dept_name
 		else dept_1_parent_dept_name
@@ -1248,6 +1249,7 @@ select
 	,coalesce( dept_1_split_allocation_pct, '' ) as dept_1_split_allocation_pct
 	,dept_1_start_date
 	,coalesce( convert( varchar, dept_1_end_date, 23 ), '' ) as dept_1_end_date
+	,dept_2_hpr_dept_key
 	,coalesce( dept_2_parent_dept_name, '' ) as dept_2_parent_dept_name
 	,coalesce( dept_2_dept_name, '' ) as dept_2_dept_name
 	,coalesce( dept_2_ovsr_name, '' ) as dept_2_ovsr_name
@@ -1257,6 +1259,7 @@ select
 	,coalesce( convert( varchar, dept_2_start_date, 23 ), '' ) as dept_2_start_date
 	,coalesce( convert( varchar, dept_2_end_date, 23 ), '' ) as dept_2_end_date
 	,tentative_end_date
+	,coalesce( room_bldg_desc, '' ) as room_bldg_desc
 	,coalesce( room, '' ) as room
 	,coalesce( bethel_email, '' ) as bethel_email
 	,hpr_flag
@@ -1281,6 +1284,7 @@ from (
 		,enrollment_2_code
 		,enrollment_2_start_date
 		,enrollment_2_end_date
+		,dept_1_hpr_dept_key
 		,dept_1_parent_dept_name
 		,dept_1_dept_name
 		,dept_1_ovsr_name
@@ -1289,6 +1293,7 @@ from (
 		,dept_1_split_allocation_pct
 		,dept_1_start_date
 		,dept_1_end_date
+		,dept_2_hpr_dept_key
 		,dept_2_parent_dept_name
 		,dept_2_dept_name
 		,dept_2_ovsr_name
@@ -1298,6 +1303,7 @@ from (
 		,dept_2_start_date
 		,dept_2_end_date
 		,tentative_end_date
+		,room_bldg_desc
 		,room
 		,bethel_email
 		,'Y' as hpr_flag
@@ -1329,6 +1335,7 @@ from (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_date as enrollment_2_end_date
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
 		,'' as dept_1_ovsr_name
@@ -1337,6 +1344,7 @@ from (
 		,vd1.split_allocation_pct as dept_1_split_allocation_pct
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
+		,d2.hpr_dept_key as dept_2_hpr_dept_key
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
 		,'' as dept_1_ovsr_name		
@@ -1346,6 +1354,7 @@ from (
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,v.tentative_end_date
+		,left( v.room, charindex( '-', v.room ) - 1 ) as room_bldg_desc
 		,v.room
 		,v.alt_Email as bethel_email
 		,'N' as hpr_flag
@@ -1363,9 +1372,13 @@ from (
 	inner join dbo.volunteer_dept_rpt vd1
 		on v.volunteer_key = vd1.volunteer_key
 		and vd1.Row_Num = 1
+	left join dbo.hpr_dept d1
+		on vd1.HUB_Dept_ID = d1.HUB_Dept_ID
 	left join dbo.volunteer_dept_rpt vd2
 		on v.volunteer_key = vd2.volunteer_key
 		and vd2.Row_Num = 2
+	left join dbo.hpr_dept d2
+		on vd2.HUB_Dept_ID = d2.HUB_Dept_ID
 	where 1=1
 		and v.room_site_code = 'RMP'
 		and v.volunteer_key not in ( select volunteer_key from rpt.volunteer_rpt_v )
@@ -1387,6 +1400,7 @@ from (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_Date as enrollment_2_end_date
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
 		,'' as dept_1_ovsr_name
@@ -1395,6 +1409,7 @@ from (
 		,vd1.split_allocation_pct as dept_1_split_allocation_pct
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
+		,d2.hpr_dept_key as dept_2_hpr_dept_key
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
 		,'' as dept_1_ovsr_name		
@@ -1404,6 +1419,7 @@ from (
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,v.tentative_end_date
+		,left( v.room, charindex( '-', v.room ) - 1 ) as room_bldg_desc
 		,v.room
 		,v.alt_Email as bethel_email
 		,'N' as hpr_flag
@@ -1423,9 +1439,13 @@ from (
 	inner join dbo.volunteer_dept_rpt vd1
 		on v.volunteer_key = vd1.volunteer_key
 		and vd1.Row_Num = 1
+	left join dbo.hpr_dept d1
+		on vd1.HUB_Dept_ID = d1.HUB_Dept_ID
 	left join dbo.volunteer_dept_rpt vd2
 		on v.volunteer_key = vd2.volunteer_key
 		and vd2.Row_Num = 2
+	left join dbo.hpr_dept d2
+		on vd2.HUB_Dept_ID = d2.HUB_Dept_ID		
 	where 1=1
 		and r.overnight_guest_category is not null
 		and v.volunteer_key not in ( select volunteer_key from rpt.volunteer_rpt_v )
@@ -1515,6 +1535,7 @@ select
 	,room_site_code
 	,room_bldg
 	,room_bldg_code
+	,room_bldg_desc
 	,room
 	,staffing_number_exception_flag
 from (  
@@ -1596,6 +1617,7 @@ from (
 		,nullif( v.Room_Site_Code, '' ) as room_site_code
 		,nullif( v.Room_Bldg, '' ) as room_bldg
 		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
+		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
 		,nullif( v.Room, '' ) as room
 		,v.staffing_number_exception_flag
 	from dbo.volunteer v
@@ -1712,6 +1734,7 @@ from (
 		,nullif( v.Room_Site_Code, '' ) as room_site_code
 		,nullif( v.Room_Bldg, '' ) as room_bldg
 		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
+		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
 		,nullif( v.Room, '' ) as room
 		,v.staffing_number_exception_flag
 	from dbo.volunteer v
@@ -1744,88 +1767,6 @@ from (
 		on v.mate_hub_person_id = mate.hub_person_id
 	where v.hpr_volunteer_exception_flag = 'Y'
 		--and v.volunteer_key = 908039
-/*
-	union all
-
-	-- NON-US BRANCH VOLUNTEERS
-	select 
-		 fb.last_name + ', ' + fb.first_name
-		,fb.first_name
-		,fb.last_name
-		,fb.gender
-		,fb.marital_status
-		,cast( round( ( datediff( day, fb.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-		,'' as address
-		,'' as city
-		,'' as state_code
-		,'' as postal_code
-		,'' as home_phone
-		,'' as mobile_phone
-		,fb.volunteer_number as hub_volunteer_num
-		,fb.department_site as enrollment_1_site_code
-		,fb.enrollment_code as enrollment_1_code
-		,fb.enrollment_start_date as enrollment_1_start_date
-		,fb.enrollment_end_date as enrollment_1_end_date
-		,null as enrollment_2_site_code
-		,null as enrollment_2_code
-		,null as enrollment_2_start_date
-		,null as enrollment_2_end_date		
-		,fb.hub_dept_id as dept_1_hub_dept_id
-		,d.cpc_code as dept_1_cpc_code
-		,d.dept_name as dept_1_parent_dept_name
-		,d.work_group_name as dept_1_dept_name
-		,coalesce( d.work_group_ovsr, d.dept_ovsr ) as dept_1_ovsr_name
-		,fb.department_start_date as dept_1_start_date
-		,null as dept_1_end_date
-		,'N' as dept_1_temp_flag
-		,'Y' as dept_1_primary_flag
-		,'Y' as dept_1_hpr_flag
-		,d.PC_Category as dept_1_pc_category
-		,'Y' as dept_1_mon_flag
-		,'Y' as dept_1_tue_flag
-		,'Y' as dept_1_wed_flag
-		,'Y' as dept_1_thu_flag
-		,'Y' as dept_1_fri_flag
-		,'N' as dept_1_sat_flag
-		,'N' as dept_1_sun_flag		
-		,null as dept_2_hub_dept_id
-		,null as dept_2_cpc_code
-		,null as dept_2_parent_dept_name
-		,null as dept_2_dept_name
-		,null as dept_2_ovsr_name
-		,null as dept_2_start_date
-		,null as dept_2_end_date
-		,null as dept_2_temp_flag
-		,null as dept_2_primary_flag
-		,null as dept_2_hpr_flag
-		,null as dept_2_pc_category
-		,null as dept_2_mon_flag
-		,null as dept_2_tue_flag
-		,null as dept_2_wed_flag
-		,null as dept_2_thu_flag
-		,null as dept_2_fri_flag
-		,null as dept_2_sat_flag
-		,null as dept_2_sun_flag
-		,fb.internal_email
-		,'' as jwbpub
-		,'' as personal
-		,fb.volunteer_number * -1 as volunteer_key  -- ARTIFICIAL VOL KEY
-		,fb.person_id
-		,null as ba_volunteer_num
-		,null as hub_person_guid
-		,mate.hub_volunteer_num as spouse_hub_volunteer_num
-		,'' as spouse_bethel_email
-		,'' as spouse_jwpub_email
-		,null as Room_Site_Code
-		,null as Room_Bldg
-		,null as Room_Bldg_Code
-		,null as Room		
-	from stg.stg_foreign_branches fb
-	inner join dbo.HPR_Dept d
-		on fb.hub_dept_id = d.hub_dept_id
-	left join dbo.volunteer mate
-		on fb.spouse_person_id = mate.hub_person_id 
-*/		
   ) core
 go
 
