@@ -193,7 +193,8 @@ select
 	,da.Candidate_1_Next_Step
 	,da.Candidate_2_Next_Step
 	,da.Candidate_3_Next_Step
-	,da.Possible_Sister	
+	,da.Possible_Sister
+	,da.HuBIncidentURL
 from dbo.dept_asgn da
 inner join dbo.hpr_dept d
 	on da.hpr_dept_key = d.hpr_dept_key

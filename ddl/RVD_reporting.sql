@@ -1151,68 +1151,6 @@ from (
 	left join dbo.volunteer mate
 		on v.mate_hub_person_id = mate.hub_person_id
 	where v.hpr_volunteer_exception_flag = 'Y'
-
---	union all
-
---	-- NON-US BRANCH VOLUNTEERS
---	select 
---		 fb.last_name + ', ' + fb.first_name
---		,fb.first_name
---		,fb.last_name
---		,fb.gender
---		,fb.marital_status
---		,cast( round( ( datediff( day, fb.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
---		,'' as address
---		,'' as city
---		,'' as state_code
---		,'' as postal_code
---		,'' as home_phone
---		,'' as mobile_phone
---		,fb.volunteer_number as hub_volunteer_num
---		,fb.department_site
---		,fb.enrollment_code
---		,fb.enrollment_start_date
---		,fb.enrollment_end_date
---		,fb.hub_dept_id
---		,d.dept_name
---		,d.cpc_code as parent_department_code
---		,d.work_group_name
---		,null as temp_parent_dept_name
---		,null as temp_dept_name
---		,null as non_hpr_parent_dept_name
---		,null as non_hpr_dept_name		
---		,fb.internal_email
---		,'' as jwbpub
---		,'' as personal
---		,fb.department_start_date
---		,null as department_end_date
---		,'Y' as primary_flag
---		,'N' as temp_flag
---		,'N' as split
---		,'Y' as mon_flag
---		,'Y' as tue_flag
---		,'Y' as wed_flag
---		,'Y' as thu_flag
---		,'Y' as fri_flag
---		,'N' as sat_flag
---		,'N' as sun_flag
---		,d.PC_Category
---		,fb.volunteer_number * -1 as volunteer_key  -- ARTIFICIAL VOL KEY
---		,fb.person_id
---		,null as ba_volunteer_num
---		,null as hub_person_guid
---		,mate.hub_volunteer_num as spouse_hub_volunteer_num
---		,'' as spouse_bethel_email
---		,'' as spouse_jwpub_email
---		,null as Room_Site_Code
---		,null as Room_Bldg
---		,null as Room_Bldg_Code
---		,null as Room		
---	from stg.stg_foreign_branches fb
---	inner join dbo.HPR_Dept d
---		on fb.hub_dept_id = d.hub_dept_id
---	left join dbo.volunteer mate
---		on fb.spouse_person_id = mate.hub_person_id 
 ) core
 go
 
@@ -1223,51 +1161,55 @@ go
 create view rpt.volunteer_all_v
 as
 select 
-	 volunteer_name
-	,hub_volunteer_num
-	,gender_code
-	,marital_status_code
-	,coalesce( cong_servant_code, '' ) as cong_servant_code
-	,age	
-	,enrollment_1_site_code
-	,enrollment_1_code
-	,enrollment_1_start_date
-	,coalesce( convert( varchar, enrollment_1_end_date, 23 ), '' ) as enrollment_1_end_date
-	,coalesce( enrollment_2_site_code, '' ) as enrollment_2_site_code
-	,coalesce( enrollment_2_code, '' ) as enrollment_2_code
-	,coalesce( convert( varchar, enrollment_2_start_date, 23 ), '' ) as enrollment_2_start_date
-	,coalesce( convert( varchar, enrollment_2_end_date, 23 ), '' ) as enrollment_2_end_date
-	,dept_1_hpr_dept_key
+	 core.volunteer_name
+	,core.hub_volunteer_num
+	,core.gender_code
+	,core.marital_status_code
+	,coalesce( core.cong_servant_code, '' ) as cong_servant_code
+	,core.age	
+	,core.enrollment_1_site_code
+	,core.enrollment_1_code
+	,core.enrollment_1_start_date
+	,coalesce( convert( varchar, core.enrollment_1_end_date, 23 ), '' ) as enrollment_1_end_date
+	,coalesce( core.enrollment_2_site_code, '' ) as enrollment_2_site_code
+	,coalesce( core.enrollment_2_code, '' ) as enrollment_2_code
+	,coalesce( convert( varchar, core.enrollment_2_start_date, 23 ), '' ) as enrollment_2_start_date
+	,coalesce( convert( varchar, core.enrollment_2_end_date, 23 ), '' ) as enrollment_2_end_date
+	,core.dept_1_hpr_dept_key
 	,case 
-		when dept_1_parent_dept_name like '%Committee' then dept_1_dept_name
-		else dept_1_parent_dept_name
+		when core.dept_1_parent_dept_name like '%Committee' then core.dept_1_dept_name
+		else core.dept_1_parent_dept_name
 	 end as dept_1_parent_dept_name
-	,dept_1_dept_name
-	,dept_1_ovsr_name
-	,dept_1_temp_flag
-	,dept_1_primary_flag
-	,coalesce( dept_1_split_allocation_pct, '' ) as dept_1_split_allocation_pct
-	,dept_1_start_date
-	,coalesce( convert( varchar, dept_1_end_date, 23 ), '' ) as dept_1_end_date
-	,dept_2_hpr_dept_key
-	,coalesce( dept_2_parent_dept_name, '' ) as dept_2_parent_dept_name
-	,coalesce( dept_2_dept_name, '' ) as dept_2_dept_name
-	,coalesce( dept_2_ovsr_name, '' ) as dept_2_ovsr_name
-	,coalesce( dept_2_temp_flag, '' ) as dept_2_temp_flag
-	,coalesce( dept_2_primary_flag, '' ) as dept_2_primary_flag
-	,coalesce( dept_2_split_allocation_pct, '' ) as dept_2_split_allocation_pct
-	,coalesce( convert( varchar, dept_2_start_date, 23 ), '' ) as dept_2_start_date
-	,coalesce( convert( varchar, dept_2_end_date, 23 ), '' ) as dept_2_end_date
-	,tentative_end_date
-	,coalesce( room_bldg_desc, '' ) as room_bldg_desc
-	,coalesce( room, '' ) as room
-	,coalesce( bethel_email, '' ) as bethel_email
-	,hpr_flag
+	,core.dept_1_dept_name
+	,core.dept_1_ovsr_name
+	,core.dept_1_temp_flag
+	,core.dept_1_primary_flag
+	,coalesce( core.dept_1_split_allocation_pct, '' ) as dept_1_split_allocation_pct
+	,core.dept_1_start_date
+	,coalesce( convert( varchar, core.dept_1_end_date, 23 ), '' ) as dept_1_end_date
+	,core.dept_2_hpr_dept_key
+	,coalesce( core.dept_2_parent_dept_name, '' ) as dept_2_parent_dept_name
+	,coalesce( core.dept_2_dept_name, '' ) as dept_2_dept_name
+	,coalesce( core.dept_2_ovsr_name, '' ) as dept_2_ovsr_name
+	,coalesce( core.dept_2_temp_flag, '' ) as dept_2_temp_flag
+	,coalesce( core.dept_2_primary_flag, '' ) as dept_2_primary_flag
+	,coalesce( core.dept_2_split_allocation_pct, '' ) as dept_2_split_allocation_pct
+	,coalesce( convert( varchar, core.dept_2_start_date, 23 ), '' ) as dept_2_start_date
+	,coalesce( convert( varchar, core.dept_2_end_date, 23 ), '' ) as dept_2_end_date
+	,core.tentative_end_date
+	,coalesce( core.room_bldg_desc, '' ) as room_bldg_desc
+	,coalesce( core.room, '' ) as room
+	,coalesce( core.bethel_email, '' ) as bethel_email
+	,core.hpr_flag
 	,case
-		when work_days <> 5 and enrollment_1_code in ( 'BBB', 'BBC', 'BCV' ) then 5
-		else work_days
+		when core.work_days <> 5 and core.enrollment_1_code in ( 'BBB', 'BBC', 'BCV' ) then 5
+		else core.work_days
 	 end as work_days
-	,volunteer_key
+	,core.volunteer_key
+	,core.jwpub_email
+	,mate.hub_volunteer_num as spouse_hub_volunteer_num
+	,mate.alt_email as spouse_bethel_email
+	,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
 from (
 	select
 		 volunteer_name
@@ -1306,6 +1248,7 @@ from (
 		,room_bldg_desc
 		,room
 		,bethel_email
+		,jwpub_email
 		,'Y' as hpr_flag
 		,( case when dept_1_mon_flag = 'Y' then 1 else 0 end ) + 
 		 ( case when dept_1_tue_flag = 'Y' then 1 else 0 end  ) +
@@ -1315,6 +1258,7 @@ from (
 		 ( case when dept_1_sat_flag = 'Y' then 1 else 0 end  ) +
 		 ( case when dept_1_sun_flag = 'Y' then 1 else 0 end  ) as work_days	 
 		,volunteer_key
+		,spouse_hub_person_id
 	from rpt.volunteer_rpt_v
 	where 1=1
 
@@ -1357,9 +1301,11 @@ from (
 		,left( v.room, charindex( '-', v.room ) - 1 ) as room_bldg_desc
 		,v.room
 		,v.alt_Email as bethel_email
+		,v.jw_username + '@jwpub.org' as jwpub_email
 		,'N' as hpr_flag
 		,5 as work_days
 		,v.volunteer_key
+		,v.mate_hub_person_id as spouse_hub_person_id
 	from dbo.volunteer v
 	inner join dbo.marital_status ms 
 		on v.marital_status_key = ms.marital_status_key	
@@ -1422,9 +1368,11 @@ from (
 		,left( v.room, charindex( '-', v.room ) - 1 ) as room_bldg_desc
 		,v.room
 		,v.alt_Email as bethel_email
+		,v.jw_username + '@jwpub.org' as jwpub_email
 		,'N' as hpr_flag
 		,5 as work_days
 		,v.volunteer_key
+		,v.mate_hub_person_id as spouse_hub_person_id
 	from dbo.volunteer v
 	inner join dbo.marital_status ms 
 		on v.marital_status_key = ms.marital_status_key	
@@ -1450,6 +1398,8 @@ from (
 		and r.overnight_guest_category is not null
 		and v.volunteer_key not in ( select volunteer_key from rpt.volunteer_rpt_v )
 	) core
+left join dbo.volunteer mate
+	on core.spouse_hub_person_id = mate.hub_person_id	
 go
 
 
@@ -1479,7 +1429,8 @@ select
 	,mobile_phone
 	,bethel_email
 	,jwpub_email
-	,personal_email	
+	,personal_email
+	,spouse_hub_person_id
 	,spouse_hub_volunteer_num
 	,spouse_bethel_email
 	,spouse_jwpub_email		
@@ -1611,6 +1562,7 @@ from (
 		,v.HUB_Person_ID
 		,v.ba_volunteer_num
 		,v.hub_person_guid
+		,v.mate_hub_person_id as spouse_hub_person_id
 		,mate.hub_volunteer_num as spouse_hub_volunteer_num
 		,mate.alt_email as spouse_bethel_email
 		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
@@ -1728,6 +1680,7 @@ from (
 		,v.HUB_Person_ID
 		,v.ba_volunteer_num
 		,v.hub_person_guid
+		,v.mate_hub_person_id as spouse_hub_person_id
 		,mate.hub_volunteer_num as spouse_hub_volunteer_num
 		,mate.alt_email as spouse_bethel_email
 		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
