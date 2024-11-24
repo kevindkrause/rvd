@@ -753,6 +753,7 @@ begin
 		set @Upd = @Upd + @@rowcount
 
 		-- UPDATE - BA INFO
+/*		
 		update dbo.volunteer
 		set 
 			ba_volunteer_id = src.volunteer_id,
@@ -778,7 +779,7 @@ begin
 			or coalesce( tgt.ba_safety_orientation_date, '2999-12-31' ) <> coalesce( src.Safety_Orientation_Date, '2999-12-31' )
 
 		set @Upd = @Upd + @@rowcount	
-		
+*/		
 		-- UPDATE - TURN ALL KEY ROLES OFF
 		update dbo.volunteer
 		set 

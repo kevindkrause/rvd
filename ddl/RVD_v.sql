@@ -145,6 +145,7 @@ select
 	,da.candidate_3_name
 	,da.candidate_3_profile
 	,v.Full_Name
+	,v.last_name + ', ' + left( v.first_name, 1 ) + '.' as volunteer_name_short
 	,e2.enrollment_code as ps_enrollment_code
 	,da.ps_start_date
 	,da.ps_end_date
@@ -168,7 +169,6 @@ select
 	,da.enrollment_key
 	,da.dept_asgn_status_key	
 	,da.volunteer_key
-	,da.Job_Description
 	,da.Num_Weeks
 	,da.Num_Months
 	,da.Until_Not_Needed
@@ -184,17 +184,13 @@ select
 	,da.HPR_Dept_Sharepoint_Key
 	,da.HPR_Crew_Sharepoint_Key
 	,da.ID_SP
-	,CASE WHEN isnull([das.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [das.Sort_Trade_Request] END AS Sort_Trade_Request
-	,da.Candidate_1_Vol_key
-	,da.Candidate_2_Vol_key
-	,da.Candidate_3_Vol_key
-	,da.Quantity_To_Replicate
-	,da.Multiple_Record_Number
+	,case when isnull(das.sort_trade_request, 999) = 999 then 999 else das.sort_trade_request end as Sort_Trade_Request
 	,da.Candidate_1_Next_Step
 	,da.Candidate_2_Next_Step
 	,da.Candidate_3_Next_Step
 	,da.Possible_Sister
 	,da.HuBIncidentURL
+	,d.PC_Code
 from dbo.dept_asgn da
 inner join dbo.hpr_dept d
 	on da.hpr_dept_key = d.hpr_dept_key
@@ -216,6 +212,7 @@ left join dbo.enrollment e2
 	on v.current_enrollment_key = e2.enrollment_key
 	and e2.active_flag = 'Y'
 go
+
 
 
 CREATE VIEW [dbo].[Dept_Asgn_LeadTime_v]
@@ -277,7 +274,6 @@ select
 	,dr.Full_Name
 	,dr.marital_status_code
 	,dr.cong_servant_code
-	,dr.Job_Description
 	,dr.Num_Weeks
 	,dr.Num_Months
 	,dr.Until_Not_Needed
@@ -288,14 +284,14 @@ select
 	,dr.Candidate_3_Vol_Key
 	,dr.Quantity_To_Replicate
 	,dr.Multiple_Record_Number
-	,CASE WHEN isnull([dr.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [dr.Sort_Trade_Request] END AS Sort_Trade_Request, 
+	,CASE WHEN isnull(dr.Sort_Trade_Request, 999) = 999 THEN 999 ELSE dr.Sort_Trade_Request END AS Sort_Trade_Request 
 	,u.VTC_CPC_Code
-	,dr.Quantity_To_Replicate
-	,dr.Multiple_Record_Number
 	,dr.Candidate_1_Next_Step
 	,dr.Candidate_2_Next_Step
 	,dr.Candidate_3_Next_Step
-	,dr.Possible_Sister	
+	,dr.Possible_Sister
+	,dr.Sort_Trade_Request AS Expr1
+	,dr.PC_Code
 from dbo.Dept_asgn_v dr
 inner join dbo.[User] u
 	on dr.cpc_code = u.VTC_CPC_Code

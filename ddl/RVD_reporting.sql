@@ -835,11 +835,14 @@ dept_req as (
 		and d.active_flag = 'Y' ),
 
 dept_used_base as (
-	select hpr_dept_key, cal_dt, count( distinct volunteer_key ) as used_bed_cnt
-	from rpt.CVC_v
-	where used_bed_cnt <> 0
-	group by hpr_dept_key, cal_dt ),
-
+	select coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key, c.cal_dt, count(*) as used_bed_cnt
+	from rpt.volunteer_rpt_v v
+	inner join dbo.cal_dim c
+		on c.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '12/31/2027' )
+	where 1=1
+		and v.dept_1_hpr_dept_key is not null
+		and v.enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+	group by coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ), c.cal_dt ),
 
 dept_used as (
 	select 'Dept Beds' as prp_type, u.hpr_dept_key, u.cal_dt, d.cpc_code, u.used_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
@@ -878,8 +881,10 @@ final as (
 select *
 from final
 where 1=1
-	--and cal_dt = '2024-06-30' 
-	--and cpc_code = 'PS'
+	--and cal_dt = '2024-11-17' 
+	--and cpc_code = 'CI'
+	--and prp_subtype = 'Used'
+	--and dept_name = 'Trade Group - Siteworks'
 --order by cal_dt, prp_type, prp_subtype, cpc_code, dept_name
 go
 	
