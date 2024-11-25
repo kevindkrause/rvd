@@ -190,7 +190,9 @@ select
 	,da.Candidate_3_Next_Step
 	,da.Possible_Sister
 	,da.HuBIncidentURL
-	,d.PC_Code
+	,d.PC_Code	
+	,v.HUB_Person_ID
+	,v.HUB_Volunteer_ID
 from dbo.dept_asgn da
 inner join dbo.hpr_dept d
 	on da.hpr_dept_key = d.hpr_dept_key
@@ -274,6 +276,7 @@ select
 	,dr.Full_Name
 	,dr.marital_status_code
 	,dr.cong_servant_code
+	,dr.Job_Description
 	,dr.Num_Weeks
 	,dr.Num_Months
 	,dr.Until_Not_Needed
@@ -284,8 +287,10 @@ select
 	,dr.Candidate_3_Vol_Key
 	,dr.Quantity_To_Replicate
 	,dr.Multiple_Record_Number
-	,CASE WHEN isnull(dr.Sort_Trade_Request, 999) = 999 THEN 999 ELSE dr.Sort_Trade_Request END AS Sort_Trade_Request 
+	,CASE WHEN isnull([dr.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [dr.Sort_Trade_Request] END AS Sort_Trade_Request, 
 	,u.VTC_CPC_Code
+	,dr.Quantity_To_Replicate
+	,dr.Multiple_Record_Number
 	,dr.Candidate_1_Next_Step
 	,dr.Candidate_2_Next_Step
 	,dr.Candidate_3_Next_Step

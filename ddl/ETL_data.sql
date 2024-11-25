@@ -640,7 +640,7 @@ begin
 		where not exists ( select * from dbo.volunteer v where p.person_id = v.hub_person_id )
 
 		set @Ins = @@rowcount
-
+/*
 		-- UPDATE
 		update dbo.volunteer
 		set 
@@ -723,7 +723,7 @@ begin
 			or tgt.sms_flag <> case when coalesce( src.text_message, 0 ) = 0 then 'N' else 'Y' end			
 			
 		set @Upd = @@rowcount
-
+*/
 		-- UPDATE - VOLUNTEER NUMBER SYNC		
 		update dbo.volunteer 
 		set hub_volunteer_num = null
