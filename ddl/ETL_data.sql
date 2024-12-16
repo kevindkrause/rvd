@@ -640,8 +640,8 @@ begin
 		where not exists ( select * from dbo.volunteer v where p.person_id = v.hub_person_id )
 
 		set @Ins = @@rowcount
-/*
-		-- UPDATE
+
+		-- UPDATE		
 		update dbo.volunteer
 		set 
 			first_name = src.first_name,
@@ -653,9 +653,6 @@ begin
 			address = src.address1,
 			address2 = src.address2,
 			city = src.city,
-			postal_code_key = coalesce( pc.postal_code_key, 1 ),
-			state_key = coalesce( s.state_key, 1 ),
-			country_key = coalesce( c.country_key, 1 ),
 			home_phone = src.home_phone,
 			mobile_phone = src.mobile_phone,
 			email = src.external_email,
@@ -663,10 +660,8 @@ begin
 			birth_date = src.birth_date,
 			baptism_date = src.baptism_date,
 			gender_code = left( src.gender_code, 1 ),
-			marital_status_key = coalesce( ms.marital_status_key, 6 ),
 			cong_servant_code = src.cong_servant_code,
 			pioneer_flag = case when src.pioneer_status = 1 then 'Y' else 'N' end,
-			cong_key = coalesce( cong.cong_key, 16957 ),
 			hub_volunteer_num = src.volunteer_number,
 			hub_volunteer_id = src.volunteer_id,
 			hub_person_guid = src.person_guid,
@@ -675,6 +670,43 @@ begin
 			mate_hub_person_guid = src.mate_person_guid,
 			whatsapp_flag = case when src.whatsapp = 0 then 'N' else 'Y' end, 
 			sms_flag = case when src.text_message = 0 then 'N' else 'Y' end,
+			update_date = getdate()
+		from dbo.volunteer tgt
+		inner join stg.stg_person src
+			on tgt.hub_person_id = src.person_id
+		where tgt.first_name <> src.first_name
+			or tgt.last_name <> src.last_name
+			or coalesce( tgt.middle_name, '' ) <> coalesce( src.middle_name, '' )
+			or coalesce( tgt.suffix, '' ) <> coalesce( src.suffix, '' )
+			or coalesce( tgt.maiden_name, '' ) <> coalesce( src.maiden_name, '' )
+			or coalesce( tgt.address, '' ) <> coalesce( src.address1, '' )
+			or coalesce( tgt.address2, '' ) <> coalesce( src.address2, '' )
+			or coalesce( tgt.city, '' ) <> coalesce( src.city, '' )
+			or coalesce( tgt.home_phone, '' ) <> coalesce( src.home_phone, '' )
+			or coalesce( tgt.mobile_phone, '' ) <> coalesce( src.mobile_phone, '' )
+			or coalesce( tgt.email, '' ) <> coalesce( src.external_email, '' )
+			or coalesce( tgt.alt_email, '' ) <> coalesce( src.bethel_email, '' )
+			or coalesce( tgt.birth_date, cast( getdate() as date ) ) <> coalesce( src.birth_date, cast( getdate() as date ) )
+			or coalesce( tgt.baptism_date, cast( getdate() as date ) ) <> coalesce( src.baptism_date, cast( getdate() as date ) )
+			or coalesce( tgt.gender_code, '' ) <> coalesce( left( src.gender_code, 1 ), '' )
+			or coalesce( tgt.cong_servant_code, '' ) <> coalesce( src.cong_servant_code, '' )
+			or tgt.pioneer_flag <> case when coalesce( src.pioneer_status, 0 ) = 1 then 'Y' else 'N' end
+			or coalesce( tgt.hub_volunteer_num, 0 ) <> coalesce( src.volunteer_number, 0 )
+			or coalesce( tgt.hub_volunteer_id, 0 ) <> coalesce( src.volunteer_id, 0 )			
+			or coalesce( cast( tgt.hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.person_guid as nvarchar(64) ) , '' )					
+			or coalesce( tgt.jw_username, '' ) <> coalesce( replace( src.jwpub_email, '@jwpub.org', '' ), '' )
+			or coalesce( tgt.mate_hub_person_id, 0 ) <> coalesce( src.mate_person_id, 0 )
+			or coalesce( cast( tgt.mate_hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.mate_person_guid as nvarchar(64) ), '' )
+			or tgt.whatsapp_flag <> case when coalesce( src.whatsapp, 0 ) = 0 then 'N' else 'Y' end 
+			or tgt.sms_flag <> case when coalesce( src.text_message, 0 ) = 0 then 'N' else 'Y' end	
+
+		update dbo.volunteer
+		set 
+			postal_code_key = coalesce( pc.postal_code_key, 1 ),
+			state_key = coalesce( s.state_key, 1 ),
+			country_key = coalesce( c.country_key, 1 ),
+			marital_status_key = coalesce( ms.marital_status_key, 6 ),
+			cong_key = coalesce( cong.cong_key, 16957 ),
 			update_date = getdate()
 		from dbo.volunteer tgt
 		inner join stg.stg_person src
@@ -691,39 +723,15 @@ begin
 			on src.marital_status = ms.marital_status
 		left join dbo.cong cong
 			on src.cong_number = cong.cong_number		
-		where tgt.first_name <> src.first_name
-			or tgt.last_name <> src.last_name
-			or coalesce( tgt.middle_name, '' ) <> coalesce( src.middle_name, '' )
-			or coalesce( tgt.suffix, '' ) <> coalesce( src.suffix, '' )
-			or coalesce( tgt.maiden_name, '' ) <> coalesce( src.maiden_name, '' )
-			or coalesce( tgt.address, '' ) <> coalesce( src.address1, '' )
-			or coalesce( tgt.address2, '' ) <> coalesce( src.address2, '' )
-			or coalesce( tgt.city, '' ) <> coalesce( src.city, '' )
-			or coalesce( tgt.postal_code_key, 0 ) <> coalesce( pc.postal_code_key, 0 )
-			or coalesce( tgt.state_key, 0 ) <> coalesce( s.state_key, 0 )
-			or coalesce( tgt.country_key, 0 ) <> coalesce( c.country_key, 0 )
-			or coalesce( tgt.home_phone, '' ) <> coalesce( src.home_phone, '' )
-			or coalesce( tgt.mobile_phone, '' ) <> coalesce( src.mobile_phone, '' )
-			or coalesce( tgt.email, '' ) <> coalesce( src.external_email, '' )
-			or coalesce( tgt.alt_email, '' ) <> coalesce( src.bethel_email, '' )
-			or coalesce( tgt.birth_date, cast( getdate() as date ) ) <> coalesce( src.birth_date, cast( getdate() as date ) )
-			or coalesce( tgt.baptism_date, cast( getdate() as date ) ) <> coalesce( src.baptism_date, cast( getdate() as date ) )
-			or coalesce( tgt.gender_code, '' ) <> coalesce( left( src.gender_code, 1 ), '' )
-			or coalesce( tgt.marital_status_key, 0 ) <> coalesce( ms.marital_status_key, 0 )
-			or coalesce( tgt.cong_servant_code, '' ) <> coalesce( src.cong_servant_code, '' )
-			or tgt.pioneer_flag <> case when coalesce( src.pioneer_status, 0 ) = 1 then 'Y' else 'N' end
-			or coalesce( tgt.cong_key, 0 ) <> coalesce( cong.cong_key, 0 )
-			or coalesce( tgt.hub_volunteer_num, 0 ) <> coalesce( src.volunteer_number, 0 )
-			or coalesce( tgt.hub_volunteer_id, 0 ) <> coalesce( src.volunteer_id, 0 )			
-			or coalesce( cast( tgt.hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.person_guid as nvarchar(64) ) , '' )					
-			or coalesce( tgt.jw_username, '' ) <> coalesce( replace( src.jwpub_email, '@jwpub.org', '' ), '' )
-			or coalesce( tgt.mate_hub_person_id, 0 ) <> coalesce( src.mate_person_id, 0 )
-			or coalesce( cast( tgt.mate_hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.mate_person_guid as nvarchar(64) ), '' )
-			or tgt.whatsapp_flag <> case when coalesce( src.whatsapp, 0 ) = 0 then 'N' else 'Y' end 
-			or tgt.sms_flag <> case when coalesce( src.text_message, 0 ) = 0 then 'N' else 'Y' end			
+		where 
+			   coalesce( tgt.postal_code_key, 1 ) <> coalesce( pc.postal_code_key, 1 )
+			or coalesce( tgt.state_key, 1 ) <> coalesce( s.state_key, 1 )
+			or coalesce( tgt.country_key, 1 ) <> coalesce( c.country_key, 1 )
+			or coalesce( tgt.marital_status_key, 6 ) <> coalesce( ms.marital_status_key, 6 )
+			or coalesce( tgt.cong_key, 16957 ) <> coalesce( cong.cong_key, 16957 )
 			
 		set @Upd = @@rowcount
-*/
+
 		-- UPDATE - VOLUNTEER NUMBER SYNC		
 		update dbo.volunteer 
 		set hub_volunteer_num = null
@@ -3881,7 +3889,7 @@ begin
 		where 1=1
 			and (
 				    -- HID
-				   ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role_data = 'HLC Chairman' ) ) 
+				   ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role = 'HLC Member' ) ) 
 				    -- SERVICE
 				or ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role in (
 						'Kingdom Ministry School Instructor',

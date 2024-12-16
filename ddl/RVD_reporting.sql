@@ -449,33 +449,80 @@ if object_id('rpt.CVC_v', 'V') is not null
 go 
 create view rpt.CVC_v
 as
-select 
-	 da.cpc_code
-	,da.level_02
-	,da.level_03
-	,da.level_04
-	,da.full_dept_name
-	,da.crew_name
-	,da.dept_role
-	,da.full_name as volunteer_name
-	,c.cal_dt
-	,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
-	,coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' ) as end_date
-	,coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) as enrollment_code
-	,da.dept_asgn_status
-	,case when coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) in ( 'BBB', 'BBC', 'BBF', 'BBR', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end as used_bed_cnt
-	,da.dept_asgn_key
-	,da.hpr_dept_key
-	,enrollment_key
-	,da.volunteer_key
-from dbo.dept_asgn_v da
-inner join dbo.cal_dim c
-	on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' )
-where 1=1
-	and da.active_flag = 'Y'
-	and da.test_data_flag = 'N'
-go
+-- ALL DEPT ASGN BY DAY
+with dates as (
+	select cal_dt, rank() over (order by cal_dt ) as wk_num
+	from dbo.cal_dim 
+	where 1=1
+		and day_of_wk = 2
+		and cal_dt between cast(getdate()-6 as date) and getdate() + 90 ),
 
+dept_req as (
+	select 
+		 da.cpc_code
+		,da.level_02
+		,da.level_03
+		,da.level_04
+		,da.full_dept_name
+		,da.crew_name
+		,da.dept_role
+		,da.volunteer_name_short as volunteer_name
+		,c.cal_dt
+		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
+		,coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' ) as end_date
+		,coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) as enrollment_code
+		,da.dept_asgn_status
+		,case when coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) in ( 'BBB', 'BBC', 'BBF', 'BBR', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end as used_bed_cnt
+		,da.dept_asgn_key
+		,da.hpr_dept_key
+		,enrollment_key
+		,da.volunteer_key
+		,c.wk_num
+	from dates c 
+	left join dbo.dept_asgn_v da
+		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' )
+		and da.active_flag = 'Y'
+		and da.test_data_flag = 'N' )
+
+select
+	 cpc_code
+	,level_03
+	,level_04
+	,crew_name
+	,dept_role
+	,enrollment_code
+	,used_bed_cnt
+	,dept_asgn_status
+	,max( case when wk_num = 1 then volunteer_name else null end ) as wk_01
+	,max( case when wk_num = 2 then volunteer_name else null end ) as wk_02
+	,max( case when wk_num = 3 then volunteer_name else null end ) as wk_03
+	,max( case when wk_num = 4 then volunteer_name else null end ) as wk_04
+	,max( case when wk_num = 5 then volunteer_name else null end ) as wk_05
+	,max( case when wk_num = 6 then volunteer_name else null end ) as wk_06
+	,max( case when wk_num = 7 then volunteer_name else null end ) as wk_07
+	,max( case when wk_num = 8 then volunteer_name else null end ) as wk_08
+	,max( case when wk_num = 9 then volunteer_name else null end ) as wk_09
+	,max( case when wk_num = 10 then volunteer_name else null end ) as wk_10
+	,max( case when wk_num = 11 then volunteer_name else null end ) as wk_11
+	,max( case when wk_num = 12 then volunteer_name else null end ) as wk_12
+	,max( case when wk_num = 13 then volunteer_name else null end ) as wk_13
+	,max( case when wk_num = 14 then volunteer_name else null end ) as wk_14
+from dept_req
+where 1=1
+	--and cpc_code = 'CI'
+	--and level_03 = 'Trade Group'
+	--and level_04 = 'Siteworks'
+	--and used_bed_cnt = 1
+group by 
+	 cpc_code
+	,level_03
+	,level_04
+	,crew_name
+	,dept_role
+	,enrollment_code
+	,used_bed_cnt
+	,dept_asgn_status
+go
 
 
 if object_id('rpt.Dept_Crew_v', 'V') is not null
@@ -725,6 +772,390 @@ where 1=1
 go
 
 
+if object_id('rpt.PC_Volunteer_Actuals_v', 'V') is not null
+	drop view rpt.PC_Volunteer_Actuals_v
+go 
+create view rpt.PC_Volunteer_Actuals_v
+as
+with base as (
+	select 
+		 c.cal_dt
+		,d.cpc_code
+		,d.level_02
+		,d.level_03
+		,d.level_04
+		,d.level_05
+		,d.level_06
+		,d.pc_code
+		,d.pc_category
+		,v.enrollment_1_code as enrollment_code
+		,enrollment_1_site_code as site_code
+		,room_bldg_desc as site_bldg
+		,room_bldg_code as site_bldg_code
+		,v.volunteer_key
+	from rpt.volunteer_rpt_v v
+	inner join dbo.hpr_dept d
+		on coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) = d.hpr_dept_key
+	inner join dbo.cal_dim c
+		on c.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '12/31/2030' )
+		and c.day_of_mth = 1 )
+
+select
+	 pc_code
+	,pc_category
+	,cpc_code
+	,level_03
+	,level_04
+	,level_05
+	,level_06 
+	,cal_dt
+	,enrollment_code
+	,site_code
+	,site_bldg
+	,site_bldg_code
+	,sum( case when enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end ) as bed_cnt
+	,sum( case when enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 0 else 1 end ) as no_bed_cnt
+from base
+where 1=1
+	--and cal_dt between '2024-01-01' and '2024-12-01'
+	--and level_03 = 'Trade Group'
+	--and level_04 = 'Siteworks'
+	--and PC_Category = 'Tools'
+group by 
+	 pc_code
+	,pc_category
+	,cpc_code
+	,level_03
+	,level_04
+	,level_05
+	,level_06 
+	,cal_dt
+	,enrollment_code
+	,site_code
+	,site_bldg
+	,site_bldg_code
+--order by 1, 2, 3, 4, 5, 6, 7, 8, 9
+go
+
+
+
+if object_id('rpt.PRP_Actuals_Level_03_v', 'V') is not null
+	drop view rpt.PRP_Actuals_Level_03_v
+go 
+create view rpt.PRP_Actuals_Level_03_v
+as
+-- ALL DEPT ASGN BY DAY
+with dates as (
+	select cal_dt, rank() over (order by cal_dt ) as wk_num
+	from dbo.cal_dim 
+	where 1=1
+		and day_of_wk = 2
+		and cal_dt between cast(getdate()-6 as date) and getdate() + 90 ),
+
+dept_prp as (
+	select 
+		 r.cpc_code
+		,r.level_03
+		,r.level_04
+		,r.dept_name
+		,r.dept_level
+		,max( case when c.wk_num = 1 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_01_budget
+		,max( case when c.wk_num = 1 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_01_requested
+		,max( case when c.wk_num = 1 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_01_used
+		,max( case when c.wk_num = 2 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_02_budget
+		,max( case when c.wk_num = 2 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_02_requested
+		,max( case when c.wk_num = 2 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_02_used
+		,max( case when c.wk_num = 3 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_03_budget
+		,max( case when c.wk_num = 3 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_03_requested
+		,max( case when c.wk_num = 3 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_03_used
+		,max( case when c.wk_num = 4 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_04_budget
+		,max( case when c.wk_num = 4 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_04_requested
+		,max( case when c.wk_num = 4 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_04_used
+		,max( case when c.wk_num = 5 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_05_budget
+		,max( case when c.wk_num = 5 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_05_requested
+		,max( case when c.wk_num = 5 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_05_used
+		,max( case when c.wk_num = 6 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_06_budget
+		,max( case when c.wk_num = 6 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_06_requested
+		,max( case when c.wk_num = 6 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_06_used
+		,max( case when c.wk_num = 7 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_07_budget
+		,max( case when c.wk_num = 7 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_07_requested
+		,max( case when c.wk_num = 7 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_07_used
+		,max( case when c.wk_num = 8 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_08_budget
+		,max( case when c.wk_num = 8 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_08_requested
+		,max( case when c.wk_num = 8 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_08_used
+		,max( case when c.wk_num = 9 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_09_budget
+		,max( case when c.wk_num = 9 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_09_requested
+		,max( case when c.wk_num = 9 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_09_used
+		,max( case when c.wk_num = 10 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_10_budget
+		,max( case when c.wk_num = 10 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_10_requested
+		,max( case when c.wk_num = 10 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_10_used
+		,max( case when c.wk_num = 11 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_11_budget
+		,max( case when c.wk_num = 11 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_11_requested
+		,max( case when c.wk_num = 11 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_11_used
+		,max( case when c.wk_num = 12 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_12_budget
+		,max( case when c.wk_num = 12 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_12_requested
+		,max( case when c.wk_num = 12 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_12_used
+		,max( case when c.wk_num = 13 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_13_budget
+		,max( case when c.wk_num = 13 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_13_requested
+		,max( case when c.wk_num = 13 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_13_used
+		,max( case when c.wk_num = 14 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_14_budget
+		,max( case when c.wk_num = 14 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_14_requested
+		,max( case when c.wk_num = 14 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_14_used
+	from dates c 
+	left join rpt.Resource_Plan_Dept_v r
+		on c.cal_dt = r.cal_dt
+		and r.prp_type = 'Dept Beds'
+	where 1=1
+		--and r.hpr_dept_key = 217
+	group by
+		 r.cpc_code
+		,r.level_03
+		,r.level_04
+		,r.dept_name
+		,r.dept_level ),
+
+dept_num as (
+	select 
+		 cpc_code
+		,level_03
+		,level_04
+		,dept_name
+		,dept_level
+		,wk_01_budget
+		,case when wk_01_requested > wk_01_used then wk_01_requested else wk_01_used end as wk_01_used
+		,wk_02_budget
+		,case when wk_02_requested > wk_02_used then wk_02_requested else wk_02_used end as wk_02_used
+		,wk_03_budget
+		,case when wk_03_requested > wk_03_used then wk_03_requested else wk_03_used end as wk_03_used
+		,wk_04_budget
+		,case when wk_04_requested > wk_04_used then wk_04_requested else wk_04_used end as wk_04_used
+		,wk_05_budget
+		,case when wk_05_requested > wk_05_used then wk_05_requested else wk_05_used end as wk_05_used
+		,wk_06_budget
+		,case when wk_06_requested > wk_06_used then wk_06_requested else wk_06_used end as wk_06_used
+		,wk_07_budget
+		,case when wk_07_requested > wk_07_used then wk_07_requested else wk_07_used end as wk_07_used
+		,wk_08_budget
+		,case when wk_08_requested > wk_08_used then wk_08_requested else wk_08_used end as wk_08_used
+		,wk_09_budget
+		,case when wk_09_requested > wk_09_used then wk_09_requested else wk_09_used end as wk_09_used
+		,wk_10_budget
+		,case when wk_10_requested > wk_10_used then wk_10_requested else wk_10_used end as wk_10_used
+		,wk_11_budget
+		,case when wk_11_requested > wk_11_used then wk_11_requested else wk_11_used end as wk_11_used
+		,wk_12_budget
+		,case when wk_12_requested > wk_12_used then wk_12_requested else wk_12_used end as wk_12_used
+		,wk_13_budget
+		,case when wk_13_requested > wk_13_used then wk_13_requested else wk_13_used end as wk_13_used
+		,wk_14_budget
+		,case when wk_14_requested > wk_14_used then wk_14_requested else wk_14_used end as wk_14_used
+	from dept_prp
+	where dept_level > 2 ),
+
+lvl_03 as (
+	select 
+		 cpc_code
+		,level_03
+		,sum(wk_01_budget) - sum(wk_01_used) as wk_01_avail
+		,sum(wk_02_budget) - sum(wk_02_used) as wk_02_avail
+		,sum(wk_03_budget) - sum(wk_03_used) as wk_03_avail
+		,sum(wk_04_budget) - sum(wk_04_used) as wk_04_avail
+		,sum(wk_05_budget) - sum(wk_05_used) as wk_05_avail
+		,sum(wk_06_budget) - sum(wk_06_used) as wk_06_avail
+		,sum(wk_07_budget) - sum(wk_07_used) as wk_07_avail
+		,sum(wk_08_budget) - sum(wk_08_used) as wk_08_avail
+		,sum(wk_09_budget) - sum(wk_09_used) as wk_09_avail
+		,sum(wk_10_budget) - sum(wk_10_used) as wk_10_avail
+		,sum(wk_11_budget) - sum(wk_11_used) as wk_11_avail
+		,sum(wk_12_budget) - sum(wk_12_used) as wk_12_avail
+		,sum(wk_13_budget) - sum(wk_13_used) as wk_13_avail
+		,sum(wk_14_budget) - sum(wk_14_used) as wk_14_avail
+	from dept_num
+	group by 
+		 cpc_code
+		,level_03 )
+
+select 
+	 cpc_code
+	,level_03
+	,wk_01_avail
+	,wk_02_avail
+	,wk_03_avail
+	,wk_04_avail
+	,wk_05_avail
+	,wk_06_avail
+	,wk_07_avail
+	,wk_08_avail
+	,wk_09_avail
+	,wk_10_avail
+	,wk_11_avail
+	,wk_12_avail
+	,wk_13_avail
+	,wk_14_avail
+from lvl_03
+go
+
+
+if object_id('rpt.PRP_Actuals_Level_04_v', 'V') is not null
+	drop view rpt.PRP_Actuals_Level_04_v
+go 
+create view rpt.PRP_Actuals_Level_04_v
+as
+-- ALL DEPT ASGN BY DAY
+with dates as (
+	select cal_dt, rank() over (order by cal_dt ) as wk_num
+	from dbo.cal_dim 
+	where 1=1
+		and day_of_wk = 2
+		and cal_dt between cast(getdate()-6 as date) and getdate() + 90 ),
+
+dept_prp as (
+	select 
+		 r.cpc_code
+		,r.level_03
+		,r.level_04
+		,r.dept_name
+		,r.dept_level
+		,max( case when c.wk_num = 1 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_01_budget
+		,max( case when c.wk_num = 1 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_01_requested
+		,max( case when c.wk_num = 1 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_01_used
+		,max( case when c.wk_num = 2 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_02_budget
+		,max( case when c.wk_num = 2 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_02_requested
+		,max( case when c.wk_num = 2 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_02_used
+		,max( case when c.wk_num = 3 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_03_budget
+		,max( case when c.wk_num = 3 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_03_requested
+		,max( case when c.wk_num = 3 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_03_used
+		,max( case when c.wk_num = 4 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_04_budget
+		,max( case when c.wk_num = 4 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_04_requested
+		,max( case when c.wk_num = 4 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_04_used
+		,max( case when c.wk_num = 5 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_05_budget
+		,max( case when c.wk_num = 5 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_05_requested
+		,max( case when c.wk_num = 5 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_05_used
+		,max( case when c.wk_num = 6 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_06_budget
+		,max( case when c.wk_num = 6 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_06_requested
+		,max( case when c.wk_num = 6 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_06_used
+		,max( case when c.wk_num = 7 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_07_budget
+		,max( case when c.wk_num = 7 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_07_requested
+		,max( case when c.wk_num = 7 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_07_used
+		,max( case when c.wk_num = 8 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_08_budget
+		,max( case when c.wk_num = 8 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_08_requested
+		,max( case when c.wk_num = 8 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_08_used
+		,max( case when c.wk_num = 9 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_09_budget
+		,max( case when c.wk_num = 9 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_09_requested
+		,max( case when c.wk_num = 9 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_09_used
+		,max( case when c.wk_num = 10 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_10_budget
+		,max( case when c.wk_num = 10 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_10_requested
+		,max( case when c.wk_num = 10 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_10_used
+		,max( case when c.wk_num = 11 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_11_budget
+		,max( case when c.wk_num = 11 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_11_requested
+		,max( case when c.wk_num = 11 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_11_used
+		,max( case when c.wk_num = 12 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_12_budget
+		,max( case when c.wk_num = 12 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_12_requested
+		,max( case when c.wk_num = 12 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_12_used
+		,max( case when c.wk_num = 13 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_13_budget
+		,max( case when c.wk_num = 13 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_13_requested
+		,max( case when c.wk_num = 13 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_13_used
+		,max( case when c.wk_num = 14 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_14_budget
+		,max( case when c.wk_num = 14 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_14_requested
+		,max( case when c.wk_num = 14 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_14_used
+	from dates c 
+	left join rpt.Resource_Plan_Dept_v r
+		on c.cal_dt = r.cal_dt
+		and r.prp_type = 'Dept Beds'
+	where 1=1
+		--and r.hpr_dept_key = 217
+	group by
+		 r.cpc_code
+		,r.level_03
+		,r.level_04
+		,r.dept_name
+		,r.dept_level ),
+
+dept_num as (
+	select 
+		 cpc_code
+		,level_03
+		,level_04
+		,dept_name
+		,dept_level
+		,wk_01_budget
+		,case when wk_01_requested > wk_01_used then wk_01_requested else wk_01_used end as wk_01_used
+		,wk_02_budget
+		,case when wk_02_requested > wk_02_used then wk_02_requested else wk_02_used end as wk_02_used
+		,wk_03_budget
+		,case when wk_03_requested > wk_03_used then wk_03_requested else wk_03_used end as wk_03_used
+		,wk_04_budget
+		,case when wk_04_requested > wk_04_used then wk_04_requested else wk_04_used end as wk_04_used
+		,wk_05_budget
+		,case when wk_05_requested > wk_05_used then wk_05_requested else wk_05_used end as wk_05_used
+		,wk_06_budget
+		,case when wk_06_requested > wk_06_used then wk_06_requested else wk_06_used end as wk_06_used
+		,wk_07_budget
+		,case when wk_07_requested > wk_07_used then wk_07_requested else wk_07_used end as wk_07_used
+		,wk_08_budget
+		,case when wk_08_requested > wk_08_used then wk_08_requested else wk_08_used end as wk_08_used
+		,wk_09_budget
+		,case when wk_09_requested > wk_09_used then wk_09_requested else wk_09_used end as wk_09_used
+		,wk_10_budget
+		,case when wk_10_requested > wk_10_used then wk_10_requested else wk_10_used end as wk_10_used
+		,wk_11_budget
+		,case when wk_11_requested > wk_11_used then wk_11_requested else wk_11_used end as wk_11_used
+		,wk_12_budget
+		,case when wk_12_requested > wk_12_used then wk_12_requested else wk_12_used end as wk_12_used
+		,wk_13_budget
+		,case when wk_13_requested > wk_13_used then wk_13_requested else wk_13_used end as wk_13_used
+		,wk_14_budget
+		,case when wk_14_requested > wk_14_used then wk_14_requested else wk_14_used end as wk_14_used
+	from dept_prp
+	where dept_level > 3 ),
+
+lvl_04 as (
+	select 
+		 cpc_code
+		,level_03
+		,level_04
+		,sum(wk_01_budget) - sum(wk_01_used) as wk_01_avail
+		,sum(wk_02_budget) - sum(wk_02_used) as wk_02_avail
+		,sum(wk_03_budget) - sum(wk_03_used) as wk_03_avail
+		,sum(wk_04_budget) - sum(wk_04_used) as wk_04_avail
+		,sum(wk_05_budget) - sum(wk_05_used) as wk_05_avail
+		,sum(wk_06_budget) - sum(wk_06_used) as wk_06_avail
+		,sum(wk_07_budget) - sum(wk_07_used) as wk_07_avail
+		,sum(wk_08_budget) - sum(wk_08_used) as wk_08_avail
+		,sum(wk_09_budget) - sum(wk_09_used) as wk_09_avail
+		,sum(wk_10_budget) - sum(wk_10_used) as wk_10_avail
+		,sum(wk_11_budget) - sum(wk_11_used) as wk_11_avail
+		,sum(wk_12_budget) - sum(wk_12_used) as wk_12_avail
+		,sum(wk_13_budget) - sum(wk_13_used) as wk_13_avail
+		,sum(wk_14_budget) - sum(wk_14_used) as wk_14_avail
+	from dept_num
+	group by 
+		 cpc_code
+		,level_03
+		,level_04 )
+
+select 
+	 cpc_code
+	,level_03
+	,level_04
+	,wk_01_avail
+	,wk_02_avail
+	,wk_03_avail
+	,wk_04_avail
+	,wk_05_avail
+	,wk_06_avail
+	,wk_07_avail
+	,wk_08_avail
+	,wk_09_avail
+	,wk_10_avail
+	,wk_11_avail
+	,wk_12_avail
+	,wk_13_avail
+	,wk_14_avail
+from lvl_04
+go
+
+
 if object_id('rpt.PRP_v', 'V') is not null
 	drop view rpt.PRP_v
 go 
@@ -878,12 +1309,24 @@ final as (
 	select prp_type, 'Used' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, used_bed_cnt as bed_cnt from dept_used 
 	)
 
-select *
-from final
+select 
+	 f.prp_type
+	,f.prp_subtype
+	,f.cal_dt
+	,f.cpc_code
+	,d.Level_03
+	,d.level_04
+	,f.dept_level
+	,f.dept_name
+	,f.hpr_dept_key
+	,f.bed_cnt
+from final f
+left join dbo.hpr_dept d
+	on f.hpr_dept_key = d.HPR_Dept_Key
 where 1=1
 	--and cal_dt = '2024-11-17' 
-	--and cpc_code = 'CI'
-	--and prp_subtype = 'Used'
+	--and f.cpc_code = 'CI'
+	--and f.prp_subtype = 'Used'
 	--and dept_name = 'Trade Group - Siteworks'
 --order by cal_dt, prp_type, prp_subtype, cpc_code, dept_name
 go
@@ -1165,8 +1608,10 @@ if object_id('rpt.Volunteer_All_v', 'V') is not null
 go 
 create view rpt.volunteer_all_v
 as
-select 
+select distinct
 	 core.volunteer_name
+	,core.first_name
+	,core.last_name
 	,core.hub_volunteer_num
 	,core.gender_code
 	,core.marital_status_code
@@ -1218,6 +1663,8 @@ select
 from (
 	select
 		 volunteer_name
+		,first_name
+		,last_name 
 		,hub_volunteer_num
 		,gender_code
 		,marital_status_code
@@ -1271,6 +1718,8 @@ from (
 
 	select 
 		 v.full_name as volunteer_name
+		,v.first_name
+		,v.last_name 
 		,v.hub_volunteer_num
 		,v.gender_code
 		,ms.marital_status_code
@@ -1338,6 +1787,8 @@ from (
 	
 	select 
 		 v.full_name as volunteer_name
+		,v.first_name
+		,v.last_name 
 		,v.hub_volunteer_num
 		,v.gender_code
 		,ms.marital_status_code

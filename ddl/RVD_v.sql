@@ -295,7 +295,6 @@ select
 	,dr.Candidate_2_Next_Step
 	,dr.Candidate_3_Next_Step
 	,dr.Possible_Sister
-	,dr.Sort_Trade_Request AS Expr1
 	,dr.PC_Code
 from dbo.Dept_asgn_v dr
 inner join dbo.[User] u
