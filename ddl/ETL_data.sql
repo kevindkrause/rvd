@@ -761,19 +761,17 @@ begin
 		set @Upd = @Upd + @@rowcount
 
 		-- UPDATE - BA INFO
-/*		
-		update dbo.volunteer
-		set 
-			ba_volunteer_id = src.volunteer_id,
-			ba_volunteer_num = src.volunteer_banumber,
-			mate_ba_volunteer_id = src.mate_volunteer_id,
-			mate_ba_volunteer_num = src.mate_volunteer_banumber, 
-			preferred_name = left( src.preferred_name, 150 ),
-			preferred_phone = left( src.preferred_phone_number, 20 ),
-			preferred_phone_type = src.preferred_phone_type,
-			ba_safety_orientation_date = src.safety_orientation_date,
-			ba_active_flag = 'Y',
-			update_date = getdate()
+		select 
+			tgt.volunteer_key,
+			src.volunteer_id						as ba_volunteer_id,
+			src.volunteer_banumber					as ba_volunteer_num,
+			src.mate_volunteer_id					as mate_ba_volunteer_id,
+			src.mate_volunteer_banumber				as mate_ba_volunteer_num, 
+			left( src.preferred_name, 150 )			as preferred_name,
+			left( src.preferred_phone_number, 20 )	as preferred_phone,
+			src.preferred_phone_type,
+			src.safety_orientation_date				as ba_safety_orientation_date
+		into #ba_tmp
 		from dbo.volunteer tgt
 		inner join stg.stg_ba_volunteer src
 			on tgt.hub_person_guid = src.person_guid
@@ -786,8 +784,24 @@ begin
 			or coalesce( tgt.preferred_phone_type, '' ) <> coalesce( src.preferred_phone_type, '' )
 			or coalesce( tgt.ba_safety_orientation_date, '2999-12-31' ) <> coalesce( src.Safety_Orientation_Date, '2999-12-31' )
 
+		update dbo.volunteer
+		set 
+			ba_volunteer_id = src.ba_volunteer_id,
+			ba_volunteer_num = src.ba_volunteer_num,
+			mate_ba_volunteer_id = src.mate_ba_volunteer_id,
+			mate_ba_volunteer_num = src.mate_ba_volunteer_num, 
+			preferred_name = src.preferred_name,
+			preferred_phone = src.preferred_phone,
+			preferred_phone_type = src.preferred_phone_type,
+			ba_safety_orientation_date = src.ba_safety_orientation_date,
+			ba_active_flag = 'Y',
+			update_date = getdate()
+		from dbo.volunteer tgt
+		inner join #ba_tmp src
+			on tgt.volunteer_key = src.volunteer_key
+			
 		set @Upd = @Upd + @@rowcount	
-*/		
+		
 		-- UPDATE - TURN ALL KEY ROLES OFF
 		update dbo.volunteer
 		set 
