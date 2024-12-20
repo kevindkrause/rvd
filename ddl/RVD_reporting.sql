@@ -1647,6 +1647,9 @@ select distinct
 	,coalesce( convert( varchar, core.dept_2_start_date, 23 ), '' ) as dept_2_start_date
 	,coalesce( convert( varchar, core.dept_2_end_date, 23 ), '' ) as dept_2_end_date
 	,core.tentative_end_date
+	,coalesce( core.room_site_code, '' ) as room_site_code
+	,coalesce( core.room_bldg, '' ) as room_bldg
+	,coalesce( core.room_bldg_code, '' ) as room_bldg_code
 	,coalesce( core.room_bldg_desc, '' ) as room_bldg_desc
 	,coalesce( core.room, '' ) as room
 	,coalesce( core.bethel_email, '' ) as bethel_email
@@ -1697,8 +1700,11 @@ from (
 		,dept_2_start_date
 		,dept_2_end_date
 		,tentative_end_date
+		,room_site_code
+		,room_bldg
+		,room_bldg_code
 		,room_bldg_desc
-		,room
+		,room		
 		,bethel_email
 		,jwpub_email
 		,'Y' as hpr_flag
@@ -1752,6 +1758,9 @@ from (
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,v.tentative_end_date
+		,v.room_site_code
+		,v.room_bldg
+		,v.room_bldg_code
 		,left( v.room, charindex( '-', v.room ) - 1 ) as room_bldg_desc
 		,v.room
 		,v.alt_Email as bethel_email
@@ -1821,6 +1830,9 @@ from (
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,v.tentative_end_date
+		,v.room_site_code
+		,v.room_bldg
+		,v.room_bldg_code
 		,left( v.room, charindex( '-', v.room ) - 1 ) as room_bldg_desc
 		,v.room
 		,v.alt_Email as bethel_email

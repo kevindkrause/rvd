@@ -3178,6 +3178,75 @@ go
 
 
 /***********************************************************
+**					   VOLUNTEER ROOMING 
+***********************************************************/
+if object_id('dbo.ETL_Volunteer_Rooming_Hist_proc') is null
+    exec( 'create procedure dbo.ETL_Volunteer_Rooming_Hist_proc as set nocount on;' )
+go
+
+alter procedure dbo.ETL_Volunteer_Rooming_Hist_proc
+as
+begin
+	set nocount on
+	
+	declare 
+		@Table nvarchar(150) = 'Volunteer_Rooming_Hist', 
+		@Ins integer = 0,
+		@Upd integer = 0,
+		@Del integer = 0,
+		@Start datetime = getdate(), 
+		@End datetime
+		
+	-- ONLY INSERT DATA IF MONDAY
+	begin try	
+		-- INSERT
+		insert into dbo.volunteer_rooming_hist( 
+			 volunteer_key
+			,cal_dt
+			,room_site_code
+			,room_bldg
+			,room_bldg_code
+			,room_bldg_desc
+			,room )		
+		select
+			 volunteer_key
+			,cast( getdate() as date ) as cal_dt
+			,room_site_code
+			,room_bldg
+			,room_bldg_code
+			,room_bldg_desc
+			,room
+		from rpt.volunteer_all_v
+		where datename( weekday, getdate() ) = 'Monday'
+
+		set @Ins = @@rowcount
+
+		set @End = getdate()
+
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End
+	end try			
+
+	begin catch
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End,
+			@Status_Code = 'F'
+	end catch		
+end
+go
+
+
+/***********************************************************
 **					   VOLUNTEER SEARCH 
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Search_proc') is null
@@ -4657,6 +4726,7 @@ begin
 	exec dbo.ETL_Volunteer_Enrollment_Rpt_proc	
 	exec dbo.ETL_Volunteer_FTS_proc
 	exec dbo.ETL_Volunteer_Role_proc
+	exec dbo.ETL_Volunteer_Rooming_Hist_proc
 	exec dbo.ETL_Volunteer_Search_proc
 	exec dbo.ETL_Volunteer_Skill_proc
 	exec dbo.ETL_Volunteer_Training_proc
