@@ -4554,6 +4554,137 @@ begin
 
 		set @Ins = @Ins + @@rowcount
 		
+		-- PRP ACTUALS
+		-- DELETE EXISTING DATA
+		truncate table dbo.PRP_Actuals_Level_04
+		
+		set @Del = @Del + @@rowcount		
+		
+		-- INSERT PRP ACTUALS DATA		
+		insert into dbo.PRP_Actuals_Level_04(
+			cpc_code
+           ,level_03
+           ,level_04
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail )
+		select 
+			cpc_code
+           ,level_03
+           ,level_04
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail
+		from rpt.PRP_Actuals_Level_04_v
+		
+		set @Ins = @Ins + @@rowcount		
+		
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
