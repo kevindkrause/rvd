@@ -524,6 +524,41 @@ where ul.active_flag = 'Y'
 go
 
 
+if object_id('dbo.User_Task_v', 'V') is not null
+	drop view dbo.User_Task_v
+go 
+create view dbo.User_Task_v
+as
+select ut.user_task_key
+      ,ut.user_key
+	  ,u.last_name + ', ' + u.first_name as user_nm
+      ,ut.user_2_key
+	  ,u2.last_name + ', ' + u2.first_name as user_2_nm
+      ,ut.user_3_key
+	  ,u3.last_name + ', ' + u3.first_name as user_3_nm
+      ,ut.user_task
+      ,ut.start_date
+      ,ut.due_date
+      ,ut.notes
+      ,ut.user_task_status_key
+	  ,uts.User_Task_Status
+      ,ut.load_date
+      ,ut.update_date
+      ,ut.volunteer_key
+      ,ut.person_name
+      ,ut.priority_key
+from dbo.user_task ut --531
+inner join dbo.User_Task_Status uts
+	on ut.User_Task_Status_Key = uts.User_Task_Status_Key
+inner join dbo.[User] u
+	on ut.user_key = u.user_key
+left outer join dbo.[User] u2
+	on ut.user_2_key = u.user_key
+left outer join dbo.[User] u3
+	on ut.user_3_key = u.user_key
+go
+
+
 if object_id('dbo.Volunteer_App_v', 'V') is not null
 	drop view dbo.Volunteer_App_v
 go 
