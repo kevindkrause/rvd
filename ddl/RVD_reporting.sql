@@ -838,6 +838,72 @@ group by
 go
 
 
+if object_id('rpt.PRP_Actuals_Level_02_v', 'V') is not null
+	drop view rpt.PRP_Actuals_Level_02_v
+go 
+create view rpt.PRP_Actuals_Level_02_v
+as
+select 
+	 cpc_code
+	,max( wk_01_dt ) as wk_01_dt
+	,sum( wk_01_budget ) as wk_01_budget
+	,sum( wk_01_used ) as wk_01_used
+	,sum( wk_01_avail ) as wk_01_avail
+	,max( wk_02_dt ) as wk_02_dt
+	,sum( wk_02_budget ) as wk_02_budget
+	,sum( wk_02_used ) as wk_02_used
+	,sum( wk_02_avail ) as wk_02_avail
+	,max( wk_03_dt ) as wk_03_dt
+	,sum( wk_03_budget ) as wk_03_budget
+	,sum( wk_03_used ) as wk_03_used
+	,sum( wk_03_avail ) as wk_03_avail
+	,max( wk_04_dt ) as wk_04_dt
+	,sum( wk_04_budget ) as wk_04_budget
+	,sum( wk_04_used ) as wk_04_used
+	,sum( wk_04_avail ) as wk_04_avail
+	,max( wk_05_dt ) as wk_05_dt
+	,sum( wk_05_budget ) as wk_05_budget
+	,sum( wk_05_used ) as wk_05_used
+	,sum( wk_05_avail ) as wk_05_avail
+	,max( wk_06_dt ) as wk_06_dt
+	,sum( wk_06_budget ) as wk_06_budget
+	,sum( wk_06_used ) as wk_06_used
+	,sum( wk_06_avail ) as wk_06_avail
+	,max( wk_07_dt ) as wk_07_dt
+	,sum( wk_07_budget ) as wk_07_budget
+	,sum( wk_07_used ) as wk_07_used
+	,sum( wk_07_avail ) as wk_07_avail
+	,max( wk_08_dt ) as wk_08_dt
+	,sum( wk_08_budget ) as wk_08_budget
+	,sum( wk_08_used ) as wk_08_used
+	,sum( wk_08_avail ) as wk_08_avail
+	,max( wk_09_dt ) as wk_09_dt
+	,sum( wk_09_budget ) as wk_09_budget
+	,sum( wk_09_used ) as wk_09_used
+	,sum( wk_09_avail ) as wk_09_avail
+	,max( wk_10_dt ) as wk_10_dt
+	,sum( wk_10_budget ) as wk_10_budget
+	,sum( wk_10_used ) as wk_10_used
+	,sum( wk_10_avail ) as wk_10_avail
+	,max( wk_11_dt ) as wk_11_dt
+	,sum( wk_11_budget ) as wk_11_budget
+	,sum( wk_11_used ) as wk_11_used
+	,sum( wk_11_avail ) as wk_11_avail
+	,max( wk_12_dt ) as wk_12_dt
+	,sum( wk_12_budget ) as wk_12_budget
+	,sum( wk_12_used ) as wk_12_used
+	,sum( wk_12_avail ) as wk_12_avail
+	,max( wk_13_dt ) as wk_13_dt
+	,sum( wk_13_budget ) as wk_13_budget
+	,sum( wk_13_used ) as wk_13_used
+	,sum( wk_13_avail ) as wk_13_avail
+	,max( wk_14_dt ) as wk_14_dt
+	,sum( wk_14_budget ) as wk_14_budget
+	,sum( wk_14_used ) as wk_14_used
+	,sum( wk_14_avail ) as wk_14_avail
+from rpt.PRP_Actuals_Level_04_v
+group by cpc_code
+	
 
 if object_id('rpt.PRP_Actuals_Level_03_v', 'V') is not null
 	drop view rpt.PRP_Actuals_Level_03_v
