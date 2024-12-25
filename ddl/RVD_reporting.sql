@@ -901,7 +901,7 @@ select
 	,sum( wk_14_budget ) as wk_14_budget
 	,sum( wk_14_used ) as wk_14_used
 	,sum( wk_14_avail ) as wk_14_avail
-from rpt.PRP_Actuals_Level_04_v
+from dbo.PRP_Actuals_Level_04
 group by cpc_code
 	
 
@@ -969,7 +969,7 @@ select
 	,sum( wk_14_budget ) as wk_14_budget
 	,sum( wk_14_used ) as wk_14_used
 	,sum( wk_14_avail ) as wk_14_avail
-from rpt.PRP_Actuals_Level_04_v
+from dbo.PRP_Actuals_Level_04
 group by
 	 cpc_code
 	,level_03
