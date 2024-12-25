@@ -1341,13 +1341,17 @@ dept_beds as (
 		and d.active_flag = 'Y' ),
 
 dept_req_base as (
-	select a.hpr_dept_key, c.cal_dt, count(*) as requested_bed_cnt
+	select d.hpr_dept_key, c.cal_dt, count(*) as requested_bed_cnt
 	from dbo.dept_asgn_v a
 	inner join dbo.cal_dim c
 		on c.cal_dt between a.ps_start_date and coalesce( a.ps_end_date, '2031-12-31' )
+	inner join dbo.hpr_dept d
+		on a.level_04 = d.Level_04
+		and d.level_05 is null
+		and d.Active_Flag = 'Y'
 	where a.active_flag = 'Y'
 		and a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
-	group by a.hpr_dept_key, c.cal_dt ),
+	group by d.hpr_dept_key, c.cal_dt ),
 
 dept_req as (
 	select 'Dept Beds' as prp_type, a.hpr_dept_key, a.cal_dt, d.cpc_code, a.requested_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
