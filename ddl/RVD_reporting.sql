@@ -2507,7 +2507,6 @@ from (
 go
 
 
-
 if object_id('rpt.Volunteer_Training_v', 'V') is not null
 	drop view rpt.Volunteer_Training_v
 go 
@@ -2517,12 +2516,12 @@ select
 	 v.hub_volunteer_num as volunteer_number
 	,v.volunteer_name
 	,v.bethel_email
-	,v.parent_dept_code
-	,v.parent_dept_name
-	,v.dept_name
-	,v.enrollment_code
-	,v.enrollment_start_date
-	,v.enrollment_end_date
+	,v.dept_1_cpc_code as parent_dept_code
+	,v.dept_1_parent_dept_name as parent_dept_name
+	,v.dept_1_dept_name as dept_name
+	,v.enrollment_1_code as enrollment_code
+	,v.enrollment_1_start_date as enrollment_start_date
+	,v.enrollment_1_end_date as enrollment_end_date
 	,t.class_number
 	,t.class_name
 	,t.host_branch_code	
@@ -2534,13 +2533,13 @@ select
 	,t.attendance_status	
 	,t.active_flag
 	,v.volunteer_key
-from rpt.volunteer_v v
+from rpt.volunteer_rpt_v v
 left join dbo.Volunteer_Training t
 	on v.volunteer_key = t.volunteer_key
 where 1=1
 go
 
-
+	
 if object_id('rpt.Timecard_v', 'V') is not null
 	drop view rpt.Timecard_v
 go 
