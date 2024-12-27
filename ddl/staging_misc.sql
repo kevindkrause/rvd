@@ -233,6 +233,8 @@ select
 	,coalesce( [Feb-30], 0 ) as feb_30
 	,coalesce( [Mar-30], 0 ) as mar_30
 	,coalesce( [Apr-30], 0 ) as apr_30
+	,coalesce( [May-30], 0 ) as may_30
+	,coalesce( [Jun-30], 0 ) as jun_30	
 from stg.stg_PRP_Dept
 where 1=1
 	and (
@@ -381,7 +383,9 @@ select
 	,coalesce( sum( [Jan-30] ), 0 ) as jan_30
 	,coalesce( sum( [Feb-30] ), 0 ) as feb_30
 	,coalesce( sum( [Mar-30] ), 0 ) as mar_30	
-	,coalesce( sum( [Apr-30] ), 0 ) as apr_30		
+	,coalesce( sum( [Apr-30] ), 0 ) as apr_30
+	,coalesce( sum( [May-30] ), 0 ) as may_30	
+	,coalesce( sum( [Jun-30] ), 0 ) as jun_30	
 from
 	( select 
 		 department
@@ -522,6 +526,8 @@ from
 		,[Feb-30]
 		,[Mar-30]
 		,[Apr-30]
+		,[May-30]
+		,[Jun-30]	
 	  from stg.stg_PRP_Dept
 	  where 1=1
 		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR HQ', 'HPR PU' )
@@ -529,6 +535,145 @@ from
 		) core
 group by cpc_code
 go
+
+if object_id('stg.stg_PRP_Dept', 'U') is not
+	drop table stg.stg_PRP_Dept
+go
+CREATE TABLE [stg].[stg_PRP_Dept](
+	[Department] [nvarchar](255) NULL,
+	[TeamTrade] [nvarchar](255) NULL,
+	[TeamCode] [nvarchar](255) NULL,
+	[ParentCode] [nvarchar](255) NULL,
+	[HuBGroup] [nvarchar](255) NULL,
+	[DeskRequired] [nvarchar](255) NULL,
+	[Jan-20] [float] NULL,
+	[Feb-20] [float] NULL,
+	[Mar-20] [float] NULL,
+	[Apr-20] [float] NULL,
+	[May-20] [float] NULL,
+	[Jun-20] [float] NULL,
+	[Jul-20] [float] NULL,
+	[Aug-20] [float] NULL,
+	[Sep-20] [float] NULL,
+	[Oct-20] [float] NULL,
+	[Nov-20] [float] NULL,
+	[Dec-20] [float] NULL,
+	[Jan-21] [float] NULL,
+	[Feb-21] [float] NULL,
+	[Mar-21] [float] NULL,
+	[Apr-21] [float] NULL,
+	[May-21] [float] NULL,
+	[Jun-21] [float] NULL,
+	[Jul-21] [float] NULL,
+	[Aug-21] [float] NULL,
+	[Sep-21] [float] NULL,
+	[Oct-21] [float] NULL,
+	[Nov-21] [float] NULL,
+	[Dec-21] [float] NULL,
+	[Jan-22] [float] NULL,
+	[Feb-22] [float] NULL,
+	[Mar-22] [float] NULL,
+	[Apr-22] [float] NULL,
+	[May-22] [float] NULL,
+	[Jun-22] [float] NULL,
+	[Jul-22] [float] NULL,
+	[Aug-22] [float] NULL,
+	[Sep-22] [float] NULL,
+	[Oct-22] [float] NULL,
+	[Nov-22] [float] NULL,
+	[Dec-22] [float] NULL,
+	[Jan-23] [float] NULL,
+	[Feb-23] [float] NULL,
+	[Mar-23] [float] NULL,
+	[Apr-23] [float] NULL,
+	[May-23] [float] NULL,
+	[Jun-23] [float] NULL,
+	[Jul-23] [float] NULL,
+	[Aug-23] [float] NULL,
+	[Sep-23] [float] NULL,
+	[Oct-23] [float] NULL,
+	[Nov-23] [float] NULL,
+	[Dec-23] [float] NULL,
+	[Jan-24] [float] NULL,
+	[Feb-24] [float] NULL,
+	[Mar-24] [float] NULL,
+	[Apr-24] [float] NULL,
+	[May-24] [float] NULL,
+	[Jun-24] [float] NULL,
+	[Jul-24] [float] NULL,
+	[Aug-24] [float] NULL,
+	[Sep-24] [float] NULL,
+	[Oct-24] [float] NULL,
+	[Nov-24] [float] NULL,
+	[Dec-24] [float] NULL,
+	[Jan-25] [float] NULL,
+	[Feb-25] [float] NULL,
+	[Mar-25] [float] NULL,
+	[Apr-25] [float] NULL,
+	[May-25] [float] NULL,
+	[Jun-25] [float] NULL,
+	[Jul-25] [float] NULL,
+	[Aug-25] [float] NULL,
+	[Sep-25] [float] NULL,
+	[Oct-25] [float] NULL,
+	[Nov-25] [float] NULL,
+	[Dec-25] [float] NULL,
+	[Jan-26] [float] NULL,
+	[Feb-26] [float] NULL,
+	[Mar-26] [float] NULL,
+	[Apr-26] [float] NULL,
+	[May-26] [float] NULL,
+	[Jun-26] [float] NULL,
+	[Jul-26] [float] NULL,
+	[Aug-26] [float] NULL,
+	[Sep-26] [float] NULL,
+	[Oct-26] [float] NULL,
+	[Nov-26] [float] NULL,
+	[Dec-26] [float] NULL,
+	[Jan-27] [float] NULL,
+	[Feb-27] [float] NULL,
+	[Mar-27] [float] NULL,
+	[Apr-27] [float] NULL,
+	[May-27] [float] NULL,
+	[Jun-27] [float] NULL,
+	[Jul-27] [float] NULL,
+	[Aug-27] [float] NULL,
+	[Sep-27] [float] NULL,
+	[Oct-27] [float] NULL,
+	[Nov-27] [float] NULL,
+	[Dec-27] [float] NULL,
+	[Jan-28] [float] NULL,
+	[Feb-28] [float] NULL,
+	[Mar-28] [float] NULL,
+	[Apr-28] [float] NULL,
+	[May-28] [float] NULL,
+	[Jun-28] [float] NULL,
+	[Jul-28] [float] NULL,
+	[Aug-28] [float] NULL,
+	[Sep-28] [float] NULL,
+	[Oct-28] [float] NULL,
+	[Nov-28] [float] NULL,
+	[Dec-28] [float] NULL,
+	[Jan-29] [float] NULL,
+	[Feb-29] [float] NULL,
+	[Mar-29] [float] NULL,
+	[Apr-29] [float] NULL,
+	[May-29] [float] NULL,
+	[Jun-29] [float] NULL,
+	[Jul-29] [float] NULL,
+	[Aug-29] [float] NULL,
+	[Sep-29] [float] NULL,
+	[Oct-29] [float] NULL,
+	[Nov-29] [float] NULL,
+	[Dec-29] [float] NULL,
+	[Jan-30] [float] NULL,
+	[Feb-30] [float] NULL,
+	[Mar-30] [float] NULL,
+	[Apr-30] [float] NULL,
+	[May-30] [float] NULL,
+	[Jun-30] [float] NULL
+) ON [PRIMARY]
+GO
 
 
 if object_id('stg.stg_prp_dept_v', 'V') is not null
@@ -662,7 +807,9 @@ select
 	,coalesce( sum( [Jan-30] ), 0 ) as jan_30
 	,coalesce( sum( [Feb-30] ), 0 ) as feb_30
 	,coalesce( sum( [Mar-30] ), 0 ) as mar_30	
-	,coalesce( sum( [Apr-30] ), 0 ) as apr_30		
+	,coalesce( sum( [Apr-30] ), 0 ) as apr_30
+	,coalesce( sum( [May-30] ), 0 ) as may_30	
+	,coalesce( sum( [Jun-30] ), 0 ) as jun_30	
 from
 	( select 
 		 department
@@ -795,6 +942,8 @@ from
 		,[Feb-30]
 		,[Mar-30]
 		,[Apr-30]
+		,[May-30]
+		,[Jun-30]
 	  from stg.stg_PRP_Dept
 	  where 1=1
 		--and teamcode like 'HPR DD%'
@@ -944,6 +1093,8 @@ select
 	,coalesce( prp.feb_30, 0 ) as feb_30
 	,coalesce( prp.mar_30, 0 ) as mar_30
 	,coalesce( prp.apr_30, 0 ) as apr_30	
+	,coalesce( prp.may_30, 0 ) as may_30
+	,coalesce( prp.jun_30, 0 ) as jun_30		
 from dbo.hpr_dept d
 left join stg.stg_prp_dept_v prp
 	on d.pc_code_full = prp.pc_code
