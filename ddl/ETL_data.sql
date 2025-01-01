@@ -2363,7 +2363,28 @@ begin
 		inner join tmp
 			on d.volunteer_key = tmp.volunteer_key
 			
-		set @Upd = @Upd + @@rowcount
+		set @Upd = @Upd + @@rowcount;
+		
+		-- REMOVE TEMP UNASSIGNED ENTRIES
+		with dept1 as (
+			select volunteer_key, hub_dept_id as dept1, parent_dept_name as dept1_parent_dept_name, dept_name as dept1_dept_name, start_date as dept1_start_date, end_date as dept1_end_date, row_num
+			from dbo.Volunteer_Dept_Rpt
+			where hub_dept_id = 9966 ),
+
+		src as (
+			select d1.*, vd.HUB_Dept_ID as dept2, vd.Parent_Dept_Name as dept2_parent_dept_name, vd.Dept_Name as dept2_dept_name, vd.Temp_Flag as dept2_temp_flag, vd.start_date as dept2_start_date, vd.end_date as dept2_end_date
+			from dbo.Volunteer_Dept_Rpt vd
+			inner join dept1 d1
+				on vd.volunteer_key = d1.volunteer_key
+				and vd.row_num != d1.row_num
+			where vd.End_Date is null or d1.dept1_end_date = dateadd(day,1,d1.dept1_start_date) )
+
+		delete
+		from dbo.volunteer_dept_rpt 
+		where volunteer_key in ( select volunteer_key from src )
+			and hub_dept_id = 9966
+
+		set @Del = @Del + @@rowcount		
 
 		set @End = getdate()
 
