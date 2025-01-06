@@ -80,6 +80,43 @@ select distinct
 		else 'Arrived'
 	 end as enrollment_status
 from rpt.Volunteer_Departure_v
+
+union all
+
+select distinct
+	 hub_volunteer_num
+	,first_name
+	,last_name
+	,address
+	,city
+	,state_code
+	,postal_code
+	,gender_code
+	,marital_status_code
+	,home_phone
+	,mobile_phone
+	,bethel_email
+	,jwpub_email
+	,personal_email
+	,dept_2_parent_dept_name as parent_dept_name
+	,dept_2_dept_name as dept_name
+	,case 
+		when charindex( ' - ', dept_2_dept_name ) = 0 then dept_2_dept_name
+		else right( dept_2_dept_name, charindex( ' - ', reverse( dept_2_dept_name ) ) - 1 )
+	 end as sub_dept_name
+	,enrollment_1_code as enrollment_code
+	,enrollment_1_start_date as enrollment_start_date
+	,enrollment_1_end_date as enrollment_end_date
+	,spouse_hub_volunteer_num
+	,spouse_bethel_email
+	,spouse_jwpub_email
+	,volunteer_key
+	,'Transfer' as enrollment_status
+from rpt.Volunteer_Rpt_v
+where dept_1_cpc_code is null
+	and dept_1_end_date is not null
+	and dept_2_cpc_code is not null
+	and dept_2_start_date > cast(getdate() as date)
 go
 
 
@@ -798,42 +835,66 @@ with base as (
 		on coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) = d.hpr_dept_key
 	inner join dbo.cal_dim c
 		on c.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '12/31/2030' )
-		and c.day_of_mth = 1 )
+		and c.day_of_mth = 1 ),
+		
+commuters as (
+	select volunteer_key, mon + tues + wed + thurs + fri as commute_day_cnt
+	from (
+		select 
+			 volunteer_key
+			,sum( case when mon_am_flag = 'Y' then 1 else 0 end ) as mon
+			,sum( case when tue_am_flag = 'Y' then 1 else 0 end ) as tues
+			,sum( case when wed_am_flag = 'Y' then 1 else 0 end ) as wed
+			,sum( case when thu_am_flag = 'Y' then 1 else 0 end ) as thurs
+			,sum( case when fri_am_flag = 'Y' then 1 else 0 end ) as fri
+		from dbo.Volunteer_Dept_v
+		where active_flag = 'Y'
+			and enrollment_code in ( 'BBV', 'BCC' )
+			--and site_code = 'RMP'
+		group by volunteer_key ) x )		
 
 select
-	 pc_code
-	,pc_category
-	,cpc_code
-	,level_03
-	,level_04
-	,level_05
-	,level_06 
-	,cal_dt
-	,enrollment_code
-	,site_code
-	,site_bldg
-	,site_bldg_code
-	,sum( case when enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end ) as bed_cnt
-	,sum( case when enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 0 else 1 end ) as no_bed_cnt
-from base
+	 b.pc_code
+	,b.pc_category
+	,b.cpc_code
+	,b.level_03
+	,b.level_04
+	,b.level_05
+	,b.level_06 
+	,b.cal_dt
+	,b.enrollment_code
+	,b.site_code
+	,b.site_bldg
+	,b.site_bldg_code
+	,sum( case when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end ) as bed_cnt
+	,sum( case when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 0 else 1 end ) as no_bed_cnt
+	,cast( sum(
+		case 
+			when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BRS', 'BCL' ) then 5
+			when b.enrollment_code in ( 'BBV', 'BCC' ) then coalesce( c.commute_day_cnt, 0 )
+			else 0
+		 end ) as decimal(5,1) ) / 5 as fte
+from base b
+left join commuters c
+	on b.volunteer_key = c.volunteer_key
 where 1=1
-	--and cal_dt between '2024-01-01' and '2024-12-01'
+	--and cal_dt between '2025-01-01' and '2025-01-01'
 	--and level_03 = 'Trade Group'
 	--and level_04 = 'Siteworks'
 	--and PC_Category = 'Tools'
 group by 
-	 pc_code
-	,pc_category
-	,cpc_code
-	,level_03
-	,level_04
-	,level_05
-	,level_06 
-	,cal_dt
-	,enrollment_code
-	,site_code
-	,site_bldg
-	,site_bldg_code
+	 b.pc_code
+	,b.pc_category
+	,b.cpc_code
+	,b.level_03
+	,b.level_04
+	,b.level_05
+	,b.level_06 
+	,b.cal_dt
+	,b.enrollment_code
+	,b.site_code
+	,b.site_bldg
+	,b.site_bldg_code 
 --order by 1, 2, 3, 4, 5, 6, 7, 8, 9
 go
 
