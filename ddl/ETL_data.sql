@@ -4641,7 +4641,55 @@ begin
            ,wk_14_dt
            ,wk_14_budget
            ,wk_14_used
-           ,wk_14_avail )
+           ,wk_14_avail
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+           ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_24_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail )
 		select 
 			cpc_code
            ,level_03
@@ -4701,7 +4749,51 @@ begin
            ,wk_14_dt
            ,wk_14_budget
            ,wk_14_used
-           ,wk_14_avail
+           ,wk_14_avail           
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail           
+           ,wk_20_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail           
 		from rpt.PRP_Actuals_Level_04_v
 		
 		set @Ins = @Ins + @@rowcount		
@@ -4869,7 +4961,7 @@ begin
 	exec dbo.ETL_BA_Project_Volunteer_Attendance_proc
 	exec dbo.ETL_Volunteer_proc
 	exec dbo.ETL_Volunteer_App_proc
-	exec dbo.ETL_Volunteer_App_Collection_proc
+	--exec dbo.ETL_Volunteer_App_Collection_proc
 	exec dbo.ETL_Volunteer_Approval_Level_Hist_proc
 	exec dbo.ETL_Volunteer_Availability_proc
 	exec dbo.ETL_Volunteer_Dept_proc

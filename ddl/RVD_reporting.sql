@@ -2062,11 +2062,17 @@ select
 	,enrollment_1_code
 	,coalesce( enrollment_1_site_code, 'UNK' ) as enrollment_1_site_code
 	,enrollment_1_start_date
-	,enrollment_1_end_date
+	,case
+		when enrollment_1_code in ( 'BCV' ) then coalesce( enrollment_1_end_date, tentative_end_date )
+		else enrollment_1_end_date
+	 end as enrollment_1_end_date
 	,enrollment_2_code
 	,enrollment_2_site_code
 	,enrollment_2_start_date
-	,enrollment_2_end_date
+	,case
+		when enrollment_1_code in ( 'BBV', 'BRV' ) then coalesce( enrollment_2_end_date, tentative_end_date )
+		else enrollment_2_end_date
+	 end as enrollment_2_end_date
 	,dept_1_hpr_dept_key
 	,dept_1_hub_dept_id
 	,dept_1_cpc_code
