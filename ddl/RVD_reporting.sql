@@ -488,11 +488,11 @@ create view rpt.CVC_v
 as
 -- ALL DEPT ASGN BY DAY
 with dates as (
-	select cal_dt, rank() over (order by cal_dt ) as wk_num
+	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
 	from dbo.cal_dim 
 	where 1=1
 		and day_of_wk = 2
-		and cal_dt between cast(getdate()-6 as date) and getdate() + 90 ),
+		and cal_dt between cast(getdate()-6 as date) and getdate() + 200 ),
 
 dept_req as (
 	select 
@@ -503,7 +503,10 @@ dept_req as (
 		,da.full_dept_name
 		,da.crew_name
 		,da.dept_role
-		,da.volunteer_name_short as volunteer_name
+		,case
+			when da.volunteer_name_short is not null then da.volunteer_name_short
+			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '03/31/2028' ) then 'Dept Request'
+		 end as volunteer_name
 		,c.cal_dt
 		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
 		,coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' ) as end_date
@@ -517,7 +520,7 @@ dept_req as (
 		,c.wk_num
 	from dates c 
 	left join dbo.dept_asgn_v da
-		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' )
+		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '03/31/2028' )
 		and da.active_flag = 'Y'
 		and da.test_data_flag = 'N' )
 
@@ -530,6 +533,7 @@ select
 	,enrollment_code
 	,used_bed_cnt
 	,dept_asgn_status
+	,max( dept_asgn_key ) as dept_asgn_key	
 	,max( case when wk_num = 1 then volunteer_name else null end ) as wk_01
 	,max( case when wk_num = 2 then volunteer_name else null end ) as wk_02
 	,max( case when wk_num = 3 then volunteer_name else null end ) as wk_03
@@ -544,6 +548,18 @@ select
 	,max( case when wk_num = 12 then volunteer_name else null end ) as wk_12
 	,max( case when wk_num = 13 then volunteer_name else null end ) as wk_13
 	,max( case when wk_num = 14 then volunteer_name else null end ) as wk_14
+	,max( case when wk_num = 15 then volunteer_name else null end ) as wk_15
+	,max( case when wk_num = 16 then volunteer_name else null end ) as wk_16
+	,max( case when wk_num = 17 then volunteer_name else null end ) as wk_17
+	,max( case when wk_num = 18 then volunteer_name else null end ) as wk_18
+	,max( case when wk_num = 19 then volunteer_name else null end ) as wk_19
+	,max( case when wk_num = 20 then volunteer_name else null end ) as wk_20
+	,max( case when wk_num = 21 then volunteer_name else null end ) as wk_21
+	,max( case when wk_num = 22 then volunteer_name else null end ) as wk_22
+	,max( case when wk_num = 23 then volunteer_name else null end ) as wk_23
+	,max( case when wk_num = 24 then volunteer_name else null end ) as wk_24	
+	,max( case when wk_num = 25 then volunteer_name else null end ) as wk_25
+	,max( case when wk_num = 26 then volunteer_name else null end ) as wk_26	
 from dept_req
 where 1=1
 	--and cpc_code = 'CI'
