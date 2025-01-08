@@ -962,6 +962,54 @@ select
 	,sum( wk_14_budget ) as wk_14_budget
 	,sum( wk_14_used ) as wk_14_used
 	,sum( wk_14_avail ) as wk_14_avail
+	,max( wk_15_dt ) as wk_15_dt
+	,sum( wk_15_budget ) as wk_15_budget
+	,sum( wk_15_used ) as wk_15_used
+	,sum( wk_15_avail ) as wk_15_avail
+	,max( wk_16_dt ) as wk_16_dt
+	,sum( wk_16_budget ) as wk_16_budget
+	,sum( wk_16_used ) as wk_16_used
+	,sum( wk_16_avail ) as wk_16_avail
+	,max( wk_17_dt ) as wk_17_dt
+	,sum( wk_17_budget ) as wk_17_budget
+	,sum( wk_17_used ) as wk_17_used
+	,sum( wk_17_avail ) as wk_17_avail
+	,max( wk_18_dt ) as wk_18_dt
+	,sum( wk_18_budget ) as wk_18_budget
+	,sum( wk_18_used ) as wk_18_used
+	,sum( wk_18_avail ) as wk_18_avail
+	,max( wk_19_dt ) as wk_19_dt
+	,sum( wk_19_budget ) as wk_19_budget
+	,sum( wk_19_used ) as wk_19_used
+	,sum( wk_19_avail ) as wk_19_avail
+	,max( wk_20_dt ) as wk_20_dt
+	,sum( wk_20_budget ) as wk_20_budget
+	,sum( wk_20_used ) as wk_20_used
+	,sum( wk_20_avail ) as wk_20_avail
+	,max( wk_21_dt ) as wk_21_dt
+	,sum( wk_21_budget ) as wk_21_budget
+	,sum( wk_21_used ) as wk_21_used
+	,sum( wk_21_avail ) as wk_21_avail
+	,max( wk_22_dt ) as wk_22_dt
+	,sum( wk_22_budget ) as wk_22_budget
+	,sum( wk_22_used ) as wk_22_used
+	,sum( wk_22_avail ) as wk_22_avail
+	,max( wk_23_dt ) as wk_23_dt
+	,sum( wk_23_budget ) as wk_23_budget
+	,sum( wk_23_used ) as wk_23_used
+	,sum( wk_23_avail ) as wk_23_avail
+	,max( wk_24_dt ) as wk_24_dt
+	,sum( wk_24_budget ) as wk_24_budget
+	,sum( wk_24_used ) as wk_24_used
+	,sum( wk_24_avail ) as wk_24_avail
+	,max( wk_25_dt ) as wk_25_dt
+	,sum( wk_25_budget ) as wk_25_budget
+	,sum( wk_25_used ) as wk_25_used
+	,sum( wk_25_avail ) as wk_25_avail
+	,max( wk_26_dt ) as wk_26_dt
+	,sum( wk_26_budget ) as wk_26_budget
+	,sum( wk_26_used ) as wk_26_used
+	,sum( wk_26_avail ) as wk_26_avail
 from dbo.PRP_Actuals_Level_04
 group by cpc_code
 	
@@ -1030,6 +1078,54 @@ select
 	,sum( wk_14_budget ) as wk_14_budget
 	,sum( wk_14_used ) as wk_14_used
 	,sum( wk_14_avail ) as wk_14_avail
+	,max( wk_15_dt ) as wk_15_dt
+	,sum( wk_15_budget ) as wk_15_budget
+	,sum( wk_15_used ) as wk_15_used
+	,sum( wk_15_avail ) as wk_15_avail
+	,max( wk_16_dt ) as wk_16_dt
+	,sum( wk_16_budget ) as wk_16_budget
+	,sum( wk_16_used ) as wk_16_used
+	,sum( wk_16_avail ) as wk_16_avail
+	,max( wk_17_dt ) as wk_17_dt
+	,sum( wk_17_budget ) as wk_17_budget
+	,sum( wk_17_used ) as wk_17_used
+	,sum( wk_17_avail ) as wk_17_avail
+	,max( wk_18_dt ) as wk_18_dt
+	,sum( wk_18_budget ) as wk_18_budget
+	,sum( wk_18_used ) as wk_18_used
+	,sum( wk_18_avail ) as wk_18_avail
+	,max( wk_19_dt ) as wk_19_dt
+	,sum( wk_19_budget ) as wk_19_budget
+	,sum( wk_19_used ) as wk_19_used
+	,sum( wk_19_avail ) as wk_19_avail
+	,max( wk_20_dt ) as wk_20_dt
+	,sum( wk_20_budget ) as wk_20_budget
+	,sum( wk_20_used ) as wk_20_used
+	,sum( wk_20_avail ) as wk_20_avail
+	,max( wk_21_dt ) as wk_21_dt
+	,sum( wk_21_budget ) as wk_21_budget
+	,sum( wk_21_used ) as wk_21_used
+	,sum( wk_21_avail ) as wk_21_avail
+	,max( wk_22_dt ) as wk_22_dt
+	,sum( wk_22_budget ) as wk_22_budget
+	,sum( wk_22_used ) as wk_22_used
+	,sum( wk_22_avail ) as wk_22_avail
+	,max( wk_23_dt ) as wk_23_dt
+	,sum( wk_23_budget ) as wk_23_budget
+	,sum( wk_23_used ) as wk_23_used
+	,sum( wk_23_avail ) as wk_23_avail
+	,max( wk_24_dt ) as wk_24_dt
+	,sum( wk_24_budget ) as wk_24_budget
+	,sum( wk_24_used ) as wk_24_used
+	,sum( wk_24_avail ) as wk_24_avail
+	,max( wk_25_dt ) as wk_25_dt
+	,sum( wk_25_budget ) as wk_25_budget
+	,sum( wk_25_used ) as wk_25_used
+	,sum( wk_25_avail ) as wk_25_avail
+	,max( wk_26_dt ) as wk_26_dt
+	,sum( wk_26_budget ) as wk_26_budget
+	,sum( wk_26_used ) as wk_26_used
+	,sum( wk_26_avail ) as wk_26_avail
 from dbo.PRP_Actuals_Level_04
 group by
 	 cpc_code
@@ -1044,11 +1140,11 @@ create view rpt.PRP_Actuals_Level_04_v
 as
 -- ALL DEPT ASGN BY DAY
 with dates as (
-	select top 14 cal_dt, rank() over (order by cal_dt ) as wk_num
+	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
 	from dbo.cal_dim 
 	where 1=1
 		and day_of_wk = 2
-		and cal_dt between cast( getdate() - 6 as date) and getdate() + 100 ),
+		and cal_dt between cast( getdate() - 6 as date) and getdate() + 200 ),
 
 dept_prp as (
 	select 
@@ -1113,6 +1209,54 @@ dept_prp as (
 		,max( case when c.wk_num = 14 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_14_budget
 		,max( case when c.wk_num = 14 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_14_requested
 		,max( case when c.wk_num = 14 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_14_used
+		,max( case when c.wk_num = 15 then c.cal_dt end ) as wk_15_dt
+		,max( case when c.wk_num = 15 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_15_budget
+		,max( case when c.wk_num = 15 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_15_requested
+		,max( case when c.wk_num = 15 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_15_used
+		,max( case when c.wk_num = 16 then c.cal_dt end ) as wk_16_dt
+		,max( case when c.wk_num = 16 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_16_budget
+		,max( case when c.wk_num = 16 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_16_requested
+		,max( case when c.wk_num = 16 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_16_used
+		,max( case when c.wk_num = 17 then c.cal_dt end ) as wk_17_dt
+		,max( case when c.wk_num = 17 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_17_budget
+		,max( case when c.wk_num = 17 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_17_requested
+		,max( case when c.wk_num = 17 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_17_used
+		,max( case when c.wk_num = 18 then c.cal_dt end ) as wk_18_dt
+		,max( case when c.wk_num = 18 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_18_budget
+		,max( case when c.wk_num = 18 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_18_requested
+		,max( case when c.wk_num = 18 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_18_used
+		,max( case when c.wk_num = 19 then c.cal_dt end ) as wk_19_dt
+		,max( case when c.wk_num = 19 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_19_budget
+		,max( case when c.wk_num = 19 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_19_requested
+		,max( case when c.wk_num = 19 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_19_used
+		,max( case when c.wk_num = 20 then c.cal_dt end ) as wk_20_dt
+		,max( case when c.wk_num = 20 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_20_budget
+		,max( case when c.wk_num = 20 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_20_requested
+		,max( case when c.wk_num = 20 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_20_used
+		,max( case when c.wk_num = 21 then c.cal_dt end ) as wk_21_dt
+		,max( case when c.wk_num = 21 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_21_budget
+		,max( case when c.wk_num = 21 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_21_requested
+		,max( case when c.wk_num = 21 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_21_used
+		,max( case when c.wk_num = 22 then c.cal_dt end ) as wk_22_dt
+		,max( case when c.wk_num = 22 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_22_budget
+		,max( case when c.wk_num = 22 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_22_requested
+		,max( case when c.wk_num = 22 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_22_used
+		,max( case when c.wk_num = 23 then c.cal_dt end ) as wk_23_dt
+		,max( case when c.wk_num = 23 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_23_budget
+		,max( case when c.wk_num = 23 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_23_requested
+		,max( case when c.wk_num = 23 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_23_used
+		,max( case when c.wk_num = 24 then c.cal_dt end ) as wk_24_dt
+		,max( case when c.wk_num = 24 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_24_budget
+		,max( case when c.wk_num = 24 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_24_requested
+		,max( case when c.wk_num = 24 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_24_used
+		,max( case when c.wk_num = 25 then c.cal_dt end ) as wk_25_dt
+		,max( case when c.wk_num = 25 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_25_budget
+		,max( case when c.wk_num = 25 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_25_requested
+		,max( case when c.wk_num = 25 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_25_used
+		,max( case when c.wk_num = 26 then c.cal_dt end ) as wk_26_dt
+		,max( case when c.wk_num = 26 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_26_budget
+		,max( case when c.wk_num = 26 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_26_requested
+		,max( case when c.wk_num = 26 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_26_used
 	from dates c 
 	left join rpt.Resource_Plan_Dept_v r
 		on c.cal_dt = r.cal_dt
@@ -1175,6 +1319,42 @@ dept_num as (
 		,wk_14_dt
 		,wk_14_budget
 		,case when wk_14_requested > wk_14_used then wk_14_requested else wk_14_used end as wk_14_used
+		,wk_15_dt
+		,wk_15_budget
+		,case when wk_15_requested > wk_15_used then wk_15_requested else wk_15_used end as wk_15_used
+		,wk_16_dt
+		,wk_16_budget
+		,case when wk_16_requested > wk_16_used then wk_16_requested else wk_16_used end as wk_16_used
+		,wk_17_dt
+		,wk_17_budget
+		,case when wk_17_requested > wk_17_used then wk_17_requested else wk_17_used end as wk_17_used
+		,wk_18_dt
+		,wk_18_budget
+		,case when wk_18_requested > wk_18_used then wk_18_requested else wk_18_used end as wk_18_used
+		,wk_19_dt
+		,wk_19_budget
+		,case when wk_19_requested > wk_19_used then wk_19_requested else wk_19_used end as wk_19_used
+		,wk_20_dt
+		,wk_20_budget
+		,case when wk_20_requested > wk_20_used then wk_20_requested else wk_20_used end as wk_20_used
+		,wk_21_dt
+		,wk_21_budget
+		,case when wk_21_requested > wk_21_used then wk_21_requested else wk_21_used end as wk_21_used
+		,wk_22_dt
+		,wk_22_budget
+		,case when wk_22_requested > wk_22_used then wk_22_requested else wk_22_used end as wk_22_used
+		,wk_23_dt
+		,wk_23_budget
+		,case when wk_23_requested > wk_23_used then wk_23_requested else wk_23_used end as wk_23_used
+		,wk_24_dt
+		,wk_24_budget
+		,case when wk_24_requested > wk_24_used then wk_24_requested else wk_24_used end as wk_24_used
+		,wk_25_dt
+		,wk_25_budget
+		,case when wk_25_requested > wk_25_used then wk_25_requested else wk_25_used end as wk_25_used
+		,wk_26_dt
+		,wk_26_budget
+		,case when wk_26_requested > wk_26_used then wk_26_requested else wk_26_used end as wk_26_used
 	from dept_prp
 	where dept_level > 3 ),
 
@@ -1239,6 +1419,54 @@ lvl_04 as (
 		,max( wk_14_budget ) as wk_14_budget
 		,max( wk_14_used ) as wk_14_used
 		,max( wk_14_budget ) - max( wk_14_used ) as wk_14_avail
+		,max( wk_15_dt ) as wk_15_dt
+		,max( wk_15_budget ) as wk_15_budget
+		,max( wk_15_used ) as wk_15_used
+		,max( wk_15_budget ) - max( wk_15_used ) as wk_15_avail
+		,max( wk_16_dt ) as wk_16_dt
+		,max( wk_16_budget ) as wk_16_budget
+		,max( wk_16_used ) as wk_16_used
+		,max( wk_16_budget) - max( wk_16_used ) as wk_16_avail
+		,max( wk_17_dt ) as wk_17_dt
+		,max( wk_17_budget ) as wk_17_budget
+		,max( wk_17_used ) as wk_17_used
+		,max( wk_17_budget ) - max( wk_17_used ) as wk_17_avail
+		,max( wk_18_dt ) as wk_18_dt
+		,max( wk_18_budget ) as wk_18_budget
+		,max( wk_18_used ) as wk_18_used
+		,max( wk_18_budget ) - max( wk_18_used ) as wk_18_avail
+		,max( wk_19_dt ) as wk_19_dt
+		,max( wk_19_budget ) as wk_19_budget
+		,max( wk_19_used ) as wk_19_used
+		,max( wk_19_budget ) - max( wk_19_used ) as wk_19_avail
+		,max( wk_20_dt ) as wk_20_dt
+		,max( wk_20_budget ) as wk_20_budget
+		,max( wk_20_used ) as wk_20_used
+		,max( wk_20_budget ) - max( wk_20_used ) as wk_20_avail
+		,max( wk_21_dt ) as wk_21_dt
+		,max( wk_21_budget ) as wk_21_budget
+		,max( wk_21_used ) as wk_21_used
+		,max( wk_21_budget) - max( wk_21_used ) as wk_21_avail
+		,max( wk_22_dt ) as wk_22_dt
+		,max( wk_22_budget ) as wk_22_budget
+		,max( wk_22_used ) as wk_22_used
+		,max( wk_22_budget ) - max( wk_22_used ) as wk_22_avail
+		,max( wk_23_dt ) as wk_23_dt
+		,max( wk_23_budget ) as wk_23_budget
+		,max( wk_23_used ) as wk_23_used
+		,max( wk_23_budget ) - max( wk_23_used ) as wk_23_avail
+		,max( wk_24_dt ) as wk_24_dt
+		,max( wk_24_budget ) as wk_24_budget
+		,max( wk_24_used ) as wk_24_used
+		,max( wk_24_budget ) - max( wk_24_used ) as wk_24_avail
+		,max( wk_25_dt ) as wk_25_dt
+		,max( wk_25_budget ) as wk_25_budget
+		,max( wk_25_used ) as wk_25_used
+		,max( wk_25_budget ) - max( wk_25_used ) as wk_25_avail
+		,max( wk_26_dt ) as wk_26_dt
+		,max( wk_26_budget ) as wk_26_budget
+		,max( wk_26_used ) as wk_26_used
+		,max( wk_26_budget ) - max( wk_26_used ) as wk_26_avail
 	from dept_num
 	group by 
 		 cpc_code
@@ -1305,6 +1533,54 @@ select
 	,wk_14_budget
 	,wk_14_used
 	,wk_14_avail
+	,wk_15_dt
+	,wk_15_budget
+	,wk_15_used
+	,wk_15_avail
+	,wk_16_dt
+	,wk_16_budget
+	,wk_16_used
+	,wk_16_avail
+	,wk_17_dt
+	,wk_17_budget
+	,wk_17_used
+	,wk_17_avail
+	,wk_18_dt
+	,wk_18_budget
+	,wk_18_used
+	,wk_18_avail
+	,wk_19_dt
+	,wk_19_budget
+	,wk_19_used
+	,wk_19_avail
+	,wk_20_dt
+	,wk_20_budget
+	,wk_20_used
+	,wk_20_avail
+	,wk_21_dt
+	,wk_21_budget
+	,wk_21_used
+	,wk_21_avail
+	,wk_22_dt
+	,wk_22_budget
+	,wk_22_used
+	,wk_22_avail
+	,wk_23_dt
+	,wk_23_budget
+	,wk_23_used
+	,wk_23_avail
+	,wk_24_dt
+	,wk_24_budget
+	,wk_24_used
+	,wk_24_avail
+	,wk_25_dt
+	,wk_25_budget
+	,wk_25_used
+	,wk_25_avail
+	,wk_26_dt
+	,wk_26_budget
+	,wk_26_used
+	,wk_26_avail
 from lvl_04
 go
 

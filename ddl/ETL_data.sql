@@ -4677,7 +4677,7 @@ begin
            ,wk_23_dt
            ,wk_23_budget
            ,wk_23_used
-           ,wk_24_avail
+           ,wk_23_avail
            ,wk_24_dt
            ,wk_24_budget
            ,wk_24_used
@@ -4771,6 +4771,10 @@ begin
            ,wk_19_used
            ,wk_19_avail           
            ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+		   ,wk_21_dt
            ,wk_21_budget
            ,wk_21_used
            ,wk_21_avail
