@@ -505,13 +505,13 @@ dept_req as (
 		,da.dept_role
 		,case
 			when da.volunteer_name_short is not null then da.volunteer_name_short
-			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '03/31/2028' ) then 'Dept Request'
+			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '03/31/2028' ) then coalesce( da.ps_enrollment_code, da.dept_enrollment_code )
 		 end as volunteer_name
 		,c.cal_dt
 		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
 		,coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' ) as end_date
 		,coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) as enrollment_code
-		,da.dept_asgn_status
+		,da.dept_asgn_status_code as dept_asgn_status
 		,case when coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) in ( 'BBB', 'BBC', 'BBF', 'BBR', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end as used_bed_cnt
 		,da.dept_asgn_key
 		,da.hpr_dept_key

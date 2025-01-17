@@ -130,6 +130,7 @@ select
 	,da.dept_first_name
 	,da.dept_last_name
 	,das.dept_asgn_status
+	,das.dept_asgn_status_code
 	,da.priority_key
 	,case 
 		when da.priority_key = 1 then '!!'

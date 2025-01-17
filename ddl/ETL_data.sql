@@ -1319,6 +1319,7 @@ begin
 		set 
 			App_Request_Collection_Flag = 'N',
 			update_date = getdate()
+		where App_Request_Collection_Flag = 'Y'			
 
 		set @Upd = @@rowcount	
 	
@@ -4965,7 +4966,7 @@ begin
 	exec dbo.ETL_BA_Project_Volunteer_Attendance_proc
 	exec dbo.ETL_Volunteer_proc
 	exec dbo.ETL_Volunteer_App_proc
-	--exec dbo.ETL_Volunteer_App_Collection_proc
+	exec dbo.ETL_Volunteer_App_Collection_proc
 	exec dbo.ETL_Volunteer_Approval_Level_Hist_proc
 	exec dbo.ETL_Volunteer_Availability_proc
 	exec dbo.ETL_Volunteer_Dept_proc
