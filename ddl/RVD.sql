@@ -371,6 +371,113 @@ create table dbo.Country(
 go
 
 
+if object_id('dbo.DC_52_Data', 'U') is not null
+	drop table dbo.DC_52_Data
+go 
+create table dbo.DC_52_Data(
+	id 							int identity(1,1) 	not null constraint PK_DC_52_Data primary key,
+	sp_id 						int 				not null,
+	full_name 					nvarchar(255),
+	branch_project 				nvarchar(255),
+	vol_id 						int 				not null,
+	dept 						nvarchar(255),
+	co_status 					nvarchar(30),
+	to_status 					nvarchar(30),
+	vd_status 					nvarchar(30),
+	end_date 					date,
+	start_date 					date,
+	vd_date 					date,
+	assignment 					nvarchar(255),
+	CMS_Test1 					nvarchar(255),
+	1_clear_thinking 			nvarchar(10),
+	1_displays_fruit_spirit 	nvarchar(10),
+	10_ability_lead 			nvarchar(10),
+	11_ability_train 			nvarchar(10),
+	12_quality_concscious 		nvarchar(10),
+	2_dependability 			nvarchar(10),
+	2_display_humility 			nvarchar(10),
+	3_eager_learn 				nvarchar(10),
+	3_proper_dress 				nvarchar(10),
+	4_comm_effectively 			nvarchar(10),
+	4_support_theo_direction 	nvarchar(10),
+	5_cooperates 				nvarchar(10),
+	5_org_ability 				nvarchar(10),
+	6_attends_cong_mtg 			nvarchar(10),
+	6_work_well_others 			nvarchar(10),
+	7_share_ministry 			nvarchar(10),
+	7_problem_solving			nvarchar(10),
+	8_good_health 				nvarchar(10),
+	8_productivity 				nvarchar(10),
+	9_safety_conscious 			nvarchar(10),
+	assistant 					nvarchar(255),
+	co_reviewed 				nvarchar(255),
+	overseer 					nvarchar(255),
+	potential_detail_1 			nvarchar(1000),
+	potential_detail_2 			nvarchar(1000),
+	potential_detail_3 			nvarchar(1000),
+	potential_oversight_1 		nvarchar(1000),
+	potential_oversight_2 		nvarchar(1000),
+	potential_oversight_3 		nvarchar(1000),
+	potential_role_1 			nvarchar(255),
+	potential_role_2 			nvarchar(255),
+	potential_role_3 			nvarchar(255),
+	future_assignments 			nvarchar(10),
+	title 						nvarchar(255),
+	to_reviewed 				nvarchar(30),
+	trade_skill_1 				nvarchar(255),
+	trade_skill_1_details 		nvarchar(1000),
+	trade_skill_1_level 		nvarchar(255),
+	trade_skill_2 				nvarchar(255),
+	trade_skill_2_details 		nvarchar(1000),
+	trade_skill_2_level 		nvarchar(255),
+	trade_skill_3 				nvarchar(255),
+	trade_skill_3_details 		nvarchar(1000),
+	trade_skill_3_level 		nvarchar(255),
+	volunteer_desk 				nvarchar(1000),
+	counsel_given 				nvarchar(1000),
+	summary_comments 			nvarchar(3000),
+	load_date 					datetime 			not null,
+	update_date 				datetime 			not null )
+go
+
+alter table dbo.dc_52_data add  constraint df_dc_52_data_load_date  default (getdate()) for load_date
+go
+
+alter table dbo.dc_52_data add  constraint df_dc_52_data_update_date  default (getdate()) for update_date
+go
+
+
+if object_id('dbo.DC52_To_Review', 'U') is not null
+	drop table dbo.DC52_To_Review
+go 
+create table dbo.DC52_To_Review(
+	volunteer_name 			nvarchar(255) 		not null,
+	volunteer_key 			int,
+	hub_volunteer_num 		int 				not null,
+	hub_person_id 			int,
+	parent_dept_name 		nvarchar(255),
+	dept_name 				nvarchar(255),
+	enrollment_start_date 	date,
+	enrollment_end_date 	date,
+	ovsr_name 				nvarchar(255),
+	ovsr_email 				nvarchar(255),
+	asst_name 				nvarchar(255),
+	asst_email 				nvarchar(255),
+	enrollment_code 		nvarchar(30),
+	processed_to_sp 		nvarchar(1),
+	load_date 				datetime 			not null,
+	update_date 			datetime 			not null,
+	id 						int identity(1,1) 	not null constraint pk_dc52_to_review primary key
+)
+go
+
+alter table dbo.dc52_to_review add  constraint df_dc52_to_review_load_date  default (getdate()) for load_date
+go
+
+alter table dbo.dc52_to_review add  constraint df_dc52_to_review_update_date  default (getdate()) for update_date
+go
+
+
 if object_id('dbo.Dept_Asgn', 'U') is not null
 	drop table dbo.Dept_Asgn
 go 
@@ -1038,6 +1145,31 @@ create table dbo.Source_System(
 go
 
 
+if object_id('dbo.Staffing_Matrix', 'U') is not null
+	drop table dbo.Staffing_Matrix
+go 
+create table dbo.Staffing_Matrix(
+	cal_dt 				date 			not null,
+	cpc_code 			nvarchar(10) 	not null,
+	level_02 			nvarchar(100),
+	level_03 			nvarchar(100),
+	level_04 			nvarchar(100),
+	crew_name 			nvarchar(255),
+	dept_role 			nvarchar(150),
+	ps_start_date 		date,
+	ps_end_date 		date,
+	full_name 			nvarchar(255),
+	ps_enrollment_code 	nvarchar(30),
+	room_site_code 		nvarchar(30),
+	room_bldg_code 		nvarchar(30),
+	dept_asgn_status 	nvarchar(150),
+	ps_notes 			nvarchar(4000),
+	dept_asgn_key 		int 			not null,
+	hpr_dept_key 		int 			not null
+) 
+go
+
+
 if object_id('dbo.State', 'U') is not null
 	drop table dbo.State
 go 
@@ -1211,6 +1343,8 @@ go
 create table dbo.User_Task(
 	User_Task_Key 			integer identity(1,1) 	not null constraint user_task_pk primary key,
 	User_Key 				integer 				not null,
+	User_2_Key				integer,
+	User_3_Key				integer,
 	Volunteer_Key			integer,
 	Person_Name				nvarchar(1000),
 	User_Task 				nvarchar(255) 			not null constraint df_user_task_task default ' ',
