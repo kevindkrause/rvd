@@ -194,6 +194,15 @@ select
 	,d.PC_Code	
 	,v.HUB_Person_ID
 	,v.HUB_Volunteer_ID
+	,da.Update_Source
+	,da.Update_Type
+	,da.UpdateDate_Source
+	,da.Update_ReviewedByUser
+	,da.Ext_Orig_PS_End_Date
+	,da.Ext_Orig_Enrollment_Key
+	,da.Ext_Orig_Dept_Asgn_Status_Key
+	,da.Extension_Flag
+	,da.Extension_Flag_UpdateDate
 from dbo.dept_asgn da
 inner join dbo.hpr_dept d
 	on da.hpr_dept_key = d.hpr_dept_key
