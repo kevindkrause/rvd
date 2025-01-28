@@ -533,7 +533,7 @@ select
 	,enrollment_code
 	,used_bed_cnt
 	,dept_asgn_status
-	,max( dept_asgn_key ) as dept_asgn_key	
+	,dept_asgn_key
 	,max( case when wk_num = 1 then volunteer_name else null end ) as wk_01
 	,max( case when wk_num = 2 then volunteer_name else null end ) as wk_02
 	,max( case when wk_num = 3 then volunteer_name else null end ) as wk_03
@@ -575,6 +575,7 @@ group by
 	,enrollment_code
 	,used_bed_cnt
 	,dept_asgn_status
+	,dept_asgn_key	
 go
 
 
