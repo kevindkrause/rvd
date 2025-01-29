@@ -505,14 +505,20 @@ dept_req as (
 		,da.dept_role
 		,case
 			when da.volunteer_name_short is not null then da.volunteer_name_short
-			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '03/31/2028' ) then coalesce( da.ps_enrollment_code, da.dept_enrollment_code )
+			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '2031-12-31' ) then coalesce( da.dept_enrollment_code, da.ps_enrollment_code )
 		 end as volunteer_name
 		,c.cal_dt
 		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
-		,coalesce( da.ps_end_date, da.dept_end_date, '12/31/2027' ) as end_date
-		,coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) as enrollment_code
+		,coalesce( da.ps_end_date, da.dept_end_date, '2031-12-31' ) as end_date
+		,coalesce( da.dept_enrollment_code, da.ps_enrollment_code ) as enrollment_code
 		,da.dept_asgn_status_code as dept_asgn_status
-		,case when coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) in ( 'BBB', 'BBC', 'BBF', 'BBR', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end as used_bed_cnt
+		,case 
+			when 
+			       da.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+				or da.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+			then 1 
+			else 0 
+		 end as used_bed_cnt
 		,da.dept_asgn_key
 		,da.hpr_dept_key
 		,enrollment_key
@@ -520,7 +526,7 @@ dept_req as (
 		,c.wk_num
 	from dates c 
 	left join dbo.dept_asgn_v da
-		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '03/31/2028' )
+		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '2031-12-31' )
 		and da.active_flag = 'Y'
 		and da.test_data_flag = 'N' )
 
@@ -1698,13 +1704,14 @@ dept_req_base as (
 	select d.hpr_dept_key, c.cal_dt, count(*) as requested_bed_cnt
 	from dbo.dept_asgn_v a
 	inner join dbo.cal_dim c
-		on c.cal_dt between a.ps_start_date and coalesce( a.ps_end_date, '2031-12-31' )
+		on c.cal_dt between coalesce( a.ps_start_date, a.dept_start_date ) and coalesce( coalesce( a.ps_end_date, a.dept_end_date ), '2031-12-31' )
 	inner join dbo.hpr_dept d
 		on a.level_04 = d.Level_04
 		and d.level_05 is null
 		and d.Active_Flag = 'Y'
 	where a.active_flag = 'Y'
-		and a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+		and ( a.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+			or a.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )	)
 	group by d.hpr_dept_key, c.cal_dt ),
 
 dept_req as (
@@ -1774,11 +1781,9 @@ from final f
 left join dbo.hpr_dept d
 	on f.hpr_dept_key = d.HPR_Dept_Key
 where 1=1
-	--and cal_dt = '2024-11-17' 
-	--and f.cpc_code = 'CI'
-	--and f.prp_subtype = 'Used'
-	--and dept_name = 'Trade Group - Siteworks'
---order by cal_dt, prp_type, prp_subtype, cpc_code, dept_name
+	--and cal_dt = '2025-02-03' 
+	--and d.Level_04 = 'Mechanical'
+	--and f.dept_level = 4
 go
 	
 
