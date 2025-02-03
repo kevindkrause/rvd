@@ -546,6 +546,7 @@ create table dbo.Dept_Asgn(
  	Ext_Orig_PS_End_Date 		date,
 	Ext_Orig_Enrollment_Key 	int,
 	Ext_Orig_Dept_Asgn_Status_Key int,
+	Ext_Last_Start_Date date 	null,	
 	Extension_Flag 				nvarchar(1				not null constraint df_dept_asgn_extension_flag default 'N',
 	Extension_Flag_UpdateDate 	datetime,	
 	Load_Date 					datetime 				not null constraint df_dept_asgn_load_date default getdate(),

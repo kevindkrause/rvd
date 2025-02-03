@@ -201,6 +201,7 @@ select
 	,da.Ext_Orig_PS_End_Date
 	,da.Ext_Orig_Enrollment_Key
 	,da.Ext_Orig_Dept_Asgn_Status_Key
+	,da.Ext_Last_Start_Date
 	,da.Extension_Flag
 	,da.Extension_Flag_UpdateDate
 from dbo.dept_asgn da
