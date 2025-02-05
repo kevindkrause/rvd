@@ -514,8 +514,8 @@ dept_req as (
 		,da.dept_asgn_status_code as dept_asgn_status
 		,case 
 			when 
-			       da.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
-				or da.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+			       da.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' )
+				or da.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' )
 			then 1 
 			else 0 
 		 end as used_bed_cnt
@@ -889,8 +889,8 @@ select
 	,b.site_code
 	,b.site_bldg
 	,b.site_bldg_code
-	,sum( case when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 1 else 0 end ) as bed_cnt
-	,sum( case when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' ) then 0 else 1 end ) as no_bed_cnt
+	,sum( case when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' ) then 1 else 0 end ) as bed_cnt
+	,sum( case when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' ) then 0 else 1 end ) as no_bed_cnt
 	,cast( sum(
 		case 
 			when b.enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BRS', 'BCL' ) then 5
@@ -1710,8 +1710,8 @@ dept_req_base as (
 		and d.level_05 is null
 		and d.Active_Flag = 'Y'
 	where a.active_flag = 'Y'
-		and ( a.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
-			or a.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )	)
+		and ( a.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' )
+			or a.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' )	)
 	group by d.hpr_dept_key, c.cal_dt ),
 
 dept_req as (
@@ -1729,7 +1729,7 @@ dept_used_base as (
 		on c.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '12/31/2027' )
 	where 1=1
 		and v.dept_1_hpr_dept_key is not null
-		and v.enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV' )
+		and v.enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL' )
 	group by coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ), c.cal_dt ),
 
 dept_used as (

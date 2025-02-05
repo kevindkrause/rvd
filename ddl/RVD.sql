@@ -2006,6 +2006,8 @@ create table dbo.Volunteer_Search_Save(
 	chkAvailSat						bit						not null constraint df_volunteer_search_save_avail_sat default 0,
 	chkAvailSun						bit						not null constraint df_volunteer_search_save_avail_sun default 0,
 	cmbComplex						nvarchar(3),
+	txtFullTextNot					nvarchar(255),
+	txtFullTextNot2					nvarchar(255),
 	constraint volunteer_search_save_ak unique ( user_key, description ) )	
 go
 
