@@ -287,7 +287,6 @@ select
 	,dr.Full_Name
 	,dr.marital_status_code
 	,dr.cong_servant_code
-	,dr.Job_Description
 	,dr.Num_Weeks
 	,dr.Num_Months
 	,dr.Until_Not_Needed
@@ -298,18 +297,20 @@ select
 	,dr.Candidate_3_Vol_Key
 	,dr.Quantity_To_Replicate
 	,dr.Multiple_Record_Number
-	,CASE WHEN isnull([dr.Sort_Trade_Request], 999) = 999 THEN 999 ELSE [dr.Sort_Trade_Request] END AS Sort_Trade_Request, 
+	,case when isnull(dr.Sort_Trade_Request, 999) = 999 then 999 else dr.Sort_Trade_Request end AS Sort_Trade_Request
 	,u.VTC_CPC_Code
-	,dr.Quantity_To_Replicate
-	,dr.Multiple_Record_Number
 	,dr.Candidate_1_Next_Step
 	,dr.Candidate_2_Next_Step
 	,dr.Candidate_3_Next_Step
 	,dr.Possible_Sister
+	,dr.Sort_Trade_Request AS Expr1
 	,dr.PC_Code
+	,dr.Current_Sync_Status
 from dbo.Dept_asgn_v dr
 inner join dbo.[User] u
 	on dr.cpc_code = u.VTC_CPC_Code
+	and coalesce( dr.Level_03, '' ) = case when u.VTC_Level_02 is not null then u.VTC_Level_02 else coalesce( dr.level_03, '' ) end
+	and coalesce( dr.Level_04, '' ) = case when u.VTC_Level_03 is not null then u.VTC_Level_03 else coalesce( dr.Level_04, '' ) end	
 go	
 
 

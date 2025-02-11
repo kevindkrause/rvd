@@ -1379,7 +1379,8 @@ dept_num as (
 		,wk_26_budget
 		,case when wk_26_requested > wk_26_used then wk_26_requested else wk_26_used end as wk_26_used
 	from dept_prp
-	where dept_level > 3 ),
+	--where dept_level > 3 
+	),
 
 lvl_04 as (
 	select 
@@ -1387,109 +1388,109 @@ lvl_04 as (
 		,level_03
 		,level_04
 		,max( wk_01_dt ) as wk_01_dt
-		,max( wk_01_budget ) as wk_01_budget
-		,max( wk_01_used ) as wk_01_used
-		,max( wk_01_budget ) - max( wk_01_used ) as wk_01_avail
+		,sum( wk_01_budget ) as wk_01_budget
+		,sum( wk_01_used ) as wk_01_used
+		,sum( wk_01_budget ) - sum( wk_01_used ) as wk_01_avail
 		,max( wk_02_dt ) as wk_02_dt
-		,max( wk_02_budget ) as wk_02_budget
-		,max( wk_02_used ) as wk_02_used
-		,max( wk_02_budget ) - max( wk_02_used ) as wk_02_avail
+		,sum( wk_02_budget ) as wk_02_budget
+		,sum( wk_02_used ) as wk_02_used
+		,sum( wk_02_budget ) - sum( wk_02_used ) as wk_02_avail
 		,max( wk_03_dt ) as wk_03_dt
-		,max( wk_03_budget ) as wk_03_budget
-		,max( wk_03_used ) as wk_03_used
-		,max( wk_03_budget ) - max( wk_03_used ) as wk_03_avail
+		,sum( wk_03_budget ) as wk_03_budget
+		,sum( wk_03_used ) as wk_03_used
+		,sum( wk_03_budget ) - sum( wk_03_used ) as wk_03_avail
 		,max( wk_04_dt ) as wk_04_dt
-		,max( wk_04_budget ) as wk_04_budget
-		,max( wk_04_used ) as wk_04_used
-		,max( wk_04_budget ) - max( wk_04_used ) as wk_04_avail
+		,sum( wk_04_budget ) as wk_04_budget
+		,sum( wk_04_used ) as wk_04_used
+		,sum( wk_04_budget ) - sum( wk_04_used ) as wk_04_avail
 		,max( wk_05_dt ) as wk_05_dt
-		,max( wk_05_budget ) as wk_05_budget
-		,max( wk_05_used ) as wk_05_used
-		,max( wk_05_budget ) - max( wk_05_used ) as wk_05_avail
+		,sum( wk_05_budget ) as wk_05_budget
+		,sum( wk_05_used ) as wk_05_used
+		,sum( wk_05_budget ) - sum( wk_05_used ) as wk_05_avail
 		,max( wk_06_dt ) as wk_06_dt
-		,max( wk_06_budget ) as wk_06_budget
-		,max( wk_06_used ) as wk_06_used
-		,max( wk_06_budget ) - max( wk_06_used ) as wk_06_avail
+		,sum( wk_06_budget ) as wk_06_budget
+		,sum( wk_06_used ) as wk_06_used
+		,sum( wk_06_budget ) - sum( wk_06_used ) as wk_06_avail
 		,max( wk_07_dt ) as wk_07_dt
-		,max( wk_07_budget ) as wk_07_budget
-		,max( wk_07_used ) as wk_07_used
-		,max( wk_07_budget ) - max( wk_07_used ) as wk_07_avail
+		,sum( wk_07_budget ) as wk_07_budget
+		,sum( wk_07_used ) as wk_07_used
+		,sum( wk_07_budget ) - sum( wk_07_used ) as wk_07_avail
 		,max( wk_08_dt ) as wk_08_dt
-		,max( wk_08_budget ) as wk_08_budget
-		,max( wk_08_used ) as wk_08_used
-		,max( wk_08_budget ) - max( wk_08_used ) as wk_08_avail
+		,sum( wk_08_budget ) as wk_08_budget
+		,sum( wk_08_used ) as wk_08_used
+		,sum( wk_08_budget ) - sum( wk_08_used ) as wk_08_avail
 		,max( wk_09_dt ) as wk_09_dt
-		,max( wk_09_budget ) as wk_09_budget
-		,max( wk_09_used ) as wk_09_used
-		,max( wk_09_budget ) - max( wk_09_used ) as wk_09_avail
+		,sum( wk_09_budget ) as wk_09_budget
+		,sum( wk_09_used ) as wk_09_used
+		,sum( wk_09_budget ) - sum( wk_09_used ) as wk_09_avail
 		,max( wk_10_dt ) as wk_10_dt
-		,max( wk_10_budget ) as wk_10_budget
-		,max( wk_10_used ) as wk_10_used
-		,max( wk_10_budget ) - max( wk_10_used ) as wk_10_avail
+		,sum( wk_10_budget ) as wk_10_budget
+		,sum( wk_10_used ) as wk_10_used
+		,sum( wk_10_budget ) - sum( wk_10_used ) as wk_10_avail
 		,max( wk_11_dt ) as wk_11_dt
-		,max( wk_11_budget ) as wk_11_budget
-		,max( wk_11_used ) as wk_11_used
-		,max( wk_11_budget) - max( wk_11_used ) as wk_11_avail
+		,sum( wk_11_budget ) as wk_11_budget
+		,sum( wk_11_used ) as wk_11_used
+		,sum( wk_11_budget) - sum( wk_11_used ) as wk_11_avail
 		,max( wk_12_dt ) as wk_12_dt
-		,max( wk_12_budget ) as wk_12_budget
-		,max( wk_12_used ) as wk_12_used
-		,max( wk_12_budget ) - max( wk_12_used ) as wk_12_avail
+		,sum( wk_12_budget ) as wk_12_budget
+		,sum( wk_12_used ) as wk_12_used
+		,sum( wk_12_budget ) - sum( wk_12_used ) as wk_12_avail
 		,max( wk_13_dt ) as wk_13_dt
-		,max( wk_13_budget ) as wk_13_budget
-		,max( wk_13_used ) as wk_13_used
-		,max( wk_13_budget ) - max( wk_13_used ) as wk_13_avail
+		,sum( wk_13_budget ) as wk_13_budget
+		,sum( wk_13_used ) as wk_13_used
+		,sum( wk_13_budget ) - sum( wk_13_used ) as wk_13_avail
 		,max( wk_14_dt ) as wk_14_dt
-		,max( wk_14_budget ) as wk_14_budget
-		,max( wk_14_used ) as wk_14_used
-		,max( wk_14_budget ) - max( wk_14_used ) as wk_14_avail
+		,sum( wk_14_budget ) as wk_14_budget
+		,sum( wk_14_used ) as wk_14_used
+		,sum( wk_14_budget ) - sum( wk_14_used ) as wk_14_avail
 		,max( wk_15_dt ) as wk_15_dt
-		,max( wk_15_budget ) as wk_15_budget
-		,max( wk_15_used ) as wk_15_used
-		,max( wk_15_budget ) - max( wk_15_used ) as wk_15_avail
+		,sum( wk_15_budget ) as wk_15_budget
+		,sum( wk_15_used ) as wk_15_used
+		,sum( wk_15_budget ) - sum( wk_15_used ) as wk_15_avail
 		,max( wk_16_dt ) as wk_16_dt
-		,max( wk_16_budget ) as wk_16_budget
-		,max( wk_16_used ) as wk_16_used
-		,max( wk_16_budget) - max( wk_16_used ) as wk_16_avail
+		,sum( wk_16_budget ) as wk_16_budget
+		,sum( wk_16_used ) as wk_16_used
+		,sum( wk_16_budget) - sum( wk_16_used ) as wk_16_avail
 		,max( wk_17_dt ) as wk_17_dt
-		,max( wk_17_budget ) as wk_17_budget
-		,max( wk_17_used ) as wk_17_used
-		,max( wk_17_budget ) - max( wk_17_used ) as wk_17_avail
+		,sum( wk_17_budget ) as wk_17_budget
+		,sum( wk_17_used ) as wk_17_used
+		,sum( wk_17_budget ) - sum( wk_17_used ) as wk_17_avail
 		,max( wk_18_dt ) as wk_18_dt
-		,max( wk_18_budget ) as wk_18_budget
-		,max( wk_18_used ) as wk_18_used
-		,max( wk_18_budget ) - max( wk_18_used ) as wk_18_avail
+		,sum( wk_18_budget ) as wk_18_budget
+		,sum( wk_18_used ) as wk_18_used
+		,sum( wk_18_budget ) - sum( wk_18_used ) as wk_18_avail
 		,max( wk_19_dt ) as wk_19_dt
-		,max( wk_19_budget ) as wk_19_budget
-		,max( wk_19_used ) as wk_19_used
-		,max( wk_19_budget ) - max( wk_19_used ) as wk_19_avail
+		,sum( wk_19_budget ) as wk_19_budget
+		,sum( wk_19_used ) as wk_19_used
+		,sum( wk_19_budget ) - sum( wk_19_used ) as wk_19_avail
 		,max( wk_20_dt ) as wk_20_dt
-		,max( wk_20_budget ) as wk_20_budget
-		,max( wk_20_used ) as wk_20_used
-		,max( wk_20_budget ) - max( wk_20_used ) as wk_20_avail
+		,sum( wk_20_budget ) as wk_20_budget
+		,sum( wk_20_used ) as wk_20_used
+		,sum( wk_20_budget ) - sum( wk_20_used ) as wk_20_avail
 		,max( wk_21_dt ) as wk_21_dt
-		,max( wk_21_budget ) as wk_21_budget
-		,max( wk_21_used ) as wk_21_used
-		,max( wk_21_budget) - max( wk_21_used ) as wk_21_avail
+		,sum( wk_21_budget ) as wk_21_budget
+		,sum( wk_21_used ) as wk_21_used
+		,sum( wk_21_budget) - sum( wk_21_used ) as wk_21_avail
 		,max( wk_22_dt ) as wk_22_dt
-		,max( wk_22_budget ) as wk_22_budget
-		,max( wk_22_used ) as wk_22_used
-		,max( wk_22_budget ) - max( wk_22_used ) as wk_22_avail
+		,sum( wk_22_budget ) as wk_22_budget
+		,sum( wk_22_used ) as wk_22_used
+		,sum( wk_22_budget ) - sum( wk_22_used ) as wk_22_avail
 		,max( wk_23_dt ) as wk_23_dt
-		,max( wk_23_budget ) as wk_23_budget
-		,max( wk_23_used ) as wk_23_used
-		,max( wk_23_budget ) - max( wk_23_used ) as wk_23_avail
+		,sum( wk_23_budget ) as wk_23_budget
+		,sum( wk_23_used ) as wk_23_used
+		,sum( wk_23_budget ) - sum( wk_23_used ) as wk_23_avail
 		,max( wk_24_dt ) as wk_24_dt
-		,max( wk_24_budget ) as wk_24_budget
-		,max( wk_24_used ) as wk_24_used
-		,max( wk_24_budget ) - max( wk_24_used ) as wk_24_avail
+		,sum( wk_24_budget ) as wk_24_budget
+		,sum( wk_24_used ) as wk_24_used
+		,sum( wk_24_budget ) - sum( wk_24_used ) as wk_24_avail
 		,max( wk_25_dt ) as wk_25_dt
-		,max( wk_25_budget ) as wk_25_budget
-		,max( wk_25_used ) as wk_25_used
-		,max( wk_25_budget ) - max( wk_25_used ) as wk_25_avail
+		,sum( wk_25_budget ) as wk_25_budget
+		,sum( wk_25_used ) as wk_25_used
+		,sum( wk_25_budget ) - sum( wk_25_used ) as wk_25_avail
 		,max( wk_26_dt ) as wk_26_dt
-		,max( wk_26_budget ) as wk_26_budget
-		,max( wk_26_used ) as wk_26_used
-		,max( wk_26_budget ) - max( wk_26_used ) as wk_26_avail
+		,sum( wk_26_budget ) as wk_26_budget
+		,sum( wk_26_used ) as wk_26_used
+		,sum( wk_26_budget ) - sum( wk_26_used ) as wk_26_avail
 	from dept_num
 	group by 
 		 cpc_code

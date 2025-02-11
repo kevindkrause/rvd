@@ -936,8 +936,8 @@ if object_id('dbo.PRP_Actuals_Level_04', 'U') is not null
 go 
 create table dbo.PRP_Actuals_Level_04(
 	cpc_code 			nvarchar(10) not null,
-	level_03 			nvarchar(100) not null,
-	level_04 			nvarchar(100) not null,
+	level_03 			nvarchar(100),
+	level_04 			nvarchar(100),
 	wk_01_dt 			date,
 	wk_01_budget 		int,
 	wk_01_used 			int,
