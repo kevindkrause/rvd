@@ -514,8 +514,7 @@ dept_req as (
 		,da.dept_asgn_status_code as dept_asgn_status
 		,case 
 			when 
-			       da.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' )
-				or da.ps_enrollment_code in  ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' )
+			    da.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' )
 			then 1 
 			else 0 
 		 end as used_bed_cnt

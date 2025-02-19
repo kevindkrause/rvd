@@ -873,6 +873,7 @@ begin
 			Room_Bldg 		= null,
 			Room_Bldg_Code 	= null,
 			Room 			= null
+		where room is not null			
 
 		set @Upd = @Upd + @@rowcount
 		
@@ -1249,7 +1250,7 @@ begin
 			update_date = getdate()
 		from dbo.volunteer tgt
 		inner join ( select volunteer_key, first_value( attrib_pursued_by_val ) over( partition by volunteer_key order by update_date desc ) as attrib_pursued_by_val
-					 from dbo.volunteer_app_v where active_flag = 'Y' ) src
+					 from dbo.volunteer_app_v where active_flag = 'Y' and attrib_pursued_by_val is not null and attrib_pursued_by_val <> ''  ) src
 			on tgt.volunteer_key = src.volunteer_key
 		where 1=1
 
@@ -2568,9 +2569,9 @@ begin
 		
 		-- UPDATE CURRENT ENRL ON VOLUNTEER
 		-- RESET ALL TO NULL
-		update dbo.volunteer
-		set current_enrollment_key = null
-		where current_enrollment_key is not null
+--		update dbo.volunteer
+--		set current_enrollment_key = null
+--		where current_enrollment_key is not null
 
 		set @Upd = @Upd + @@rowcount
 				
@@ -2579,7 +2580,7 @@ begin
 			current_Enrollment_Key = src.enrollment_key,
 			update_date = getdate()
 		from dbo.volunteer tgt
-		inner join 
+		left join 
 			( select ve.Volunteer_Key, e.enrollment_key
 			  from Volunteer_Enrollment ve
 			  inner join enrollment e
@@ -2595,7 +2596,7 @@ begin
 								  group by ve.volunteer_Key ) x 
 							 where x.volunteer_Key = ve.Volunteer_Key and e.Rank_Num = x.min_rank_num )  ) src
 			on tgt.volunteer_key = src.volunteer_key
-		--where coalesce( tgt.current_enrollment_key, 0 ) <> coalesce( src.enrollment_key, 0 )		
+		where coalesce( tgt.current_enrollment_key, 0 ) <> coalesce( src.enrollment_key, 0 )		
 
 		set @Upd = @Upd + @@rowcount
 		
@@ -3960,14 +3961,14 @@ begin
 		set @Upd = @@rowcount
 		
 		-- PERSON IS TRACKED
-		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Person is Tracked' 
-							else rvd_banner + char(13) + char(10) + 'Person is Tracked' 
-						 end,
-			update_date = getdate()
-		where hub_person_id in ( select person_id from stg.stg_person_tracking )	
+--		update dbo.volunteer
+--		set 
+--			rvd_banner = case 
+--							when rvd_banner = '' then 'Person is Tracked' 
+--							else rvd_banner + char(13) + char(10) + 'Person is Tracked' 
+--						 end,
+--			update_date = getdate()
+--		where hub_person_id in ( select person_id from stg.stg_person_tracking )	
 		
 		set @Upd = @@rowcount	
 		
@@ -4039,15 +4040,15 @@ begin
 		set @Upd = @Upd + @@rowcount
 
 		-- CURRENT ENROLLMENT
-		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Currently Enrolled' 
-							else rvd_banner + char(13) + char(10) + 'Currently Enrolled' 
-						 end,
-			update_date = getdate()
-		where volunteer_key in ( select v.volunteer_key from dbo.Volunteer v inner join dbo.enrollment e on v.current_Enrollment_Key = e.Enrollment_Key 
-								 where e.Enrollment_Code not in ( 'BBC', 'BSE', 'FR', 'FRT', 'FST' ) )
+--		update dbo.volunteer
+--		set 
+--			rvd_banner = case 
+--							when rvd_banner = '' then 'Currently Enrolled' 
+--							else rvd_banner + char(13) + char(10) + 'Currently Enrolled' 
+--						 end,
+--			update_date = getdate()
+--		where volunteer_key in ( select v.volunteer_key from dbo.Volunteer v inner join dbo.enrollment e on v.current_Enrollment_Key = e.Enrollment_Key 
+--								 where e.Enrollment_Code not in ( 'BBC', 'BSE', 'FR', 'FRT', 'FST' ) )
 
 		set @Upd = @Upd + @@rowcount
 
@@ -4078,26 +4079,26 @@ begin
 		set @Upd = @Upd + @@rowcount
 		
 		-- ZIP CLOSEST TO HPR
-		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Zip Code Closest to HPR' 
-							else rvd_banner + char(13) + char(10) + 'Zip Closest to HPR' 
-						 end,
-			update_date = getdate()
-		where postal_code_key in ( select postal_code_key from dbo.postal_code where local_flag = 'Y' and hpr_flag = 'Y' )
+--		update dbo.volunteer
+--		set 
+--			rvd_banner = case 
+--							when rvd_banner = '' then 'Zip Code Closest to HPR' 
+--							else rvd_banner + char(13) + char(10) + 'Zip Closest to HPR' 
+--						 end,
+--			update_date = getdate()
+--		where postal_code_key in ( select postal_code_key from dbo.postal_code where local_flag = 'Y' and hpr_flag = 'Y' )
 
 		set @Upd = @Upd + @@rowcount
 		
 		-- ZIP CLOSEST TO OTHER COMPLEXES
-		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Zip Code Closest to Other Complexes' 
-							else rvd_banner + char(13) + char(10) + 'Zip Code Closest to Other Complexes' 
-						 end,
-			update_date = getdate()
-		where postal_code_key in ( select postal_code_key from dbo.postal_code where local_flag = 'Y' and hpr_flag = 'N' )
+--		update dbo.volunteer
+--		set 
+--			rvd_banner = case 
+--							when rvd_banner = '' then 'Zip Code Closest to Other Complexes' 
+--							else rvd_banner + char(13) + char(10) + 'Zip Code Closest to Other Complexes' 
+--						 end,
+--			update_date = getdate()
+--		where postal_code_key in ( select postal_code_key from dbo.postal_code where local_flag = 'Y' and hpr_flag = 'N' )
 
 		set @Upd = @Upd + @@rowcount			
 
@@ -4982,6 +4983,6 @@ begin
 	exec dbo.ETL_RVD_Banner_proc
 	exec dbo.ETL_PRP_Data_proc
 	exec dbo.ETL_App_Attributes_Cleanup_proc
-	exec dbo.ETL_Bad_Data_Cleanup_proc
+	exec dbo.ETL_Bad_Data_Cleanup_proc	
 end
 go

@@ -1492,6 +1492,9 @@ go
 alter table dbo.volunteer add constraint volunteer_fk_tracking_status foreign key ( tracking_status_key ) references dbo.tracking_status( tracking_status_key )
 go
 
+create index volunteer_idx_full_name on dbo.volunteer( full_name )
+go
+
 
 if object_id('dbo.Volunteer_App', 'U') is not null
 	drop table dbo.Volunteer_App
