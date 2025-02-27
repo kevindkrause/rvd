@@ -470,6 +470,16 @@ begin
 			and cong_number not in ( select cong_number from stg.stg_cong )
 
 		set @Upd = @Upd + @@rowcount
+
+		-- UPDATE - NEWLY ACTIVE
+		update dbo.cong
+		set 
+			active_flag = 'Y',
+			update_date = getdate()
+		where active_flag = 'N'
+			and cong_number in ( select cong_number from stg.stg_cong )
+
+		set @Upd = @Upd + @@rowcount
 		
 		-- CONGREGATION ACTIVITY / EVENTS
 		-- DELETE

@@ -785,6 +785,97 @@ where 1=1
 go	
 
 
+if object_id('rpt.Onsite_Report_v', 'V') is not null
+	drop view rpt.Onsite_Report_v
+go 
+create view rpt.Onsite_Report_v
+as
+with dt as (
+	select cal_dt, day_of_wk, day_nm
+	from dbo.cal_dim
+	where cal_dt between dateadd( week, datediff( week, 0, getdate() ), 0 ) and
+		dateadd( week, datediff( week, 0, getdate() ), 0 ) + 13 ),
+-- BETHELITES + TEMP
+bethel as (
+	select 
+		 coalesce( v.dept_1_cpc_code, v.dept_2_cpc_code, 'PS' ) as cpc_code
+		,coalesce( dept_1_pc_category, dept_2_pc_category, 'Support' ) as pc_category
+		,enrollment_1_code as enrollment_code
+		,dt.cal_dt
+		,dt.day_nm
+		,1 as cnt
+	from rpt.Volunteer_Rpt_v v
+	inner join dt 
+		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
+	where enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL' ) 
+),
+-- COMMUTERS
+commuters as (
+	select 
+		 coalesce( v.dept_1_cpc_code, v.dept_2_cpc_code, 'PS' ) as cpc_code
+		,coalesce( dept_1_pc_category, dept_2_pc_category, 'Support' ) as pc_category
+		,enrollment_1_code as enrollment_code
+		,dt.cal_dt	
+		,dt.day_nm
+		,case 
+			when dt.day_of_wk = 2 and dept_1_mon_flag = 'Y' then 1
+			when dt.day_of_wk = 3 and dept_1_tue_flag = 'Y' then 1
+			when dt.day_of_wk = 4 and dept_1_wed_flag = 'Y' then 1
+			when dt.day_of_wk = 5 and dept_1_thu_flag = 'Y' then 1
+			when dt.day_of_wk = 6 and dept_1_fri_flag = 'Y' then 1
+			else 0 
+		 end as cnt
+	from rpt.Volunteer_Rpt_v v
+	inner join dt 
+		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
+	where enrollment_1_code in ( 'BBV', 'BCC' ) 
+),
+-- BBO
+bbo as (
+	select 
+		 coalesce( v.dept_1_cpc_code, v.dept_2_cpc_code, 'PS' ) as cpc_code
+		,coalesce( dept_1_pc_category, dept_2_pc_category, 'Support' ) as pc_category
+		,enrollment_1_code as enrollment_code
+		,dt.cal_dt
+		,dt.day_nm
+		,case 
+			when dt.day_of_wk = 2 and ba.mon = 'Y' then 1
+			when dt.day_of_wk = 3 and ba.tue = 'Y' then 1
+			when dt.day_of_wk = 4 and ba.wed = 'Y' then 1
+			when dt.day_of_wk = 5 and ba.thu = 'Y' then 1
+			when dt.day_of_wk = 6 and ba.fri = 'Y' then 1
+			when dt.day_of_wk = 7 and ba.sat = 'Y' then 1
+			when dt.day_of_wk = 1 and ba.sun = 'Y' then 1
+			else 0 
+		 end as cnt
+	from rpt.Volunteer_Rpt_v v
+	inner join dt 
+		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
+	inner join rpt.ba_event_v ba
+		on v.ba_volunteer_num = ba.ba_volunteer_num
+		and dt.cal_dt between ba.start_date and ba.end_date
+	where enrollment_1_code in ( 'BBO' )
+),
+base as (
+	select * from bethel
+	union all
+	select * from commuters
+	union all
+	select * from bbo
+)
+select 
+	 cal_dt
+	,day_nm
+	,case when cpc_code = 'CI' then 'On-site' else 'Tuxedo' end as location
+	,sum(cnt) as onsite_cnt
+from base
+group by 
+	 cal_dt
+	,day_nm
+	,case when cpc_code = 'CI' then 'On-site' else 'Tuxedo' end
+go
+
+
 if object_id('rpt.PCC_Project_Volunteer_v', 'V') is not null
 	drop view rpt.PCC_Project_Volunteer_v
 go 
