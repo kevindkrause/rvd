@@ -3920,6 +3920,7 @@ begin
 		-- RESET ALL
 		update dbo.volunteer
 		set rvd_banner = ''
+		where rvd_banner <> ''
 		
 		-- VOL DESK USER 
 		update dbo.volunteer

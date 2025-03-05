@@ -1259,6 +1259,7 @@ create view dbo.Volunteer_Skills_v
 as
 select 
 	 vs.volunteer_key
+	,v.full_name as volunteer_name
 	,s.skill_key
 	,s.skill
 	,ss.skill_speciality_key
@@ -1330,6 +1331,8 @@ inner join dbo.skill_level bsl
 	on coalesce( vs.ovsr_assessment_skill_level_key, 7 ) = bsl.skill_level_key	
 inner join dbo.source_system src
 	on vs.source_system_key = src.source_system_key
+inner join dbo.volunteer v
+	on vs.Volunteer_Key = v.Volunteer_Key	
 where ss.active_flag = 'Y'
 	and s.active_flag = 'Y'
 	--and sl.active_flag = 'Y'
