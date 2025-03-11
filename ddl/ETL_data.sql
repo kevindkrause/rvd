@@ -4951,6 +4951,245 @@ end
 go
 
 
+/***********************************************************
+**				   DEPT ASGN STATUS UDPATE
+***********************************************************/
+if object_id('dbo.ETL_Status_Update_Process') is null
+    exec( 'create procedure dbo.ETL_Status_Update_Process as set nocount on;' )
+go
+
+alter procedure dbo.ETL_Status_Update_Process
+as
+begin
+	set nocount on
+	
+	declare 
+		@Table nvarchar(150) = 'Bad Data Cleanup', 
+		@Ins integer = 0,
+		@Upd integer = 0,
+		@Del integer = 0,
+		@Start datetime = getdate(), 
+		@End datetime
+		
+	begin try		
+		--Backup Dept_Asgn table
+		INSERT INTO rvd.arch.Dept_Asgn
+		SELECT *, cast(getdate() as date) FROM rvd.dbo.Dept_Asgn
+
+		set @Ins = @Ins + @@rowcount	
+
+		--Step 1 - NEW RECORDS:  Insert new requests showing in HuB into Dept_Asgn table
+		INSERT INTO rvd.dbo.Dept_Asgn
+		SELECT 
+			CASE WHEN ISNULL(dept_1_hpr_dept_key,999999999)=999999999 THEN dept_2_hpr_dept_key ELSE dept_1_hpr_dept_key END as [HPR_Dept_Key],
+			0 as [HPR_Crew_Key], -- Set to 'Unassigned'
+			CASE WHEN isnull(D.CPC_Code, D2.CPC_Code) = 'CI' THEN 76 WHEN isnull(D.CPC_Code, D2.CPC_Code) = 'DD' THEN 77 WHEN isnull(D.CPC_Code, D2.CPC_Code) = 'PCC' THEN 78 WHEN isnull(D.CPC_Code, D2.CPC_Code) = 'CO' THEN 79 WHEN isnull(D.CPC_Code, D2.CPC_Code) = 'PS' THEN 54 ELSE NULL END as [HPR_Dept_Role_Key],  -- Set to 'Volunteer' based on CPC_Code
+			(SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = enrollment_1_code and Active_Flag = 'Y') as [Enrollment_Key],
+			7 as [Skill_Level], -- Set to 'Not Assessed'
+			Null as [Bed_Type],
+			dept_1_start_date as [Dept_Start_Date],
+			dept_1_end_date as [Dept_End_Date],
+			Null as [Notes],
+			VR.first_name as [Dept_First_Name],
+			VR.last_name as [Dept_Last_Name],
+			CASE WHEN dept_1_start_date > CAST(GETDATE() AS DATE) THEN (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'APPROVED')
+				WHEN dept_1_start_date <=CAST(GETDATE() AS DATE) AND isnull(dept_1_end_date,'1/1/1901') < cast(getdate() as date) THEN (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'ARRIVED') 
+				WHEN dept_1_end_date >= cast(getdate() as date) THEN (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'DEPARTED')
+				ELSE (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'NEEDS HANDLING') END as [Dept_Asgn_Status_Key],  -- Set based on Start and End date
+			Null as [Candidate_1_Name],
+			Null as [Candidate_1_Profile],
+			Null as [Candidate_2_Name],
+			Null as [Candidate_2_Profile],
+			Null as [Candidate_3_Name],
+			Null as [Candidate_3_Profile],
+			'N' as [VTC_Meeting_Code],
+			VR.volunteer_key as [Volunteer_Key],
+			dept_1_start_date as [PS_Start_Date],
+			dept_1_end_date as [PS_End_Date],
+			Null as [Marital_Status_Key],--VR.marital_status_code as [Marital_Status_Key],
+			Null as [Cong_Servant_Code],--VR.cong_servant_code as [Cong_Servant_Code],
+			Null as [PS_Notes],
+			Null as [Job_Description],
+			'Y' as [Active_Flag],
+			cast(getdate() as date) as [Load_Date],
+			cast(getdate() as date) as [Update_Date],
+			3 as [Priority_Key], -- Set to 'Normal'
+			Null as [ID_SP],
+			Null as [HPR_Dept_Sharepoint_Key],
+			Null as [HPR_Crew_Sharepoint_Key],
+			Null as [HPR_Dept_Role_Sharepoint_Key],
+			'N' as [Test_Data_Flag],
+			Null as [Invite_Chart_Comments],
+			Null as [Sync_Data_Flag],
+			Null as [Current_Sync_Status],
+			Null as [Num_Weeks],
+			Null as [Num_Months],
+			Null as [Until_Not_Needed],
+			Null as [Short_Term_OK],
+			Null as [Trade_To_Qualify],
+			Null as [Candidate_1_Vol_key],
+			Null as [Candidate_2_Vol_key],
+			Null as [Candidate_3_Vol_key],
+			Null as [Quantity_To_Replicate],
+			Null as [Multiple_Record_Number],
+			Null as [Candidate_1_Next_Step],
+			Null as [Candidate_2_Next_Step],
+			Null as [Candidate_3_Next_Step],
+			Null as [Possible_Sister],
+			Null as [HuBIncidentURL],
+			'HuB' as Update_Source, -- Indicate record added from HuB
+			'New Record' as Update_Source, -- Indicates update type
+			cast(getdate() as date) as UpdateDate_Source,  -- Indicate date record added from HuB
+			'N' as Update_ReviewedByUser,
+			Null as Ext_Orig_PS_End_Date,
+			Null as Ext_Orig_Enrollment_Key,
+			Null as Ext_Orig_Dept_Asgn_Status_Key,
+			Null as Ext_Last_Start_Date,
+			'N' as Extension_Flag,
+			cast(getdate() as date) asExtension_Flag_UpdateDate
+		FROM rvd.rpt.Volunteer_Rpt_v VR
+			left outer join rvd.dbo.HPR_Dept D on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
+			left outer join rvd.dbo.HPR_Dept D2 on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
+			left outer join (select da.volunteer_key,da.Enrollment_Key from rvd.dbo.Dept_Asgn da where Active_Flag = 'Y' and isnull(volunteer_key,99999999)<>99999999) A
+				on a.Volunteer_Key = vr.volunteer_key and a.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y')
+		WHERE ISNULL(A.volunteer_key, 999999999) = 999999999 and not (isnull(dept_1_hpr_dept_key, 999999999) = 999999999 and isnull(dept_2_hpr_dept_key, 999999999) = 999999999)
+
+		set @Ins = @Ins + @@rowcount	
+
+		--Step 2 - UPDATE DATES:  Sync Dept_Asgn Dept start/end date to Hub start/end dates where records are currently active or have a future date and extension_flag is 'N'
+		--			Note:  Duplicate records (active records with same volunteer and enrollment) are being excluded from this check
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET PS_Start_Date = VR.dept_1_start_date, PS_End_Date = VR.dept_1_end_date,
+			Update_Source = 'HuB' , Update_Type = 'Date Change', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM rvd.rpt.Volunteer_Rpt_v VR inner join rvd.dbo.Dept_Asgn DA 
+			on DA.Volunteer_Key = VR.Volunteer_Key and DA.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y')
+			left outer join 		
+				(SELECT da.volunteer_key as VolKey_Dup, da.enrollment_key as EnrKey_Dup
+					from rvd.dbo.Dept_Asgn_v da 
+					where Volunteer_Key is not null and enrollment_key is not null and active_flag = 'Y'
+					group by da.volunteer_key, da.Full_Name, da.enrollment_key, da.dept_enrollment_code having count(*)>1) Dup on da.Volunteer_Key = dup.VolKey_Dup and da.Enrollment_Key = dup.EnrKey_Dup
+		where ((ISNULL(VR.dept_1_end_date,'1/1/1901')>CAST(GETDATE() AS DATE) OR (ISNULL(VR.dept_1_end_date,'1/1/1901')='1/1/1901'))  OR 
+			VR.dept_1_start_date >= CAST(GETDATE() AS DATE)) and da.Active_Flag = 'Y'
+			and ((PS_Start_Date <> VR.dept_1_start_date) or isnull(PS_End_Date,'1/1/1901') <> isnull(VR.dept_1_end_date,'1/1/1901')) and da.extension_flag = 'N'
+			and VolKey_Dup is null
+			and not ((ISNULL(PS_End_Date,'1/1/1901')<> '1/1/1901' and VR.dept_1_start_date >ISNULL(PS_End_Date,'1/1/1901')))
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 2b - UPDATE DATES (EXTENSION START DATE):  Sync Dept_Asgn Dept start date to Hub end dates where Hub end date is greater than todays date and extension_flag is 'Y'
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET Ext_Last_Start_Date = VR.dept_1_start_date,
+			Update_Source = 'HuB' , Update_Type = 'Date Change-Ext', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM rvd.rpt.Volunteer_Rpt_v VR inner join [rvd].[dbo].[Dept_Asgn] DA 
+			on DA.Volunteer_Key = VR.Volunteer_Key and DA.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y')
+		where VR.dept_1_start_date>CAST(GETDATE() AS DATE) and da.Active_Flag = 'Y'
+			and (isnull(Ext_Last_Start_Date,'1/1/1901') <> isnull(VR.dept_1_start_date,'1/1/1901')) and da.extension_flag = 'Y'
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 3 - STATUS UPATE (SUBMITTED TO APPROVED) - Update Dept_Asgn STATUS to APPROVED where status is Submitted and has a future start date
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'APPROVED'),
+			Update_Source = 'HuB' , Update_Type = 'Status to APPROVED', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn] da left outer join 
+			rvd.rpt.Volunteer_Rpt_v H on H.volunteer_key=da.Volunteer_Key and (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = h.enrollment_1_code and Active_Flag = 'Y') = da.Enrollment_Key
+		WHERE [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'SUBMITTED')
+			AND [PS_Start_Date]>CAST(GETDATE() AS DATE) and da.extension_flag = 'N' and isnull(h.volunteer_key, 999999999) <> 999999999
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 3b - STATUS UPATE (SUBMITTED TO APPROVED) FOR EXTENSIONS - Update Dept_Asgn STATUS to APPROVED where status is Submitted and has a future start date
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'APPROVED'),
+			Update_Source = 'HuB' , Update_Type = 'Status to APPROVED', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn] da left outer join 
+			rvd.rpt.Volunteer_Rpt_v H on H.volunteer_key=da.Volunteer_Key and (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = h.enrollment_1_code and Active_Flag = 'Y') = da.Enrollment_Key
+		WHERE [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'SUBMITTED')
+			AND Ext_Last_Start_Date>CAST(GETDATE() AS DATE) and da.extension_flag = 'Y' and isnull(h.volunteer_key, 999999999) <> 999999999
+
+		set @Upd = @Upd + @@rowcount	
+
+		--Step 4 - STATUS UPATE (APPROVED TO ARRIVED) - Update Dept_Asgn STATUS to ARRIVED where status is Approved and has a start date equals or after to today's date
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'ARRIVED'),
+			Update_Source = 'HuB' , Update_Type = 'Status to ARRIVED', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date),
+			Ext_Orig_PS_End_Date = null, Ext_Orig_Enrollment_Key = null, Ext_Orig_Dept_Asgn_Status_Key = null, Extension_Flag = 'N', Extension_Flag_UpdateDate = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn] da
+		WHERE [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'APPROVED')
+			AND [PS_Start_Date]<=CAST(GETDATE() AS DATE) and da.extension_flag = 'N'
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 4b - STATUS UPATE (APPROVED TO ARRIVED) FOR EXTENSIONS - Update Dept_Asgn STATUS to ARRIVED where status is Approved and has a extension start date equals or after today's date
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'ARRIVED'),
+			Update_Source = 'HuB' , Update_Type = 'Status to ARRIVED-Ext', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date),
+			Ext_Orig_PS_End_Date = null, Ext_Orig_Enrollment_Key = null, Ext_Orig_Dept_Asgn_Status_Key = null, Extension_Flag = 'N', Extension_Flag_UpdateDate = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn] da
+		WHERE [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'APPROVED')
+			AND Ext_Last_Start_Date<=CAST(GETDATE() AS DATE) and da.extension_flag = 'Y'
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 5 - STATUS UPATE (ARRIVED TO DEPARTED) - Update Dept_Asgn STATUS to DEPARTED where status is Arrived and end date has passed
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'DEPARTED'),
+			Update_Source = 'HuB' , Update_Type = 'Status to DEPARTED', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn]
+		WHERE [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'ARRIVED')
+			AND [PS_End_Date]<=CAST(GETDATE() AS DATE)  
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 6 - STATUS UPATE (CHANGE TO NEEDS HANDLING) - Update Dept_Asgn_Status_Key to 'Needs Handling' where status is Approved and no future record exists in the Volunteer_Enrollment table
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'NEEDS HANDLING'),
+			Update_Source = 'HuB' , Update_Type = 'Status to NEEDS HANDLING - No future record', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn] DA left outer join 
+			(SELECT vr.volunteer_key, vr.enrollment_1_code FROM rvd.rpt.Volunteer_Rpt_v VR WHERE VR.dept_1_start_date >= CAST(GETDATE() AS DATE)) A 
+			on A.volunteer_key = da.Volunteer_Key and da.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = a.enrollment_1_code and Active_Flag = 'Y')
+		left outer join 
+			(SELECT vr.volunteer_key, vr.enrollment_2_code FROM rvd.rpt.Volunteer_Rpt_v VR WHERE VR.enrollment_2_start_date >= CAST(GETDATE() AS DATE)) B
+			on b.volunteer_key = da.Volunteer_Key and da.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = b.enrollment_2_code and Active_Flag = 'Y')
+		where ISNULL(a.volunteer_key, 999999999) = 999999999 and ISNULL(b.volunteer_key, 999999999) = 999999999
+		and da.Active_Flag = 'Y' 
+		and da.Dept_Asgn_Status_Key = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'APPROVED')
+
+		set @Upd = @Upd + @@rowcount
+
+		--Step 7 - STATUS UPATE (CHANGE TO NEEDS HANDLING) - Update Dept_Asgn_Status_Key to 'Needs Handling' where status is ARRIVED and no volunteer is assigned
+		UPDATE [rvd].[dbo].[Dept_Asgn]
+		SET [Dept_Asgn_Status_Key] = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'NEEDS HANDLING'),
+			Update_Source = 'HuB' , Update_Type = 'Status to NEEDS HANDLING - Arrived no volunteer', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
+		FROM [rvd].[dbo].[Dept_Asgn] DA 
+		where ISNULL(da.volunteer_key, 999999999) = 999999999
+		and da.Active_Flag = 'Y' 
+		and da.Dept_Asgn_Status_Key = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'ARRIVED')
+
+		set @Upd = @Upd + @@rowcount
+	
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End
+	end try
+		
+	begin catch
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End,
+			@Status_Code = 'F'
+	end catch
+end
+go
+
 
 /***********************************************************
 **					PARENT - DATA TABLES
@@ -4984,6 +5223,7 @@ begin
 	exec dbo.ETL_RVD_Banner_proc
 	exec dbo.ETL_PRP_Data_proc
 	exec dbo.ETL_App_Attributes_Cleanup_proc
-	exec dbo.ETL_Bad_Data_Cleanup_proc	
+	exec dbo.ETL_Bad_Data_Cleanup_proc
+	exec dbo.ETL_Status_Update_Process
 end
 go
