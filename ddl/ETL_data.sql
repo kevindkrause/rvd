@@ -4964,7 +4964,7 @@ begin
 	set nocount on
 	
 	declare 
-		@Table nvarchar(150) = 'Bad Data Cleanup', 
+		@Table nvarchar(150) = 'Dept Asgn Status', 
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
@@ -5167,6 +5167,8 @@ begin
 		and da.Dept_Asgn_Status_Key = (SELECT [Dept_Asgn_Status_Key] FROM [rvd].[dbo].[Dept_Asgn_Status] WHERE [Dept_Asgn_Status_Code] = 'ARRIVED')
 
 		set @Upd = @Upd + @@rowcount
+		
+		set @End = getdate()		
 	
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,

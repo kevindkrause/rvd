@@ -505,11 +505,11 @@ dept_req as (
 		,da.dept_role
 		,case
 			when da.volunteer_name_short is not null then da.volunteer_name_short
-			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '2031-12-31' ) then coalesce( da.dept_enrollment_code, da.ps_enrollment_code )
+			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, '2031-12-31' ) then coalesce( da.dept_enrollment_code, da.ps_enrollment_code )
 		 end as volunteer_name
 		,c.cal_dt
 		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
-		,coalesce( da.ps_end_date, da.dept_end_date, '2031-12-31' ) as end_date
+		,coalesce( da.ps_end_date, '2031-12-31' ) as end_date
 		,coalesce( da.dept_enrollment_code, da.ps_enrollment_code ) as enrollment_code
 		,da.dept_asgn_status_code as dept_asgn_status
 		,case 
@@ -525,7 +525,7 @@ dept_req as (
 		,c.wk_num
 	from dates c 
 	left join dbo.dept_asgn_v da
-		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, da.dept_end_date, '2031-12-31' )
+		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, '2031-12-31' )
 		and da.active_flag = 'Y'
 		and da.test_data_flag = 'N' )
 
@@ -794,7 +794,7 @@ with dt as (
 	select cal_dt, day_of_wk, day_nm
 	from dbo.cal_dim
 	where cal_dt between dateadd( week, datediff( week, 0, getdate() ), 0 ) and
-		dateadd( week, datediff( week, 0, getdate() ), 0 ) + 13 ),
+		dateadd( week, datediff( week, 0, getdate() ), 0 ) + 27 ),
 -- BETHELITES + TEMP
 bethel as (
 	select 
@@ -970,6 +970,7 @@ select
 	 b.pc_code
 	,b.pc_category
 	,b.cpc_code
+	,b.level_02
 	,b.level_03
 	,b.level_04
 	,b.level_05
@@ -999,6 +1000,7 @@ group by
 	 b.pc_code
 	,b.pc_category
 	,b.cpc_code
+	,b.level_02
 	,b.level_03
 	,b.level_04
 	,b.level_05
@@ -3041,3 +3043,324 @@ where pc_category <> 'Support'
 	'Wilcox, Mark Patrick' 
 )*/
 go
+
+
+-- WDC reporting
+with raw as (
+	select 
+		 c.cal_dt
+		,v.volunteer_key
+		,v.full_name
+		,max( v.parent_dept_name ) as parent_dept_nm
+		,max( v.dept_name ) as dept_nm
+		,max( v.enrollment_code ) as enrl_cd
+		,max( v2.room_bldg ) as room_bldg
+	from dbo.volunteer_dept_v v
+	inner join dbo.volunteer v2
+		on v.volunteer_key = v2.volunteer_key
+	inner join dbo.cal_dim c
+		on c.cal_dt between v.start_date and coalesce( v.end_date, '2030-12-31' )
+		and c.day_of_mth = 1
+	where 1=1
+		and v.site_code = 'RMP' 
+		--and c.cal_dt = '2025-03-01'
+		--and primary_flag = 'Y'
+		--and parent_dept_name = 'Warwick Computer Department' and dept_name = 'CD Engineering'
+		--and volunteer_key in (256215,725499,537287,339970,263665, 237671) 
+	group by c.cal_dt, v.volunteer_key, v.full_name order by full_name ),
+base as (
+	select 
+		 cal_dt
+		,parent_dept_nm
+		,dept_nm
+		,case 
+			when 
+				parent_dept_nm like 'HPR%' or 
+				parent_dept_nm like '%-RMP' or
+				parent_dept_nm in ( 'Headquarters Project Ramapo', 'Architectural', 'Building Group', 'Construction Implementation', 'CPC Office', 'Design Development', 'MEP', 
+					'Personnel Support', 'Personnel Support Office', 'Procurement Cost Control', 'Site', 'Support', 'Trade Group' ) or 
+				dept_nm like '%-RMP' or
+				dept_nm in ( 'Personnel Support Office', 'Personnel Support Office - Volunteer Desk', 'MEP - Electrical' ) then 'Y'
+			when parent_dept_nm in ( 'Purchasing Department' ) or dept_nm in ( 'Purchasing Department', 'Global Purchasing Department', 'WHQ CD Engineering', 'CD Engineering' ) then 'N'
+			else 'X'
+		 end as hpr_flag
+		,case
+			when enrl_cd in ( 'BCF', 'BCS', 'BCL' ) then '1_BCF_BCS_BCL'
+			when enrl_cd in ( 'BRS' ) then '2_BRS'
+			when enrl_cd in ( 'BBT', 'BBR', 'BBF', 'BBL' ) then '3_BBT_BBR_BBF_BBL'
+			when enrl_cd in ( 'BCV', 'BBC', 'BBW' ) then '4_BCV_BBC_BBW'
+			when enrl_cd in ( 'BRV', 'BOC' ) then '5_BRV_BOC'
+			when enrl_cd in ( 'BCC', 'BBO', 'BBV' ) then '6_BCC_BBO_BBV'
+			else enrl_cd
+		 end as enrollment_code
+		,volunteer_key
+	from raw
+	where enrl_cd in ( 'BCF', 'BCS', 'BCL', 'BRS', 'BBT', 'BBR', 'BBF', 'BBL','BCV', 'BBC', 'BBW', 'BRV', 'BOC', 'BCC', 'BBO', 'BBV' ) ),
+--select parent_dept_nm, dept_nm, count(*) from base  where hpr_flag <> 'X'  group by parent_dept_nm, dept_nm order by 1,2
+
+grp as (
+	select 
+		 cal_dt
+		,enrollment_code
+		,hpr_flag
+		,count(*) as total_cnt
+	from base
+	where 1=1
+		and not ( enrollment_code in ( '3_BBT_BBR_BBF_BBL', '5_BRV_BOC' ) and hpr_flag = 'N' )
+		and hpr_flag <> 'X'
+		and cal_dt between '2019-04-01' and '2025-08-01'
+	group by cal_dt, enrollment_code, hpr_flag ),
+dw as (
+	select 
+		 enrollment_code
+		,hpr_flag
+		,cal_dt
+		,coalesce( case when cal_dt = '2019-04-01' then total_cnt end, 0 ) as 'Apr_19'
+		,coalesce( case when cal_dt = '2019-05-01' then total_cnt end, 0 ) as 'May_19'
+		,coalesce( case when cal_dt = '2019-06-01' then total_cnt end, 0 ) as 'Jun_19'
+		,coalesce( case when cal_dt = '2019-07-01' then total_cnt end, 0 ) as 'Jul_19'
+		,coalesce( case when cal_dt = '2019-08-01' then total_cnt end, 0 ) as 'Aug_19'
+		,coalesce( case when cal_dt = '2019-09-01' then total_cnt end, 0 ) as 'Sep_19'
+		,coalesce( case when cal_dt = '2019-10-01' then total_cnt end, 0 ) as 'Oct_19'
+		,coalesce( case when cal_dt = '2019-11-01' then total_cnt end, 0 ) as 'Nov_19'
+		,coalesce( case when cal_dt = '2019-12-01' then total_cnt end, 0 ) as 'Dec_19'
+
+		,coalesce( case when cal_dt = '2020-01-01' then total_cnt end, 0 ) as 'Jan_20'
+		,coalesce( case when cal_dt = '2020-02-01' then total_cnt end, 0 ) as 'Feb_20'
+		,coalesce( case when cal_dt = '2020-03-01' then total_cnt end, 0 ) as 'Mar_20'
+		,coalesce( case when cal_dt = '2020-04-01' then total_cnt end, 0 ) as 'Apr_20'
+		,coalesce( case when cal_dt = '2020-05-01' then total_cnt end, 0 ) as 'May_20'
+		,coalesce( case when cal_dt = '2020-06-01' then total_cnt end, 0 ) as 'Jun_20'
+		,coalesce( case when cal_dt = '2020-07-01' then total_cnt end, 0 ) as 'Jul_20'
+		,coalesce( case when cal_dt = '2020-08-01' then total_cnt end, 0 ) as 'Aug_20'
+		,coalesce( case when cal_dt = '2020-09-01' then total_cnt end, 0 ) as 'Sep_20'
+		,coalesce( case when cal_dt = '2020-10-01' then total_cnt end, 0 ) as 'Oct_20'
+		,coalesce( case when cal_dt = '2020-11-01' then total_cnt end, 0 ) as 'Nov_20'
+		,coalesce( case when cal_dt = '2020-12-01' then total_cnt end, 0 ) as 'Dec_20'
+
+		,coalesce( case when cal_dt = '2021-01-01' then total_cnt end, 0 ) as 'Jan_21'
+		,coalesce( case when cal_dt = '2021-02-01' then total_cnt end, 0 ) as 'Feb_21'
+		,coalesce( case when cal_dt = '2021-03-01' then total_cnt end, 0 ) as 'Mar_21'
+		,coalesce( case when cal_dt = '2021-04-01' then total_cnt end, 0 ) as 'Apr_21'
+		,coalesce( case when cal_dt = '2021-05-01' then total_cnt end, 0 ) as 'May_21'
+		,coalesce( case when cal_dt = '2021-06-01' then total_cnt end, 0 ) as 'Jun_21'
+		,coalesce( case when cal_dt = '2021-07-01' then total_cnt end, 0 ) as 'Jul_21'
+		,coalesce( case when cal_dt = '2021-08-01' then total_cnt end, 0 ) as 'Aug_21'
+		,coalesce( case when cal_dt = '2021-09-01' then total_cnt end, 0 ) as 'Sep_21'
+		,coalesce( case when cal_dt = '2021-10-01' then total_cnt end, 0 ) as 'Oct_21'
+		,coalesce( case when cal_dt = '2021-11-01' then total_cnt end, 0 ) as 'Nov_21'
+		,coalesce( case when cal_dt = '2021-12-01' then total_cnt end, 0 ) as 'Dec_21'
+
+		,coalesce( case when cal_dt = '2022-01-01' then total_cnt end, 0 ) as 'Jan_22'
+		,coalesce( case when cal_dt = '2022-02-01' then total_cnt end, 0 ) as 'Feb_22'
+		,coalesce( case when cal_dt = '2022-03-01' then total_cnt end, 0 ) as 'Mar_22'
+		,coalesce( case when cal_dt = '2022-04-01' then total_cnt end, 0 ) as 'Apr_22'
+		,coalesce( case when cal_dt = '2022-05-01' then total_cnt end, 0 ) as 'May_22'
+		,coalesce( case when cal_dt = '2022-06-01' then total_cnt end, 0 ) as 'Jun_22'
+		,coalesce( case when cal_dt = '2022-07-01' then total_cnt end, 0 ) as 'Jul_22'
+		,coalesce( case when cal_dt = '2022-08-01' then total_cnt end, 0 ) as 'Aug_22'
+		,coalesce( case when cal_dt = '2022-09-01' then total_cnt end, 0 ) as 'Sep_22'
+		,coalesce( case when cal_dt = '2022-10-01' then total_cnt end, 0 ) as 'Oct_22'
+		,coalesce( case when cal_dt = '2022-11-01' then total_cnt end, 0 ) as 'Nov_22'
+		,coalesce( case when cal_dt = '2022-12-01' then total_cnt end, 0 ) as 'Dec_22'
+
+		,coalesce( case when cal_dt = '2023-01-01' then total_cnt end, 0 ) as 'Jan_23'
+		,coalesce( case when cal_dt = '2023-02-01' then total_cnt end, 0 ) as 'Feb_23'
+		,coalesce( case when cal_dt = '2023-03-01' then total_cnt end, 0 ) as 'Mar_23'
+		,coalesce( case when cal_dt = '2023-04-01' then total_cnt end, 0 ) as 'Apr_23'
+		,coalesce( case when cal_dt = '2023-05-01' then total_cnt end, 0 ) as 'May_23'
+		,coalesce( case when cal_dt = '2023-06-01' then total_cnt end, 0 ) as 'Jun_23'
+		,coalesce( case when cal_dt = '2023-07-01' then total_cnt end, 0 ) as 'Jul_23'
+		,coalesce( case when cal_dt = '2023-08-01' then total_cnt end, 0 ) as 'Aug_23'
+		,coalesce( case when cal_dt = '2023-09-01' then total_cnt end, 0 ) as 'Sep_23'
+		,coalesce( case when cal_dt = '2023-10-01' then total_cnt end, 0 ) as 'Oct_23'
+		,coalesce( case when cal_dt = '2023-11-01' then total_cnt end, 0 ) as 'Nov_23'
+		,coalesce( case when cal_dt = '2023-12-01' then total_cnt end, 0 ) as 'Dec_23'
+
+		,coalesce( case when cal_dt = '2024-01-01' then total_cnt end, 0 ) as 'Jan_24'
+		,coalesce( case when cal_dt = '2024-02-01' then total_cnt end, 0 ) as 'Feb_24'
+		,coalesce( case when cal_dt = '2024-03-01' then total_cnt end, 0 ) as 'Mar_24'
+		,coalesce( case when cal_dt = '2024-04-01' then total_cnt end, 0 ) as 'Apr_24'
+		,coalesce( case when cal_dt = '2024-05-01' then total_cnt end, 0 ) as 'May_24'
+		,coalesce( case when cal_dt = '2024-06-01' then total_cnt end, 0 ) as 'Jun_24'
+		,coalesce( case when cal_dt = '2024-07-01' then total_cnt end, 0 ) as 'Jul_24'
+		,coalesce( case when cal_dt = '2024-08-01' then total_cnt end, 0 ) as 'Aug_24'
+		,coalesce( case when cal_dt = '2024-09-01' then total_cnt end, 0 ) as 'Sep_24'
+		,coalesce( case when cal_dt = '2024-10-01' then total_cnt end, 0 ) as 'Oct_24'
+		,coalesce( case when cal_dt = '2024-11-01' then total_cnt end, 0 ) as 'Nov_24'
+		,coalesce( case when cal_dt = '2024-12-01' then total_cnt end, 0 ) as 'Dec_24'
+
+		,coalesce( case when cal_dt = '2025-01-01' then total_cnt end, 0 ) as 'Jan_25'
+		,coalesce( case when cal_dt = '2025-02-01' then total_cnt end, 0 ) as 'Feb_25'
+		,coalesce( case when cal_dt = '2025-03-01' then total_cnt end, 0 ) as 'Mar_25'
+		,coalesce( case when cal_dt = '2025-04-01' then total_cnt end, 0 ) as 'Apr_25'
+		,coalesce( case when cal_dt = '2025-05-01' then total_cnt end, 0 ) as 'May_25'
+		,coalesce( case when cal_dt = '2025-06-01' then total_cnt end, 0 ) as 'Jun_25'
+		,coalesce( case when cal_dt = '2025-07-01' then total_cnt end, 0 ) as 'Jul_25'
+		,coalesce( case when cal_dt = '2025-08-01' then total_cnt end, 0 ) as 'Aug_25'
+		,coalesce( case when cal_dt = '2025-09-01' then total_cnt end, 0 ) as 'Sep_25'
+		,coalesce( case when cal_dt = '2025-10-01' then total_cnt end, 0 ) as 'Oct_25'
+		,coalesce( case when cal_dt = '2025-11-01' then total_cnt end, 0 ) as 'Nov_25'
+		,coalesce( case when cal_dt = '2025-12-01' then total_cnt end, 0 ) as 'Dec_25'
+
+		,coalesce( case when cal_dt = '2026-01-01' then total_cnt end, 0 ) as 'Jan_26'
+		,coalesce( case when cal_dt = '2026-02-01' then total_cnt end, 0 ) as 'Feb_26'
+		,coalesce( case when cal_dt = '2026-03-01' then total_cnt end, 0 ) as 'Mar_26'
+		,coalesce( case when cal_dt = '2026-04-01' then total_cnt end, 0 ) as 'Apr_26'
+		,coalesce( case when cal_dt = '2026-05-01' then total_cnt end, 0 ) as 'May_26'
+		,coalesce( case when cal_dt = '2026-06-01' then total_cnt end, 0 ) as 'Jun_26'
+		,coalesce( case when cal_dt = '2026-07-01' then total_cnt end, 0 ) as 'Jul_26'
+		,coalesce( case when cal_dt = '2026-08-01' then total_cnt end, 0 ) as 'Aug_26'
+		,coalesce( case when cal_dt = '2026-09-01' then total_cnt end, 0 ) as 'Sep_26'
+		,coalesce( case when cal_dt = '2026-10-01' then total_cnt end, 0 ) as 'Oct_26'
+		,coalesce( case when cal_dt = '2026-11-01' then total_cnt end, 0 ) as 'Nov_26'
+		,coalesce( case when cal_dt = '2026-12-01' then total_cnt end, 0 ) as 'Dec_26'
+
+		,coalesce( case when cal_dt = '2027-01-01' then total_cnt end, 0 ) as 'Jan_27'
+		,coalesce( case when cal_dt = '2027-02-01' then total_cnt end, 0 ) as 'Feb_27'
+		,coalesce( case when cal_dt = '2027-03-01' then total_cnt end, 0 ) as 'Mar_27'
+		,coalesce( case when cal_dt = '2027-04-01' then total_cnt end, 0 ) as 'Apr_27'
+		,coalesce( case when cal_dt = '2027-05-01' then total_cnt end, 0 ) as 'May_27'
+		,coalesce( case when cal_dt = '2027-06-01' then total_cnt end, 0 ) as 'Jun_27'
+		,coalesce( case when cal_dt = '2027-07-01' then total_cnt end, 0 ) as 'Jul_27'
+		,coalesce( case when cal_dt = '2027-08-01' then total_cnt end, 0 ) as 'Aug_27'
+		,coalesce( case when cal_dt = '2027-09-01' then total_cnt end, 0 ) as 'Sep_27'
+		,coalesce( case when cal_dt = '2027-10-01' then total_cnt end, 0 ) as 'Oct_27'
+		,coalesce( case when cal_dt = '2027-11-01' then total_cnt end, 0 ) as 'Nov_27'
+		,coalesce( case when cal_dt = '2027-12-01' then total_cnt end, 0 ) as 'Dec_27'
+
+		,coalesce( case when cal_dt = '2028-01-01' then total_cnt end, 0 ) as 'Jan_28'
+		,coalesce( case when cal_dt = '2028-02-01' then total_cnt end, 0 ) as 'Feb_28'
+		,coalesce( case when cal_dt = '2028-03-01' then total_cnt end, 0 ) as 'Mar_28'
+		,coalesce( case when cal_dt = '2028-04-01' then total_cnt end, 0 ) as 'Apr_28'
+		,coalesce( case when cal_dt = '2028-05-01' then total_cnt end, 0 ) as 'May_28'
+		,coalesce( case when cal_dt = '2028-06-01' then total_cnt end, 0 ) as 'Jun_28'
+		,coalesce( case when cal_dt = '2028-07-01' then total_cnt end, 0 ) as 'Jul_28'
+		,coalesce( case when cal_dt = '2028-08-01' then total_cnt end, 0 ) as 'Aug_28'
+		,coalesce( case when cal_dt = '2028-09-01' then total_cnt end, 0 ) as 'Sep_28'
+		,coalesce( case when cal_dt = '2028-10-01' then total_cnt end, 0 ) as 'Oct_28'
+		,coalesce( case when cal_dt = '2028-11-01' then total_cnt end, 0 ) as 'Nov_28'
+		,coalesce( case when cal_dt = '2028-12-01' then total_cnt end, 0 ) as 'Dec_28'
+	from grp )
+select 
+	 enrollment_code
+	,hpr_flag
+	,sum( apr_19 ) as apr_19
+	,sum( may_19 ) as may_19
+	,sum( jun_19 ) as jun_19
+	,sum( jul_19 ) as jul_19
+	,sum( aug_19 ) as aug_19
+	,sum( sep_19 ) as sep_19
+	,sum( oct_19 ) as oct_19
+	,sum( nov_19 ) as nov_19
+	,sum( dec_19 ) as dec_19
+	
+	,sum( jan_20 ) as jan_20
+	,sum( feb_20 ) as feb_20
+	,sum( mar_20 ) as mar_20
+	,sum( apr_20 ) as apr_20
+	,sum( may_20 ) as may_20
+	,sum( jun_20 ) as jun_20
+	,sum( jul_20 ) as jul_20
+	,sum( aug_20 ) as aug_20
+	,sum( sep_20 ) as sep_20
+	,sum( oct_20 ) as oct_20
+	,sum( nov_20 ) as nov_20
+	,sum( dec_20 ) as dec_20
+	
+	,sum( jan_21 ) as jan_21
+	,sum( feb_21 ) as feb_21
+	,sum( mar_21 ) as mar_21
+	,sum( apr_21 ) as apr_21
+	,sum( may_21 ) as may_21
+	,sum( jun_21 ) as jun_21
+	,sum( jul_21 ) as jul_21
+	,sum( aug_21 ) as aug_21
+	,sum( sep_21 ) as sep_21
+	,sum( oct_21 ) as oct_21
+	,sum( nov_21 ) as nov_21
+	,sum( dec_21 ) as dec_21
+	
+	,sum( jan_22 ) as jan_22
+	,sum( feb_22 ) as feb_22
+	,sum( mar_22 ) as mar_22
+	,sum( apr_22 ) as apr_22
+	,sum( may_22 ) as may_22
+	,sum( jun_22 ) as jun_22
+	,sum( jul_22 ) as jul_22
+	,sum( aug_22 ) as aug_22
+	,sum( sep_22 ) as sep_22
+	,sum( oct_22 ) as oct_22
+	,sum( nov_22 ) as nov_22
+	,sum( dec_22 ) as dec_22
+
+	,sum( jan_23 ) as jan_23
+	,sum( feb_23 ) as feb_23
+	,sum( mar_23 ) as mar_23
+	,sum( apr_23 ) as apr_23
+	,sum( may_23 ) as may_23
+	,sum( jun_23 ) as jun_23
+	,sum( jul_23 ) as jul_23
+	,sum( aug_23 ) as aug_23
+	,sum( sep_23 ) as sep_23
+	,sum( oct_23 ) as oct_23
+	,sum( nov_23 ) as nov_23
+	,sum( dec_23 ) as dec_23
+
+	,sum( jan_24 ) as jan_24
+	,sum( feb_24 ) as feb_24
+	,sum( mar_24 ) as mar_24
+	,sum( apr_24 ) as apr_24
+	,sum( may_24 ) as may_24
+	,sum( jun_24 ) as jun_24
+	,sum( jul_24 ) as jul_24
+	,sum( aug_24 ) as aug_24
+	,sum( sep_24 ) as sep_24
+	,sum( oct_24 ) as oct_24
+	,sum( nov_24 ) as nov_24
+	,sum( dec_24 ) as dec_24
+	
+	,sum( jan_25 ) as jan_25
+	,sum( feb_25 ) as feb_25
+	,sum( mar_25 ) as mar_25
+	--,sum( apr_25 ) as apr_25
+	--,sum( may_25 ) as may_25
+	--,sum( jun_25 ) as jun_25
+	--,sum( jul_25 ) as jul_25
+	--,sum( aug_25 ) as aug_25
+	--,sum( sep_25 ) as sep_25
+	--,sum( oct_25 ) as oct_25
+	--,sum( nov_25 ) as nov_25
+	--,sum( dec_25 ) as dec_25
+	
+	--,sum( jan_26 ) as jan_26
+	--,sum( feb_26 ) as feb_26
+	--,sum( mar_26 ) as mar_26
+	--,sum( apr_26 ) as apr_26
+	--,sum( may_26 ) as may_26
+	--,sum( jun_26 ) as jun_26
+	--,sum( jul_26 ) as jul_26
+	--,sum( aug_26 ) as aug_26
+	--,sum( sep_26 ) as sep_26
+	--,sum( oct_26 ) as oct_26
+	--,sum( nov_26 ) as nov_26
+	--,sum( dec_26 ) as dec_26
+	
+	--,sum( jan_27 ) as jan_27
+	--,sum( feb_27 ) as feb_27
+	--,sum( mar_27 ) as mar_27
+	--,sum( apr_27 ) as apr_27
+	--,sum( may_27 ) as may_27
+	--,sum( jun_27 ) as jun_27
+	--,sum( jul_27 ) as jul_27
+	--,sum( aug_27 ) as aug_27
+	--,sum( sep_27 ) as sep_27
+	--,sum( oct_27 ) as oct_27
+	--,sum( nov_27 ) as nov_27
+	--,sum( dec_27 ) as dec_27
+from dw
+where cal_dt < getdate()
+group by enrollment_code, hpr_flag
+order by enrollment_code, hpr_flag desc
+
+

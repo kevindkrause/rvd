@@ -2,6 +2,9 @@
 **						ENV CHANGE
 **	rvdrehearsal = [rvdrehearsal-ussqlext021.bethel.jw.org].RVDUNION_Export / USSQLext139.RVDUNION_Export
 **	rvd 		 = [rvd-ussqlext019.bethel.jw.org].RVD_Export / USSQLEXT140.RVD_Export
+**		select top 10 * from [rvd-ussqlext019.bethel.jw.org].RVD_Export.dbo.Volunteer_Attendance
+**
+**		select top 10 * from [rvdrehearsal-ussqlext021.bethel.jw.org].RVDUNION_Export.dbo.Volunteer_Attendance
 ***********************************************************/
 
 use rvdrehearsal
