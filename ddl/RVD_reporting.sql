@@ -24,6 +24,7 @@ select distinct
 	,bethel_email
 	,jwpub_email
 	,personal_email
+	,parent_dept_code as cpc_code
 	,parent_dept_name
 	,dept_name
 	,case 
@@ -63,7 +64,8 @@ select distinct
 	,mobile_phone
 	,bethel_email
 	,jwpub_email
-	,personal_email	
+	,personal_email
+	,parent_dept_code as cpc_code
 	,parent_dept_name
 	,dept_name
 	,case 
@@ -104,6 +106,7 @@ select distinct
 	,bethel_email
 	,jwpub_email
 	,personal_email
+	,dept_2_cpc_code as cpc_code
 	,dept_2_parent_dept_name as parent_dept_name
 	,dept_2_dept_name as dept_name
 	,case 

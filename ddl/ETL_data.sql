@@ -5059,20 +5059,42 @@ begin
 		--Step 2 - UPDATE DATES:  Sync Dept_Asgn Dept start/end date to Hub start/end dates where records are currently active or have a future date and extension_flag is 'N'
 		--			Note:  Duplicate records (active records with same volunteer and enrollment) are being excluded from this check
 		UPDATE [rvd].[dbo].[Dept_Asgn]
-		SET PS_Start_Date = VR.dept_1_start_date, PS_End_Date = VR.dept_1_end_date,
+		SET PS_Start_Date = VR.dept_1_start_date, PS_End_Date = coalesce(VR.dept_1_end_date, vr.enrollment_1_end_date),
 			Update_Source = 'HuB' , Update_Type = 'Date Change', UpdateDate_Source = cast(getdate() as date), Update_ReviewedByUser = 'N', Update_Date = cast(getdate() as date)
-		FROM rvd.rpt.Volunteer_Rpt_v VR inner join rvd.dbo.Dept_Asgn DA 
-			on DA.Volunteer_Key = VR.Volunteer_Key and DA.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y')
+		--select da.Dept_Name, da.Work_Group_Name, da.dept_role, da.crew_name, da.dept_asgn_key, da.full_name, da.ps_enrollment_code, vr.enrollment_1_code, 
+		--	da.ps_start_date, vr.dept_1_start_date, vr.enrollment_1_start_date, da.ps_end_date, vr.dept_1_end_date, vr.enrollment_1_end_date, vr.tentative_end_date,
+		--	coalesce(VR.dept_1_end_date, vr.enrollment_1_end_date) as new_end_date
+		FROM rvd.rpt.Volunteer_Rpt_v VR
+		inner join rvd.dbo.Dept_Asgn DA 
+			on DA.Volunteer_Key = VR.Volunteer_Key 
+			and DA.Enrollment_Key = (SELECT Enrollment_Key from rvd.dbo.Enrollment where enrollment_code = VR.enrollment_1_code 
+			and Active_Flag = 'Y')
 			left outer join 		
 				(SELECT da.volunteer_key as VolKey_Dup, da.enrollment_key as EnrKey_Dup
 					from rvd.dbo.Dept_Asgn_v da 
 					where Volunteer_Key is not null and enrollment_key is not null and active_flag = 'Y'
-					group by da.volunteer_key, da.Full_Name, da.enrollment_key, da.dept_enrollment_code having count(*)>1) Dup on da.Volunteer_Key = dup.VolKey_Dup and da.Enrollment_Key = dup.EnrKey_Dup
-		where ((ISNULL(VR.dept_1_end_date,'1/1/1901')>CAST(GETDATE() AS DATE) OR (ISNULL(VR.dept_1_end_date,'1/1/1901')='1/1/1901'))  OR 
-			VR.dept_1_start_date >= CAST(GETDATE() AS DATE)) and da.Active_Flag = 'Y'
-			and ((PS_Start_Date <> VR.dept_1_start_date) or isnull(PS_End_Date,'1/1/1901') <> isnull(VR.dept_1_end_date,'1/1/1901')) and da.extension_flag = 'N'
+					group by da.volunteer_key, da.Full_Name, da.enrollment_key, da.dept_enrollment_code 
+					having count(*)>1) Dup 
+				on da.Volunteer_Key = dup.VolKey_Dup and da.Enrollment_Key = dup.EnrKey_Dup
+		where 1=1
+			--and vr.volunteer_key = 627798
+			and (
+				   (coalesce(vr.enrollment_1_end_date,VR.dept_1_end_date,'1/1/1901')>CAST(GETDATE() AS DATE) 
+				OR (coalesce(vr.enrollment_1_end_date,VR.dept_1_end_date,'1/1/1901')='1/1/1901'))  
+				OR VR.dept_1_start_date >= CAST(GETDATE() AS DATE)
+				) 
+			and da.Active_Flag = 'Y'
+			and (
+				   (da.PS_Start_Date <> VR.dept_1_start_date) 
+				or isnull(da.PS_End_Date,'1/1/1901') <> isnull(VR.dept_1_end_date,'1/1/1901')
+				or isnull(da.PS_End_Date,'1/1/1901') <> isnull(VR.enrollment_1_end_date,'1/1/1901')
+				) 
+			and da.extension_flag = 'N'
 			and VolKey_Dup is null
-			and not ((ISNULL(PS_End_Date,'1/1/1901')<> '1/1/1901' and VR.dept_1_start_date >ISNULL(PS_End_Date,'1/1/1901')))
+			and not ( 
+				(ISNULL(da.PS_End_Date,'1/1/1901')<> '1/1/1901' and VR.dept_1_start_date >ISNULL(da.PS_End_Date,'1/1/1901'))
+				)
+			and coalesce(VR.dept_1_end_date, vr.enrollment_1_end_date) > vr.dept_1_start_date
 
 		set @Upd = @Upd + @@rowcount
 
