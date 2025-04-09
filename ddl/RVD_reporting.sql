@@ -43,6 +43,9 @@ select distinct
 		else 'Arrived'
 	 end as enrollment_status
 from rpt.Volunteer_v
+where 1=1
+	and parent_dept_name not like '%WHQ Computer%'
+	and parent_dept_name not like '%Purchasing%'
 
 union all
 
@@ -80,6 +83,9 @@ select distinct
 		else 'Arrived'
 	 end as enrollment_status
 from rpt.Volunteer_Departure_v
+where 1=1
+	and parent_dept_name not like '%WHQ Computer%'
+	and parent_dept_name not like '%Purchasing%'
 
 union all
 
@@ -113,7 +119,10 @@ select distinct
 	,volunteer_key
 	,'Transfer' as enrollment_status
 from rpt.Volunteer_Rpt_v
-where dept_1_cpc_code is null
+where 1=1
+	and dept_2_parent_dept_name not like '%WHQ Computer%'
+	and dept_2_parent_dept_name not like '%Purchasing%'
+	and dept_1_cpc_code is null
 	and dept_1_end_date is not null
 	and dept_2_cpc_code is not null
 	and dept_2_start_date > cast(getdate() as date)
