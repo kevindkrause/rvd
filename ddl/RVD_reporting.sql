@@ -697,13 +697,14 @@ select
 		when cpc_code = 'DD' then 2
 		when cpc_code = 'PCC' then 3
 		when cpc_code = 'PS' then 4
-		else 5
+		when cpc_code = 'VD' then 5
+		else 6
 	 end as sort_order
 from dbo.hpr_dept
 where 1=1
 	and active_flag = 'Y' 
 	and nyc_flag = 'N'
-	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI' ) 
+	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI', 'VD' ) 
 go
 
 
@@ -2057,7 +2058,7 @@ from (
 	inner join dbo.HPR_Dept d
 		on vd.hub_dept_id = d.hub_dept_id
 		and d.Active_Flag = 'Y'
-		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS' )
+		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept 
 				 where hub_dept_id in ( select hub_dept_id from dbo.HPR_Dept where active_flag = 'Y' ) and ( end_date is null or end_date > getdate() ) group by volunteer_key ) multi
 		on v.volunteer_key = multi.volunteer_key

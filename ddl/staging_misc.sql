@@ -397,6 +397,7 @@ from
 			when teamcode in ( 'HPR PCC', 'HPR PU' ) then 'PCC'
 			when teamcode = 'HPR PS' then 'PS'
 			when teamcode = 'HPR HQ' then 'CI'
+			when teamcode = 'HPR VD' then 'VD'			
 			else 'CI'
 		 end as cpc_code
 		,parentcode
@@ -530,7 +531,7 @@ from
 		,[Jun-30]	
 	  from stg.stg_PRP_Dept
 	  where 1=1
-		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR HQ', 'HPR PU' )
+		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR HQ', 'HPR PU', 'HPR VD' )
 		and teamtrade like 'Total%'
 		) core
 group by cpc_code
