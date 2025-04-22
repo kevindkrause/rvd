@@ -483,6 +483,7 @@ if object_id('dbo.Dept_Asgn', 'U') is not null
 go 
 create table dbo.Dept_Asgn(
 	Dept_Asgn_Key 				integer identity(1,1) 	not null constraint dept_asgn_pk primary key,
+	Dept_Role_Key				integer,
 	HPR_Dept_Key 				integer 			 	not null,
 	HPR_Dept_Sharepoint_Key		nvarchar(255),
 	HPR_Crew_Key				integer 				not null constraint df_dept_asgn_crew default 0,
@@ -649,6 +650,89 @@ alter table dbo.dept_role_volunteer add constraint dept_asgn_volunteer_fk_dept_a
 go
 
 alter table dbo.dept_role_volunteer add constraint dept_asgn_volunteer_fk_dept_asgn_status foreign key ( dept_asgn_status_key ) references dbo.dept_asgn_status( dept_asgn_status_key )
+go
+
+
+
+if object_id('dbo.Dept_Role', 'U') is not null
+	drop table dbo.Dept_Role
+go 
+create table dbo.Dept_Role(
+	Dept_Role_Key 				integer identity(1,1) 	not null constraint dept_role_pk primary key,
+	HPR_Dept_Key 				integer 			 	not null,
+	HPR_Crew_Key				integer 				not null constraint df_dept_role_crew default 0,
+	HPR_Dept_Role_Key			integer 				not null constraint df_dept_role_role default 0,
+	Enrollment_Key				integer,
+	Skill_Level					nvarchar(255),
+	Dept_Start_Date				date,
+	Dept_End_Date				date,
+	Notes						nvarchar(4000),
+	Dept_First_Name				nvarchar(255),
+	Dept_Last_Name				nvarchar(255),
+	Dept_Asgn_Status_Key		integer,
+	Priority_Key				integer					not null constraint df_dept_role_priority default 3,
+	Candidate_1_Name			nvarchar(255),
+	Candidate_1_Profile			nvarchar(255),
+	Candidate_1_Next_Step 		nvarchar(50),	
+	Candidate_1_Vol_key			int,	
+	Candidate_2_Name			nvarchar(255),
+	Candidate_2_Profile			nvarchar(255),
+	Candidate_2_Next_Step 		nvarchar(50),
+	Candidate_2_Vol_key			int,
+	Candidate_3_Name			nvarchar(255),
+	Candidate_3_Profile			nvarchar(255),
+	Candidate_3_Next_Step 		nvarchar(50),
+	Candidate_3_Vol_key			int,
+	Candidate_4_Name			nvarchar(255),
+	Candidate_4_Profile			nvarchar(255),
+	Candidate_4_Vol_key			int,
+	Candidate_4_Next_Step		nvarchar(50),
+	Candidate_5_Name			nvarchar(255),
+	Candidate_5_Profile			nvarchar(255),
+	Candidate_5_Vol_key			int,
+	Candidate_5_Next_Step		nvarchar(50),
+	Candidate_6_Name			nvarchar(255),
+	Candidate_6_Profile			nvarchar(255),
+	Candidate_6_Vol_key			int,
+	Candidate_6_Next_Step		nvarchar(50),
+	Candidate_7_Name			nvarchar(255),
+	Candidate_7_Profile			nvarchar(255),
+	Candidate_7_Vol_key			int,
+	Candidate_7_Next_Step		nvarchar(50),
+	Candidate_8_Name			nvarchar(255),
+	Candidate_8_Profile			nvarchar(255),
+	Candidate_8_Vol_key			int,
+	Candidate_8_Next_Step		nvarchar(50),	
+	VTC_Meeting_Code			nvarchar(10)			not null constraint df_dept_role_vtc_mt_code default 'N',
+	Volunteer_Key				integer,
+	PS_Start_Date		 		date,
+	PS_End_Date					date,
+	Marital_Status_Key			integer,
+	Cong_Servant_Code			nvarchar(3),
+	PS_Notes					nvarchar(4000),
+	Job_Description				nvarchar(255),
+	Invite_Chart_Comments		nvarchar(4000),
+	Active_Flag 				nvarchar(1) 			not null constraint df_dept_role_active_flag default 'Y',
+	Test_Data_Flag 				nvarchar(1) 			not null constraint df_dept_role_test_data_flag default 'N',
+	Until_Not_Needed			nvarchar(1),
+	Short_Term_OK				nvarchar(1),
+	Trade_To_Qualify			nvarchar(1),
+	Possible_Sister 			nvarchar(1),
+	HuBIncidentURL 				nvarchar(255),
+	Load_Date 					datetime 				not null constraint df_dept_role_load_date default getdate(),
+	Update_Date 				datetime 				not null constraint df_dept_role_update_date default getdate() )
+go
+
+alter table dbo.dept_role add constraint dept_role_fk_dept_asgn_status foreign key ( dept_asgn_status_key ) references dbo.dept_asgn_status( dept_asgn_status_key )
+go
+
+alter table dbo.dept_role add constraint dept_role_fk_dept foreign key ( hpr_dept_key ) references dbo.hpr_dept( hpr_dept_key )
+go
+
+alter table dbo.dept_role with nocheck add constraint dept_role_fk_dept_role foreign key ( hpr_dept_role_key ) references dbo.hpr_dept_role( hpr_dept_role_key )
+go
+
+alter table dbo.dept_role add constraint dept_role_fk_priority foreign key ( priority_key ) references dbo.priority( priority_key )
 go
 
 

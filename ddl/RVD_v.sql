@@ -139,12 +139,46 @@ select
 		when da.priority_key = 4 then '_'
 		else '.'
 	 end as priority
+	,da.candidate_1_vol_key
 	,da.candidate_1_name
 	,da.candidate_1_profile
+	,da.candidate_1_next_step
+	,case when isnull(da.candidate_1_name, 'Null') <> 'Null' then left(da.candidate_1_name, charindex(',', da.candidate_1_name) + 2) end as candidate_1_name_abbr
+	,da.candidate_2_vol_key
 	,da.candidate_2_name
 	,da.candidate_2_profile
+	,da.candidate_2_next_step
+	,case when isnull(da.candidate_2_name, 'Null') <> 'Null' then left(da.candidate_2_name, charindex(',', da.candidate_2_name) + 2) end as candidate_2_name_abbr
+	,da.candidate_3_vol_key
 	,da.candidate_3_name
 	,da.candidate_3_profile
+	,da.candidate_3_next_step
+	,case when isnull(da.candidate_3_name, 'Null') <> 'Null' then left(da.candidate_3_name, charindex(',', da.candidate_3_name) + 2) end as candidate_3_name_abbr
+	,da.candidate_4_vol_key
+	,da.candidate_4_name
+	,da.candidate_4_profile
+	,da.candidate_4_next_step
+	,case when isnull(da.candidate_4_name, 'Null') <> 'Null' then left(da.candidate_4_name, charindex(',', da.candidate_4_name) + 2) end as candidate_4_name_abbr
+	,da.candidate_5_vol_key
+	,da.candidate_5_name
+	,da.candidate_5_profile
+	,da.candidate_5_next_step
+	,case when isnull(da.candidate_5_name, 'Null') <> 'Null' then left(da.candidate_5_name, charindex(',', da.candidate_5_name) + 2) end as candidate_5_name_abbr
+	,da.candidate_6_vol_key
+	,da.candidate_6_name
+	,da.candidate_6_profile
+	,da.candidate_6_next_step
+	,case when isnull(da.candidate_6_name, 'Null') <> 'Null' then left(da.candidate_6_name, charindex(',', da.candidate_6_name) + 2) end as candidate_6_name_abbr	
+	,da.candidate_7_vol_key
+	,da.candidate_7_name
+	,da.candidate_7_profile
+	,da.candidate_7_next_step
+	,case when isnull(da.candidate_7_name, 'Null') <> 'Null' then left(da.candidate_7_name, charindex(',', da.candidate_7_name) + 2) end as candidate_7_name_abbr
+	,da.candidate_8_vol_key
+	,da.candidate_8_name
+	,da.candidate_8_profile
+	,da.candidate_8_next_step
+	,case when isnull(da.candidate_8_name, 'Null') <> 'Null' then left(da.candidate_8_name, charindex(',', da.candidate_8_name) + 2) end as candidate_8_name_abbr		
 	,v.Full_Name
 	,v.last_name + ', ' + left( v.first_name, 1 ) + '.' as volunteer_name_short
 	,e2.enrollment_code as ps_enrollment_code
@@ -175,9 +209,6 @@ select
 	,da.Until_Not_Needed
 	,da.Short_Term_OK
 	,da.Trade_To_Qualify
-	,da.Candidate_1_Vol_key
-	,da.Candidate_2_Vol_key
-	,da.Candidate_3_Vol_key
 	,da.Quantity_To_Replicate
 	,da.Multiple_Record_Number
 	,da.Current_Sync_Status
@@ -186,9 +217,6 @@ select
 	,da.HPR_Crew_Sharepoint_Key
 	,da.ID_SP
 	,case when isnull(das.sort_trade_request, 999) = 999 then 999 else das.sort_trade_request end as Sort_Trade_Request
-	,da.Candidate_1_Next_Step
-	,da.Candidate_2_Next_Step
-	,da.Candidate_3_Next_Step
 	,da.Possible_Sister
 	,da.HuBIncidentURL
 	,d.PC_Code	
@@ -263,13 +291,47 @@ select
 	,dr.dept_last_name
 	,dr.dept_asgn_status_key
 	,dr.priority_key
-	,dr.priority
+	,dr.priority	
+	,dr.candidate_1_vol_key
 	,dr.candidate_1_name
 	,dr.candidate_1_profile
+	,dr.candidate_1_next_step
+	,dr.candidate_1_name_abbr
+	,dr.candidate_2_vol_key
 	,dr.candidate_2_name
 	,dr.candidate_2_profile
+	,dr.candidate_2_next_step
+	,dr.candidate_2_name_abbr
+	,dr.candidate_3_vol_key
 	,dr.candidate_3_name
 	,dr.candidate_3_profile
+	,dr.candidate_3_next_step
+	,dr.candidate_3_name_abbr
+	,dr.candidate_4_vol_key
+	,dr.candidate_4_name
+	,dr.candidate_4_profile
+	,dr.candidate_4_next_step
+	,dr.candidate_4_name_abbr
+	,dr.candidate_5_vol_key
+	,dr.candidate_5_name
+	,dr.candidate_5_profile
+	,dr.candidate_5_next_step
+	,dr.candidate_5_name_abbr
+	,dr.candidate_6_vol_key
+	,dr.candidate_6_name
+	,dr.candidate_6_profile
+	,dr.candidate_6_next_step
+	,dr.candidate_6_name_abbr	
+	,dr.candidate_7_vol_key
+	,dr.candidate_7_name
+	,dr.candidate_7_profile
+	,dr.candidate_7_next_step
+	,dr.candidate_7_name_abbr
+	,dr.candidate_8_vol_key
+	,dr.candidate_8_name
+	,dr.candidate_8_profile
+	,dr.candidate_8_next_step
+	,dr.candidate_8_name_abbr
 	,dr.vtc_meeting_code
 	,dr.volunteer_key
 	,dr.ps_start_date
@@ -292,16 +354,10 @@ select
 	,dr.Until_Not_Needed
 	,dr.Short_Term_OK
 	,dr.Trade_To_Qualify
-	,dr.Candidate_1_Vol_Key
-	,dr.Candidate_2_Vol_Key
-	,dr.Candidate_3_Vol_Key
 	,dr.Quantity_To_Replicate
 	,dr.Multiple_Record_Number
 	,case when isnull(dr.Sort_Trade_Request, 999) = 999 then 999 else dr.Sort_Trade_Request end AS Sort_Trade_Request
 	,u.VTC_CPC_Code
-	,dr.Candidate_1_Next_Step
-	,dr.Candidate_2_Next_Step
-	,dr.Candidate_3_Next_Step
 	,dr.Possible_Sister
 	,dr.Sort_Trade_Request AS Expr1
 	,dr.PC_Code
@@ -1104,22 +1160,25 @@ go
 create view dbo.Volunteer_Pursuit_Hist_v
 as
 select 
-	volunteer_pursuit_hist_key, 	
-	volunteer_key,
-	vtc_name,	
-	hpr_dept_key,
-	start_date,	
-	target_date,
-	role_name,	
-	role_desc,	
-	attribute_value,
-	requested_flag,
-	volunteer_pursuit_cancel_reason_key,
-	request_cancel_reason,
-	active_flag, 
-	load_date, 	
-	update_date
-from dbo.Volunteer_Pursuit_Hist
+	ph.volunteer_pursuit_hist_key, 	
+	ph.volunteer_key,
+	ph.vtc_name,	
+	v.Full_Name,
+	ph.hpr_dept_key,
+	ph.start_date,	
+	ph.target_date,
+	ph.role_name,	
+	ph.role_desc,	
+	ph.attribute_value,
+	ph.requested_flag,
+	ph.volunteer_pursuit_cancel_reason_key,
+	ph.request_cancel_reason,
+	ph.active_flag, 
+	ph.load_date, 	
+	ph.update_date
+from dbo.Volunteer_Pursuit_Hist ph
+inner join dbo.volunteer v
+	on ph.volunteer_key = v.volunteer_key
 go
 
 
