@@ -119,6 +119,8 @@ select
 	,d.level_02
 	,d.level_03
 	,d.level_04
+	,d.level_05
+	,d.level_06
 	,case when d.work_group_name = '' then d.dept_name else d.dept_name + ' - ' +  d.work_group_name end as full_dept_name
 	,c.crew_name
 	,dr.dept_role

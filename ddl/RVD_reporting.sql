@@ -512,21 +512,23 @@ dept_req as (
 		,da.level_02
 		,da.level_03
 		,da.level_04
+		,da.level_05
+		,da.level_06
 		,da.full_dept_name
 		,da.crew_name
 		,da.dept_role
 		,case
 			when da.volunteer_name_short is not null then da.volunteer_name_short
-			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, '2030-12-31' ) then coalesce( da.ps_enrollment_code, da.dept_enrollment_code )
+			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, '2030-12-31' ) then coalesce( da.dept_enrollment_code, da.ps_enrollment_code )
 		 end as volunteer_name
 		,c.cal_dt
-		,coalesce( da.ps_enrollment_code, da.dept_start_date ) as start_date
+		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
 		,coalesce( da.ps_end_date, '2030-12-31' ) as end_date
-		,coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) as enrollment_code
+		,coalesce( da.dept_enrollment_code, da.ps_enrollment_code ) as enrollment_code
 		,da.dept_asgn_status_code as dept_asgn_status
 		,case 
 			when 
-			    coalesce( da.ps_enrollment_code, da.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' )
+			    coalesce( da.dept_enrollment_code, da.ps_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' )
 			then 1 
 			else 0 
 		 end as used_bed_cnt
@@ -545,6 +547,9 @@ select
 	 cpc_code
 	,level_03
 	,level_04
+	,level_05
+	,level_06
+	,coalesce( level_06, level_05, level_04, level_03 ) as dept_lowest_level
 	,crew_name
 	,dept_role
 	,enrollment_code
@@ -587,6 +592,8 @@ group by
 	 cpc_code
 	,level_03
 	,level_04
+	,level_05
+	,level_06
 	,crew_name
 	,dept_role
 	,enrollment_code
@@ -594,6 +601,7 @@ group by
 	,dept_asgn_status
 	,dept_asgn_key	
 go
+
 
 
 if object_id('rpt.Dept_Crew_v', 'V') is not null
