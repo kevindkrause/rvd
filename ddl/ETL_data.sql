@@ -4805,6 +4805,679 @@ begin
 		
 		set @Ins = @Ins + @@rowcount		
 		
+		-- V2 DATA
+		-- DELETE EXISTING DATA
+		truncate table dbo.PRP_Actuals_Level_04_v2
+		
+		set @Del = @Del + @@rowcount		
+		
+		-- INSERT PRP ACTUALS DATA		
+		insert into dbo.PRP_Actuals_Level_04_v2(
+			cpc_code
+           ,level_03
+           ,level_04
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+           ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail )
+		select 
+			cpc_code
+           ,level_03
+           ,level_04
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail           
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail           
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+		   ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail           
+		from rpt.PRP_Actuals_Level_04_v2
+		
+		set @Ins = @Ins + @@rowcount		
+		
+		-- DELETE EXISTING DATA
+		truncate table dbo.PRP_Actuals_Level_03_v2
+		
+		set @Del = @Del + @@rowcount		
+		
+		-- INSERT PRP ACTUALS DATA		
+		insert into dbo.PRP_Actuals_Level_03_v2(
+			cpc_code
+           ,level_03
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+           ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail )
+		select 
+			cpc_code
+           ,level_03
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail           
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail           
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+		   ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail           
+		from rpt.PRP_Actuals_Level_03_v2
+		
+		set @Ins = @Ins + @@rowcount		
+
+		-- DELETE EXISTING DATA
+		truncate table dbo.PRP_Actuals_Level_02_v2
+		
+		set @Del = @Del + @@rowcount		
+		
+		-- INSERT PRP ACTUALS DATA		
+		insert into dbo.PRP_Actuals_Level_02_v2(
+			cpc_code
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+           ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail )
+		select 
+			cpc_code
+           ,wk_01_dt
+           ,wk_01_budget
+           ,wk_01_used
+           ,wk_01_avail
+           ,wk_02_dt
+           ,wk_02_budget
+           ,wk_02_used
+           ,wk_02_avail
+           ,wk_03_dt
+           ,wk_03_budget
+           ,wk_03_used
+           ,wk_03_avail
+           ,wk_04_dt
+           ,wk_04_budget
+           ,wk_04_used
+           ,wk_04_avail
+           ,wk_05_dt
+           ,wk_05_budget
+           ,wk_05_used
+           ,wk_05_avail
+           ,wk_06_dt
+           ,wk_06_budget
+           ,wk_06_used
+           ,wk_06_avail
+           ,wk_07_dt
+           ,wk_07_budget
+           ,wk_07_used
+           ,wk_07_avail
+           ,wk_08_dt
+           ,wk_08_budget
+           ,wk_08_used
+           ,wk_08_avail
+           ,wk_09_dt
+           ,wk_09_budget
+           ,wk_09_used
+           ,wk_09_avail
+           ,wk_10_dt
+           ,wk_10_budget
+           ,wk_10_used
+           ,wk_10_avail
+           ,wk_11_dt
+           ,wk_11_budget
+           ,wk_11_used
+           ,wk_11_avail
+           ,wk_12_dt
+           ,wk_12_budget
+           ,wk_12_used
+           ,wk_12_avail
+           ,wk_13_dt
+           ,wk_13_budget
+           ,wk_13_used
+           ,wk_13_avail
+           ,wk_14_dt
+           ,wk_14_budget
+           ,wk_14_used
+           ,wk_14_avail           
+           ,wk_15_dt
+           ,wk_15_budget
+           ,wk_15_used
+           ,wk_15_avail
+           ,wk_16_dt
+           ,wk_16_budget
+           ,wk_16_used
+           ,wk_16_avail
+           ,wk_17_dt
+           ,wk_17_budget
+           ,wk_17_used
+           ,wk_17_avail
+           ,wk_18_dt
+           ,wk_18_budget
+           ,wk_18_used
+           ,wk_18_avail
+           ,wk_19_dt
+           ,wk_19_budget
+           ,wk_19_used
+           ,wk_19_avail           
+           ,wk_20_dt
+           ,wk_20_budget
+           ,wk_20_used
+           ,wk_20_avail
+		   ,wk_21_dt
+           ,wk_21_budget
+           ,wk_21_used
+           ,wk_21_avail
+           ,wk_22_dt
+           ,wk_22_budget
+           ,wk_22_used
+           ,wk_22_avail
+           ,wk_23_dt
+           ,wk_23_budget
+           ,wk_23_used
+           ,wk_23_avail
+           ,wk_24_dt
+           ,wk_24_budget
+           ,wk_24_used
+           ,wk_24_avail
+           ,wk_25_dt
+           ,wk_25_budget
+           ,wk_25_used
+           ,wk_25_avail
+           ,wk_26_dt
+           ,wk_26_budget
+           ,wk_26_used
+           ,wk_26_avail           
+		from rpt.PRP_Actuals_Level_02_v2
+		
+		set @Ins = @Ins + @@rowcount		
+		
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -4949,6 +5622,248 @@ begin
 	end catch		
 end
 go
+
+
+/***********************************************************
+**				   REPORTING SNAPSHOTS
+***********************************************************/
+if object_id('dbo.ETL_Reporting_Snapshots_proc') is null
+    exec( 'create procedure dbo.ETL_Reporting_Snapshots_proc as set nocount on;' )
+go
+
+alter procedure dbo.ETL_Reporting_Snapshots_proc
+as
+begin
+	set nocount on
+	
+	declare 
+		@Table nvarchar(150) = 'Volunteer V Snapshot', 
+		@Ins integer = 0,
+		@Upd integer = 0,
+		@Del integer = 0,
+		@Start datetime = getdate(), 
+		@End datetime
+	
+	begin try		
+	
+		-- DELETE EXISTING DATA
+		truncate table dbo.Volunteer_v_snp
+		
+		set @Del = @Del + @@rowcount	
+		
+		-- INSERT NEW DATA		
+		insert into dbo.Volunteer_v_snp(
+			 volunteer_key
+			,hub_volunteer_num
+			,hub_person_id
+			,hub_person_guid
+			,ba_volunteer_num
+			,first_name
+			,last_name
+			,volunteer_name
+			,volunteer_name_short
+			,gender_code
+			,marital_status_code
+			,cong_servant_code
+			,cong_midweek_mt_dow
+			,cong_midweek_mt_time
+			,cong_weekend_mt_dow
+			,cong_weekend_mt_time
+			,age
+			,address
+			,city
+			,state_code
+			,postal_code
+			,home_phone
+			,mobile_phone
+			,bethel_email
+			,jwpub_email
+			,personal_email
+			,spouse_hub_person_id
+			,spouse_hub_volunteer_num
+			,spouse_bethel_email
+			,spouse_jwpub_email		
+			,enrollment_1_code
+			,enrollment_1_site_code
+			,enrollment_1_start_date
+			,enrollment_1_start_date_raw
+			,enrollment_1_end_date
+			,enrollment_2_code
+			,enrollment_2_site_code
+			,enrollment_2_start_date
+			,enrollment_2_start_date_raw
+			,enrollment_2_end_date
+			,dept_1_hpr_dept_key
+			,dept_1_hub_dept_id
+			,dept_1_cpc_code
+			,dept_1_parent_dept_name
+			,dept_1_dept_name
+			,dept_1_ovsr_name
+			,dept_1_start_date
+			,dept_1_end_date
+			,dept_1_temp_flag
+			,dept_1_primary_flag
+			,dept_1_split_asgn_flag
+			,dept_1_split_allocation_pct
+			,dept_1_hpr_flag
+			,dept_1_pc_category
+			,dept_1_mon_flag
+			,dept_1_tue_flag
+			,dept_1_wed_flag
+			,dept_1_thu_flag
+			,dept_1_fri_flag
+			,dept_1_sat_flag
+			,dept_1_sun_flag
+			,dept_2_hpr_dept_key
+			,dept_2_hub_dept_id
+			,dept_2_cpc_code
+			,dept_2_parent_dept_name
+			,dept_2_dept_name
+			,dept_2_ovsr_name
+			,dept_2_start_date
+			,dept_2_end_date
+			,dept_2_temp_flag
+			,dept_2_primary_flag
+			,dept_2_split_asgn_flag
+			,dept_2_split_allocation_pct
+			,dept_2_hpr_flag
+			,dept_2_pc_category
+			,dept_2_mon_flag
+			,dept_2_tue_flag
+			,dept_2_wed_flag
+			,dept_2_thu_flag
+			,dept_2_fri_flag
+			,dept_2_sat_flag
+			,dept_2_sun_flag
+			,loan_dept_name
+			,tentative_end_date
+			,room_site_code
+			,room_bldg
+			,room_bldg_code
+			,room_bldg_desc
+			,room
+			,staffing_number_exception_flag
+			,record_type )		
+		select
+			 volunteer_key
+			,hub_volunteer_num
+			,hub_person_id
+			,hub_person_guid
+			,ba_volunteer_num
+			,first_name
+			,last_name
+			,volunteer_name
+			,volunteer_name_short
+			,gender_code
+			,marital_status_code
+			,cong_servant_code
+			,cong_midweek_mt_dow
+			,cong_midweek_mt_time
+			,cong_weekend_mt_dow
+			,cong_weekend_mt_time
+			,age
+			,address
+			,city
+			,state_code
+			,postal_code
+			,home_phone
+			,mobile_phone
+			,bethel_email
+			,jwpub_email
+			,personal_email
+			,spouse_hub_person_id
+			,spouse_hub_volunteer_num
+			,spouse_bethel_email
+			,spouse_jwpub_email		
+			,enrollment_1_code
+			,enrollment_1_site_code
+			,enrollment_1_start_date
+			,enrollment_1_start_date_raw
+			,enrollment_1_end_date
+			,enrollment_2_code
+			,enrollment_2_site_code
+			,enrollment_2_start_date
+			,enrollment_2_start_date_raw
+			,enrollment_2_end_date
+			,dept_1_hpr_dept_key
+			,dept_1_hub_dept_id
+			,dept_1_cpc_code
+			,dept_1_parent_dept_name
+			,dept_1_dept_name
+			,dept_1_ovsr_name
+			,dept_1_start_date
+			,dept_1_end_date
+			,dept_1_temp_flag
+			,dept_1_primary_flag
+			,dept_1_split_asgn_flag
+			,dept_1_split_allocation_pct
+			,dept_1_hpr_flag
+			,dept_1_pc_category
+			,dept_1_mon_flag
+			,dept_1_tue_flag
+			,dept_1_wed_flag
+			,dept_1_thu_flag
+			,dept_1_fri_flag
+			,dept_1_sat_flag
+			,dept_1_sun_flag
+			,dept_2_hpr_dept_key
+			,dept_2_hub_dept_id
+			,dept_2_cpc_code
+			,dept_2_parent_dept_name
+			,dept_2_dept_name
+			,dept_2_ovsr_name
+			,dept_2_start_date
+			,dept_2_end_date
+			,dept_2_temp_flag
+			,dept_2_primary_flag
+			,dept_2_split_asgn_flag
+			,dept_2_split_allocation_pct
+			,dept_2_hpr_flag
+			,dept_2_pc_category
+			,dept_2_mon_flag
+			,dept_2_tue_flag
+			,dept_2_wed_flag
+			,dept_2_thu_flag
+			,dept_2_fri_flag
+			,dept_2_sat_flag
+			,dept_2_sun_flag
+			,loan_dept_name
+			,tentative_end_date
+			,room_site_code
+			,room_bldg
+			,room_bldg_code
+			,room_bldg_desc
+			,room
+			,staffing_number_exception_flag
+			,record_type	
+		from rpt.Volunteer_v2
+
+		set @Ins = @Ins+ @@rowcount	
+		
+		set @End = getdate()
+
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End
+	end try
+		
+	begin catch
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End,
+			@Status_Code = 'F'
+	end catch		
+end
+go
+
 
 
 /***********************************************************
@@ -5328,5 +6243,6 @@ begin
 	exec dbo.ETL_App_Attributes_Cleanup_proc
 	exec dbo.ETL_Bad_Data_Cleanup_proc
 	exec dbo.ETL_Status_Update_Process
+	exec dbo.ETL_Reporting_Snapshots_proc
 end
 go

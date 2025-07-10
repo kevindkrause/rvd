@@ -461,6 +461,20 @@ begin
 
 		set @Upd = @Upd + @@rowcount	
 
+		-- UPDATE - MEETING TIMES		
+		update dbo.Cong
+		set
+			Midweek_Meeting_DOW = src.Midweek_Day,
+			Midweek_Meeting_Time = src.Midweek_Time,
+			Weekend_Meeting_DOW = src.Weekend_Day,
+			Weekend_Meeting_Time = src.Weekend_Time,		
+			update_date = getdate()
+		from dbo.Cong tgt
+		inner join stg.stg_Cong_meeting src
+			on tgt.cong_number = src.cong_num		
+
+		set @Upd = @Upd + @@rowcount			
+
 		-- UPDATE - NO LONGER ACTIVE IN HUB
 		update dbo.cong
 		set 
