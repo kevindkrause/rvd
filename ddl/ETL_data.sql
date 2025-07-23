@@ -4162,11 +4162,11 @@ begin
 	
 	begin try
 		-- FIX PRP DATA
-		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TE' where teamtrade = 'Site Logistics - Telehandler' 
-		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL CR' where teamtrade = 'Site Logistics - Crane Operator'
-		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL RI' where teamtrade = 'Site Logistics - Rigger'
-		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TC' where teamtrade = 'Site Logistics - Traffic Management'
-		update stg.stg_prp_dept set teamcode = 'HPR CI BG SL BP' where teamtrade = 'Batch Plant'
+		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TE' where teamtrade = 'Site Logistics - Telehandler' 
+		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL CR' where teamtrade = 'Site Logistics - Crane Operator'
+		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL RI' where teamtrade = 'Site Logistics - Rigger'
+		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TC' where teamtrade = 'Site Logistics - Traffic Management'
+		--update stg.stg_prp_dept set teamcode = 'HPR CI BG BP' where teamtrade = 'Batch Plant'
 
 		-- DELETE BED DATA
 		truncate table dbo.PRP
@@ -4592,12 +4592,12 @@ begin
 		
 		-- PRP ACTUALS
 		-- DELETE EXISTING DATA
-		truncate table dbo.PRP_Actuals_Level_04
+		truncate table dbo.PRP_Actuals_Level_04_snp
 		
 		set @Del = @Del + @@rowcount		
 		
 		-- INSERT PRP ACTUALS DATA		
-		insert into dbo.PRP_Actuals_Level_04(
+		insert into dbo.PRP_Actuals_Level_04_snp(
 			cpc_code
            ,level_03
            ,level_04
@@ -4818,12 +4818,12 @@ begin
 		set @Ins = @Ins + @@rowcount		
 				
 		-- DELETE EXISTING DATA
-		truncate table dbo.PRP_Actuals_Level_03_v
+		truncate table dbo.PRP_Actuals_Level_03_snp
 		
 		set @Del = @Del + @@rowcount		
 		
 		-- INSERT PRP ACTUALS DATA		
-		insert into dbo.PRP_Actuals_Level_03_v(
+		insert into dbo.PRP_Actuals_Level_03_snp(
 			cpc_code
            ,level_03
            ,wk_01_dt
@@ -5042,12 +5042,12 @@ begin
 		set @Ins = @Ins + @@rowcount		
 
 		-- DELETE EXISTING DATA
-		truncate table dbo.PRP_Actuals_Level_02_v
+		truncate table dbo.PRP_Actuals_Level_02_snp
 		
 		set @Del = @Del + @@rowcount		
 		
 		-- INSERT PRP ACTUALS DATA		
-		insert into dbo.PRP_Actuals_Level_02_v(
+		insert into dbo.PRP_Actuals_Level_02_snp(
 			cpc_code
            ,wk_01_dt
            ,wk_01_budget

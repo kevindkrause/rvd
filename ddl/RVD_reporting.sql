@@ -493,117 +493,10 @@ where c.active_flag = 'Y'
 go
 
 
-create view rpt.CVC_v
-as
--- ALL DEPT ASGN BY DAY
-with dates as (
-	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
-	from dbo.cal_dim 
-	where 1=1
-		and day_of_wk = 2
-		and cal_dt between cast(getdate()-6 as date) and getdate() + 200 ),
-
-dept_req as (
-	select 
-		 da.cpc_code
-		,da.level_02
-		,da.level_03
-		,da.level_04
-		,da.level_05
-		,da.level_06
-		,da.full_dept_name
-		,da.crew_name
-		,da.dept_role
-		,case
-			when da.volunteer_name_short is not null then da.volunteer_name_short
-			when c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, '2030-12-31' ) then coalesce( da.dept_enrollment_code, da.ps_enrollment_code )
-		 end as volunteer_name
-		,c.cal_dt
-		,coalesce( da.ps_start_date, da.dept_start_date ) as start_date
-		,coalesce( da.ps_end_date, '2030-12-31' ) as end_date
-		,coalesce( da.dept_enrollment_code, da.ps_enrollment_code ) as enrollment_code
-		,da.dept_asgn_status_code as dept_asgn_status
-		,case 
-			when 
-			    coalesce( da.dept_enrollment_code, da.ps_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' )
-			then 1 
-			else 0 
-		 end as used_bed_cnt
-		,da.dept_asgn_key
-		,da.hpr_dept_key
-		,enrollment_key
-		,da.volunteer_key
-		,c.wk_num
-	from dates c 
-	left join dbo.dept_asgn_v da
-		on c.cal_dt between coalesce( da.ps_start_date, da.dept_start_date ) and coalesce( da.ps_end_date, '2030-12-31' )
-		and da.active_flag = 'Y'
-		and da.test_data_flag = 'N' )
-
-select
-	 cpc_code
-	,level_03
-	,level_04
-	,level_05
-	,level_06
-	,coalesce( level_06, level_05, level_04, level_03 ) as dept_lowest_level
-	,crew_name
-	,dept_role
-	,enrollment_code
-	,used_bed_cnt
-	,dept_asgn_status
-	,dept_asgn_key
-	,max( case when wk_num = 1 then volunteer_name else null end ) as wk_01
-	,max( case when wk_num = 2 then volunteer_name else null end ) as wk_02
-	,max( case when wk_num = 3 then volunteer_name else null end ) as wk_03
-	,max( case when wk_num = 4 then volunteer_name else null end ) as wk_04
-	,max( case when wk_num = 5 then volunteer_name else null end ) as wk_05
-	,max( case when wk_num = 6 then volunteer_name else null end ) as wk_06
-	,max( case when wk_num = 7 then volunteer_name else null end ) as wk_07
-	,max( case when wk_num = 8 then volunteer_name else null end ) as wk_08
-	,max( case when wk_num = 9 then volunteer_name else null end ) as wk_09
-	,max( case when wk_num = 10 then volunteer_name else null end ) as wk_10
-	,max( case when wk_num = 11 then volunteer_name else null end ) as wk_11
-	,max( case when wk_num = 12 then volunteer_name else null end ) as wk_12
-	,max( case when wk_num = 13 then volunteer_name else null end ) as wk_13
-	,max( case when wk_num = 14 then volunteer_name else null end ) as wk_14
-	,max( case when wk_num = 15 then volunteer_name else null end ) as wk_15
-	,max( case when wk_num = 16 then volunteer_name else null end ) as wk_16
-	,max( case when wk_num = 17 then volunteer_name else null end ) as wk_17
-	,max( case when wk_num = 18 then volunteer_name else null end ) as wk_18
-	,max( case when wk_num = 19 then volunteer_name else null end ) as wk_19
-	,max( case when wk_num = 20 then volunteer_name else null end ) as wk_20
-	,max( case when wk_num = 21 then volunteer_name else null end ) as wk_21
-	,max( case when wk_num = 22 then volunteer_name else null end ) as wk_22
-	,max( case when wk_num = 23 then volunteer_name else null end ) as wk_23
-	,max( case when wk_num = 24 then volunteer_name else null end ) as wk_24	
-	,max( case when wk_num = 25 then volunteer_name else null end ) as wk_25
-	,max( case when wk_num = 26 then volunteer_name else null end ) as wk_26	
-from dept_req
-where 1=1
-	--and cpc_code = 'CI'
-	--and level_03 = 'Trade Group'
-	--and level_04 = 'Siteworks'
-	--and used_bed_cnt = 1
-group by 
-	 cpc_code
-	,level_03
-	,level_04
-	,level_05
-	,level_06
-	,crew_name
-	,dept_role
-	,enrollment_code
-	,used_bed_cnt
-	,dept_asgn_status
-	,dept_asgn_key	
-go
-
-
-if object_id('rpt.CVC_v2', 'V') is not null
-	drop view rpt.CVC_v2
+if object_id('rpt.CVC_v', 'V') is not null
+	drop view rpt.CVC_v
 go 
-create view rpt.CVC_v2
+create view rpt.CVC_v
 as
 with dates as (
 	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
@@ -1056,7 +949,7 @@ select
 	,case when v.record_type = 'PROJECTED' then 'Y' else 'N' end 	as projected_flag
 	,sum( v.bed_cnt ) 												as bed_cnt
 	,sum( case when v.bed_cnt = 0 then 1 else 0 end ) 				as no_bed_cnt
-	,sum( v.fte ) 													as fte
+	,sum( v.fte ) 													as fte_cnt
 	,sum( case when v.onsite_flag = 'Y' then 1 else 0 end ) 		as onsite_cnt
 	,max( d.hpr_dept_key ) 											as hpr_dept_key
 from rpt.Resource_Plan_Vol_Daily_v v
