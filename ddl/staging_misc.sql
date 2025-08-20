@@ -234,7 +234,10 @@ select
 	,coalesce( [Mar-30], 0 ) as mar_30
 	,coalesce( [Apr-30], 0 ) as apr_30
 	,coalesce( [May-30], 0 ) as may_30
-	,coalesce( [Jun-30], 0 ) as jun_30	
+	,coalesce( [Jun-30], 0 ) as jun_30
+	,coalesce( [Jul-30], 0 ) as jul_30
+	,coalesce( [Aug-30], 0 ) as aug_30
+	,coalesce( [Sep-30], 0 ) as sep_30
 from stg.stg_PRP_Dept
 where 1=1
 	and (
@@ -386,6 +389,9 @@ select
 	,coalesce( sum( [Apr-30] ), 0 ) as apr_30
 	,coalesce( sum( [May-30] ), 0 ) as may_30	
 	,coalesce( sum( [Jun-30] ), 0 ) as jun_30	
+	,coalesce( sum( [Jul-30] ), 0 ) as jul_30
+	,coalesce( sum( [Aug-30] ), 0 ) as aug_30	
+	,coalesce( sum( [Sep-30] ), 0 ) as sep_30
 from
 	( select 
 		 department
@@ -528,7 +534,10 @@ from
 		,[Mar-30]
 		,[Apr-30]
 		,[May-30]
-		,[Jun-30]	
+		,[Jun-30]
+		,[Jul-30]
+		,[Aug-30]
+		,[Sep-30]
 	  from stg.stg_PRP_Dept
 	  where 1=1
 		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR HQ', 'HPR PU', 'HPR VD' )
@@ -672,7 +681,10 @@ CREATE TABLE [stg].[stg_PRP_Dept](
 	[Mar-30] [float] NULL,
 	[Apr-30] [float] NULL,
 	[May-30] [float] NULL,
-	[Jun-30] [float] NULL
+	[Jun-30] [float] NULL,
+	[Jul-30] [float] NULL,
+	[Aug-30] [float] NULL,
+	[Sep-30] [float] NULL	
 ) ON [PRIMARY]
 GO
 
@@ -809,8 +821,11 @@ select
 	,coalesce( sum( [Feb-30] ), 0 ) as feb_30
 	,coalesce( sum( [Mar-30] ), 0 ) as mar_30	
 	,coalesce( sum( [Apr-30] ), 0 ) as apr_30
-	,coalesce( sum( [May-30] ), 0 ) as may_30	
-	,coalesce( sum( [Jun-30] ), 0 ) as jun_30	
+	,coalesce( sum( [May-30] ), 0 ) as may_30
+	,coalesce( sum( [Jun-30] ), 0 ) as jun_30
+	,coalesce( sum( [Jul-30] ), 0 ) as jul_30
+	,coalesce( sum( [Aug-30] ), 0 ) as aug_30	
+	,coalesce( sum( [Sep-30] ), 0 ) as sep_30
 from
 	( select 
 		 department
@@ -945,6 +960,9 @@ from
 		,[Apr-30]
 		,[May-30]
 		,[Jun-30]
+		,[Jul-30]
+		,[Aug-30]
+		,[Sep-30]		
 	  from stg.stg_PRP_Dept
 	  where 1=1
 		--and teamcode like 'HPR DD%'
@@ -1095,7 +1113,10 @@ select
 	,coalesce( prp.mar_30, 0 ) as mar_30
 	,coalesce( prp.apr_30, 0 ) as apr_30	
 	,coalesce( prp.may_30, 0 ) as may_30
-	,coalesce( prp.jun_30, 0 ) as jun_30		
+	,coalesce( prp.jun_30, 0 ) as jun_30
+	,coalesce( prp.jul_30, 0 ) as jul_30	
+	,coalesce( prp.aug_30, 0 ) as aug_30
+	,coalesce( prp.sep_30, 0 ) as sep_30	
 from dbo.hpr_dept d
 left join stg.stg_prp_dept_v prp
 	on d.pc_code_full = prp.pc_code

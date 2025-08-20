@@ -375,6 +375,50 @@ create table dbo.Country(
 go
 
 
+CREATE TABLE [dbo].[CVC_snp](
+	[cpc_code] [nvarchar](10) NOT NULL,
+	[level_03] [nvarchar](100) NULL,
+	[level_04] [nvarchar](100) NULL,
+	[level_05] [nvarchar](100) NULL,
+	[level_06] [nvarchar](100) NULL,
+	[dept_lowest_level] [nvarchar](100) NULL,
+	[crew_name] [nvarchar](255) NULL,
+	[dept_role] [nvarchar](150) NULL,
+	[enrollment_code] [nvarchar](30) NULL,
+	[used_bed_cnt] [int] NULL,
+	[dept_asgn_status] [nvarchar](30) NULL,
+	[dept_asgn_key] [int] NULL,
+	[volunteer_key] [int] NULL,
+	[wk_01] [nvarchar](154) NULL,
+	[wk_02] [nvarchar](154) NULL,
+	[wk_03] [nvarchar](154) NULL,
+	[wk_04] [nvarchar](154) NULL,
+	[wk_05] [nvarchar](154) NULL,
+	[wk_06] [nvarchar](154) NULL,
+	[wk_07] [nvarchar](154) NULL,
+	[wk_08] [nvarchar](154) NULL,
+	[wk_09] [nvarchar](154) NULL,
+	[wk_10] [nvarchar](154) NULL,
+	[wk_11] [nvarchar](154) NULL,
+	[wk_12] [nvarchar](154) NULL,
+	[wk_13] [nvarchar](154) NULL,
+	[wk_14] [nvarchar](154) NULL,
+	[wk_15] [nvarchar](154) NULL,
+	[wk_16] [nvarchar](154) NULL,
+	[wk_17] [nvarchar](154) NULL,
+	[wk_18] [nvarchar](154) NULL,
+	[wk_19] [nvarchar](154) NULL,
+	[wk_20] [nvarchar](154) NULL,
+	[wk_21] [nvarchar](154) NULL,
+	[wk_22] [nvarchar](154) NULL,
+	[wk_23] [nvarchar](154) NULL,
+	[wk_24] [nvarchar](154) NULL,
+	[wk_25] [nvarchar](154) NULL,
+	[wk_26] [nvarchar](154) NULL
+) ON [PRIMARY]
+GO
+
+
 if object_id('dbo.DC_52_Data', 'U') is not null
 	drop table dbo.DC_52_Data
 go 

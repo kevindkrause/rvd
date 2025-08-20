@@ -906,7 +906,7 @@ go
 alter procedure dbo.ETL_lkp_proc
 as
 begin
-	exec dbo.ETL_App_Type_proc
+	--exec dbo.ETL_App_Type_proc
 	exec dbo.ETL_BA_Project_proc
 	exec dbo.ETL_BA_Project_Group_proc
 	exec dbo.ETL_Cong_proc
