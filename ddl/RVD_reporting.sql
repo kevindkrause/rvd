@@ -2673,6 +2673,7 @@ guest as (
 	where 1=1
 		and r.overnight_guest_category is not null
 		and v.volunteer_key not in ( select volunteer_key from hpr )
+		and v.hub_person_id <> 627794
 ),
 
 final as (
@@ -2745,7 +2746,8 @@ select
 	---------------------------------	
 	,enrollment_1_code
 	,coalesce( enrollment_1_site_code, 'UNK' ) as enrollment_1_site_code
-	,case when enrollment_1_start_date < dept_1_start_date then enrollment_1_start_date else dept_1_start_date end as enrollment_1_start_date
+	--,case when enrollment_1_start_date < dept_1_start_date then enrollment_1_start_date else dept_1_start_date end as enrollment_1_start_date
+	,enrollment_1_start_date
 	,enrollment_1_start_date as enrollment_1_start_date_raw
 	,case
 		when enrollment_1_code in ( 'BCV' ) then coalesce( enrollment_1_end_date, tentative_end_date )
@@ -2753,7 +2755,7 @@ select
 	 end as enrollment_1_end_date
 	,enrollment_2_code
 	,enrollment_2_site_code
-	,case when enrollment_2_start_date < dept_2_start_date then enrollment_2_start_date else dept_2_start_date end as enrollment_2_start_date
+	,enrollment_2_start_date
 	,enrollment_2_start_date as enrollment_2_start_date_raw
 	,case
 		when enrollment_1_code in ( 'BBV', 'BRV' ) then coalesce( enrollment_2_end_date, tentative_end_date )
