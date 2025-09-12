@@ -956,7 +956,12 @@ begin
 		inner join stg.Volunteer_Cong_Hist_Ranking_v src
 			on tgt.hub_person_id = src.person_id
 
-		set @Upd = @Upd + @@rowcount	
+		set @Upd = @Upd + @@rowcount
+		
+		-- FIX BAD BA VOLUNTEER NUMBERS
+		update dbo.volunteer set ba_volunteer_num = null where ba_volunteer_num = 0
+		
+		set @Upd = @Upd + @@rowcount
 				
 		set @End = getdate()
 
