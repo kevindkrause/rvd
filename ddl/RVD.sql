@@ -705,83 +705,151 @@ go
 if object_id('dbo.Dept_Role', 'U') is not null
 	drop table dbo.Dept_Role
 go 
-create table dbo.Dept_Role(
-	Dept_Role_Key 				integer identity(1,1) 	not null constraint dept_role_pk primary key,
-	HPR_Dept_Key 				integer 			 	not null,
-	HPR_Crew_Key				integer 				not null constraint df_dept_role_crew default 0,
-	HPR_Dept_Role_Key			integer 				not null constraint df_dept_role_role default 0,
-	Enrollment_Key				integer,
-	Skill_Level					nvarchar(255),
-	Dept_Start_Date				date,
-	Dept_End_Date				date,
-	Notes						nvarchar(4000),
-	Dept_First_Name				nvarchar(255),
-	Dept_Last_Name				nvarchar(255),
-	Dept_Asgn_Status_Key		integer,
-	Priority_Key				integer					not null constraint df_dept_role_priority default 3,
-	Candidate_1_Name			nvarchar(255),
-	Candidate_1_Profile			nvarchar(255),
-	Candidate_1_Next_Step 		nvarchar(50),	
-	Candidate_1_Vol_key			int,	
-	Candidate_2_Name			nvarchar(255),
-	Candidate_2_Profile			nvarchar(255),
-	Candidate_2_Next_Step 		nvarchar(50),
-	Candidate_2_Vol_key			int,
-	Candidate_3_Name			nvarchar(255),
-	Candidate_3_Profile			nvarchar(255),
-	Candidate_3_Next_Step 		nvarchar(50),
-	Candidate_3_Vol_key			int,
-	Candidate_4_Name			nvarchar(255),
-	Candidate_4_Profile			nvarchar(255),
-	Candidate_4_Vol_key			int,
-	Candidate_4_Next_Step		nvarchar(50),
-	Candidate_5_Name			nvarchar(255),
-	Candidate_5_Profile			nvarchar(255),
-	Candidate_5_Vol_key			int,
-	Candidate_5_Next_Step		nvarchar(50),
-	Candidate_6_Name			nvarchar(255),
-	Candidate_6_Profile			nvarchar(255),
-	Candidate_6_Vol_key			int,
-	Candidate_6_Next_Step		nvarchar(50),
-	Candidate_7_Name			nvarchar(255),
-	Candidate_7_Profile			nvarchar(255),
-	Candidate_7_Vol_key			int,
-	Candidate_7_Next_Step		nvarchar(50),
-	Candidate_8_Name			nvarchar(255),
-	Candidate_8_Profile			nvarchar(255),
-	Candidate_8_Vol_key			int,
-	Candidate_8_Next_Step		nvarchar(50),	
-	VTC_Meeting_Code			nvarchar(10)			not null constraint df_dept_role_vtc_mt_code default 'N',
-	Volunteer_Key				integer,
-	PS_Start_Date		 		date,
-	PS_End_Date					date,
-	Marital_Status_Key			integer,
-	Cong_Servant_Code			nvarchar(3),
-	PS_Notes					nvarchar(4000),
-	Job_Description				nvarchar(255),
-	Invite_Chart_Comments		nvarchar(4000),
-	Active_Flag 				nvarchar(1) 			not null constraint df_dept_role_active_flag default 'Y',
-	Test_Data_Flag 				nvarchar(1) 			not null constraint df_dept_role_test_data_flag default 'N',
-	Until_Not_Needed			nvarchar(1),
-	Short_Term_OK				nvarchar(1),
-	Trade_To_Qualify			nvarchar(1),
-	Possible_Sister 			nvarchar(1),
-	HuBIncidentURL 				nvarchar(255),
-	Load_Date 					datetime 				not null constraint df_dept_role_load_date default getdate(),
-	Update_Date 				datetime 				not null constraint df_dept_role_update_date default getdate() )
-go
+CREATE TABLE [dbo].[Dept_Role](
+	[Dept_Role_Key] [int] IDENTITY(1,1) NOT NULL,
+	[HPR_Dept_Key] [int] NOT NULL,
+	[HPR_Crew_Key] [int] NOT NULL,
+	[HPR_Dept_Role_Key] [int] NOT NULL,
+	[Enrollment_Key] [int] NULL,
+	[Skill_Level] [nvarchar](255) NULL,
+	[Role_Start_Date] [date] NULL,
+	[Role_End_Date] [date] NULL,
+	[Notes] [nvarchar](4000) NULL,
+	[Dept_Volunteer_Name] [nvarchar](255) NULL,
+	[Dept_Asgn_Status_Key] [int] NULL,
+	[Priority_Key] [int] NOT NULL,
+	[VTC_Meeting_Code] [nvarchar](10) NOT NULL,
+	[Marital_Status_Key] [int] NULL,
+	[Cong_Servant_Code] [nvarchar](3) NULL,
+	[PS_Notes] [nvarchar](4000) NULL,
+	[Job_Description] [nvarchar](255) NULL,
+	[Until_Not_Needed] [nvarchar](1) NULL,
+	[Short_Term_OK] [nvarchar](1) NULL,
+	[Trade_To_Qualify] [nvarchar](1) NULL,
+	[Possible_Sister] [nvarchar](1) NULL,
+	[Dept_Asgn_Key] [int] NULL,
+	[Current_Sync_Status] [nvarchar](50) NULL,
+	[Update_Source] [nvarchar](25) NULL,
+	[Update_Type] [nvarchar](200) NULL,
+	[UpdateDate_Source] [datetime] NULL,
+	[Update_ReviewedByUser] [nvarchar](1) NULL,
+	[Update_AddLink1] [int] NULL,
+	[Update_AddLink2] [int] NULL,
+	[Active_Flag] [nvarchar](1) NOT NULL,
+	[Load_Date] [datetime] NOT NULL,
+	[Update_Date] [datetime] NOT NULL,
+	[Sync_Data_Flag] [nvarchar](50) NULL,
+ CONSTRAINT [dept_role_pk] PRIMARY KEY CLUSTERED 
+(
+	[Dept_Role_Key] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 
-alter table dbo.dept_role add constraint dept_role_fk_dept_asgn_status foreign key ( dept_asgn_status_key ) references dbo.dept_asgn_status( dept_asgn_status_key )
-go
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_crew]  DEFAULT ((0)) FOR [HPR_Crew_Key]
+GO
 
-alter table dbo.dept_role add constraint dept_role_fk_dept foreign key ( hpr_dept_key ) references dbo.hpr_dept( hpr_dept_key )
-go
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_role]  DEFAULT ((0)) FOR [HPR_Dept_Role_Key]
+GO
 
-alter table dbo.dept_role with nocheck add constraint dept_role_fk_dept_role foreign key ( hpr_dept_role_key ) references dbo.hpr_dept_role( hpr_dept_role_key )
-go
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [DF_Dept_Role_Dept_Asgn_Status_Key]  DEFAULT ((27)) FOR [Dept_Asgn_Status_Key]
+GO
 
-alter table dbo.dept_role add constraint dept_role_fk_priority foreign key ( priority_key ) references dbo.priority( priority_key )
-go
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_priority]  DEFAULT ((3)) FOR [Priority_Key]
+GO
+
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_vtc_mt_code]  DEFAULT ('N') FOR [VTC_Meeting_Code]
+GO
+
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_active_flag]  DEFAULT ('Y') FOR [Active_Flag]
+GO
+
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_load_date]  DEFAULT (getdate()) FOR [Load_Date]
+GO
+
+ALTER TABLE [dbo].[Dept_Role] ADD  CONSTRAINT [df_dept_role_update_date]  DEFAULT (getdate()) FOR [Update_Date]
+GO
+
+ALTER TABLE [dbo].[Dept_Role]  WITH CHECK ADD  CONSTRAINT [dept_role_fk_dept] FOREIGN KEY([HPR_Dept_Key])
+REFERENCES [dbo].[HPR_Dept] ([HPR_Dept_Key])
+GO
+
+ALTER TABLE [dbo].[Dept_Role] CHECK CONSTRAINT [dept_role_fk_dept]
+GO
+
+ALTER TABLE [dbo].[Dept_Role]  WITH CHECK ADD  CONSTRAINT [dept_role_fk_dept_asgn_status] FOREIGN KEY([Dept_Asgn_Status_Key])
+REFERENCES [dbo].[Dept_Asgn_Status] ([Dept_Asgn_Status_Key])
+GO
+
+ALTER TABLE [dbo].[Dept_Role] CHECK CONSTRAINT [dept_role_fk_dept_asgn_status]
+GO
+
+ALTER TABLE [dbo].[Dept_Role]  WITH NOCHECK ADD  CONSTRAINT [dept_role_fk_dept_role] FOREIGN KEY([HPR_Dept_Role_Key])
+REFERENCES [dbo].[HPR_Dept_Role] ([HPR_Dept_Role_Key])
+GO
+
+ALTER TABLE [dbo].[Dept_Role] CHECK CONSTRAINT [dept_role_fk_dept_role]
+GO
+
+ALTER TABLE [dbo].[Dept_Role]  WITH CHECK ADD  CONSTRAINT [dept_role_fk_priority] FOREIGN KEY([Priority_Key])
+REFERENCES [dbo].[Priority] ([Priority_Key])
+GO
+
+ALTER TABLE [dbo].[Dept_Role] CHECK CONSTRAINT [dept_role_fk_priority]
+GO
+
+
+CREATE TABLE [dbo].[Dept_Role_Volunteer](
+	[Dept_Role_Vol_Key] [int] IDENTITY(1,1) NOT NULL,
+	[Dept_Role_Key] [int] NOT NULL,
+	[Dept_Asgn_Key] [int] NULL,
+	[Volunteer_Type] [int] NULL,
+	[Vol_Enrollment_Key] [int] NULL,
+	[Bed_Type] [nvarchar](255) NULL,
+	[Vol_Start_Date] [date] NULL,
+	[Vol_End_Date] [date] NULL,
+	[Notes] [nvarchar](4000) NULL,
+	[Dept_Asgn_Status_Key] [int] NULL,
+	[Candidate_Next_Step] [nvarchar](50) NULL,
+	[Volunteer_Key] [int] NOT NULL,
+	[PS_Notes] [nvarchar](4000) NULL,
+	[Invite_Chart_Comments] [nvarchar](4000) NULL,
+	[Until_Not_Needed] [nvarchar](1) NULL,
+	[HuBIncidentURL] [nvarchar](255) NULL,
+	[Update_Source] [nvarchar](25) NULL,
+	[Update_Type] [nvarchar](200) NULL,
+	[UpdateDate_Source] [datetime] NULL,
+	[Update_ReviewedByUser] [nvarchar](1) NULL,
+	[Ext_Orig_PS_End_Date] [date] NULL,
+	[Ext_Orig_Enrollment_Key] [int] NULL,
+	[Ext_Orig_Dept_Asgn_Status_Key] [int] NULL,
+	[Ext_Last_Start_Date] [date] NULL,
+	[Extension_Flag] [nvarchar](1) NOT NULL,
+	[Extension_Flag_UpdateDate] [datetime] NULL,
+	[Active_Flag] [nvarchar](1) NOT NULL,
+	[Load_Date] [datetime] NOT NULL,
+	[Update_Date] [datetime] NOT NULL,
+ CONSTRAINT [dept_role_volunteers_pk] PRIMARY KEY CLUSTERED 
+(
+	[Dept_Role_Vol_Key] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Dept_Role_Volunteer] ADD  CONSTRAINT [DF_Dept_Role_Volunteer_Volunteer_Type]  DEFAULT ((25)) FOR [Volunteer_Type]
+GO
+
+ALTER TABLE [dbo].[Dept_Role_Volunteer] ADD  CONSTRAINT [df_dept_role_volunteers_extension_flag]  DEFAULT ('N') FOR [Extension_Flag]
+GO
+
+ALTER TABLE [dbo].[Dept_Role_Volunteer] ADD  CONSTRAINT [df_dept_role_volunteers_active_flag]  DEFAULT ('Y') FOR [Active_Flag]
+GO
+
+ALTER TABLE [dbo].[Dept_Role_Volunteer] ADD  CONSTRAINT [df_dept_role_volunteers_load_date]  DEFAULT (getdate()) FOR [Load_Date]
+GO
+
+ALTER TABLE [dbo].[Dept_Role_Volunteer] ADD  CONSTRAINT [df_dept_role_volunteers_update_date]  DEFAULT (getdate()) FOR [Update_Date]
+GO
 
 
 if object_id('dbo.Enrollment', 'U') is not null

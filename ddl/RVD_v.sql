@@ -372,6 +372,146 @@ inner join dbo.[User] u
 go	
 
 
+CREATE VIEW [dbo].[Dept_Role_v]
+AS
+SELECT        da.Dept_Role_Key, da.Dept_Asgn_Key, d.CPC_Code, d.Dept_Name, d.Work_Group_Name, d.Level_02, d.Level_03, d.Level_04, 
+                         CASE WHEN d .work_group_name = '' THEN d .dept_name ELSE d .dept_name + ' - ' + d .work_group_name END AS full_dept_name, c.Crew_Name, dr.Dept_Role, da.Skill_Level, da.Role_Start_Date, da.Role_End_Date, 
+                         e.Enrollment_Code AS dept_enrollment_code, da.Notes, das.Dept_Asgn_Status, das.Dept_Asgn_Status_Code, da.Priority_Key, 
+                         CASE WHEN da.priority_key = 1 THEN '!!' WHEN da.priority_key = 2 THEN '!' WHEN da.priority_key = 3 THEN '-' WHEN da.priority_key = 4 THEN '_' ELSE '.' END AS priority, DATEDIFF(month, da.Role_Start_Date, 
+                         COALESCE (da.Role_End_Date, CONVERT(DATETIME, '2027-12-31 00:00:00', 102))) AS duration_in_months, da.PS_Notes, da.Job_Description, da.VTC_Meeting_Code, da.Active_Flag, da.Load_Date, da.Update_Date, 
+                         da.HPR_Dept_Key, da.HPR_Crew_Key, da.HPR_Dept_Role_Key, da.Enrollment_Key, da.Dept_Asgn_Status_Key, da.Until_Not_Needed, da.Short_Term_OK, da.Trade_To_Qualify, CASE WHEN isnull(das.sort_trade_request, 999) 
+                         = 999 THEN 999 ELSE das.sort_trade_request END AS Sort_Trade_Request, da.Possible_Sister, d.PC_Code, da.Dept_Volunteer_Name, da.Marital_Status_Key, da.Cong_Servant_Code, da.Current_Sync_Status, 
+                         da.Sync_Data_Flag
+FROM            dbo.Dept_Role AS da INNER JOIN
+                         dbo.HPR_Dept AS d ON da.HPR_Dept_Key = d.HPR_Dept_Key LEFT OUTER JOIN
+                         dbo.Dept_Asgn_Status AS das ON da.Dept_Asgn_Status_Key = das.Dept_Asgn_Status_Key AND das.Dept_Asgn_Status_Type = 'DA' LEFT OUTER JOIN
+                         dbo.HPR_Crew AS c ON da.HPR_Crew_Key = c.HPR_Crew_Key LEFT OUTER JOIN
+                         dbo.HPR_Dept_Role AS dr ON da.HPR_Dept_Role_Key = dr.HPR_Dept_Role_Key LEFT OUTER JOIN
+                         dbo.Enrollment AS e ON da.Enrollment_Key = e.Enrollment_Key AND e.Active_Flag = 'Y'
+GO
+
+
+CREATE VIEW [dbo].[Dept_Role_Volunteer_v]
+AS
+SELECT        drv.Dept_Role_Vol_Key, drv.Dept_Role_Key, drv.Volunteer_Type AS Volunteer_Type_ID, vt.Dept_Asgn_Status_Code AS Volunteer_Type_Description, drv.Bed_Type, drv.Vol_Start_Date, drv.Vol_End_Date, drv.Notes, 
+                         drv.Dept_Asgn_Status_Key, das.Dept_Asgn_Status_Code, das.Dept_Asgn_Status, drv.Volunteer_Key, v.Full_Name, v.Last_Name + N', ' + LEFT(v.First_Name, 1) + N'.' AS volunteer_name_short, ms.Marital_Status_Code, 
+                         v.Cong_Servant_Code, v.Room_Site_Code, v.Room_Bldg_Code, CASE WHEN isnull(das.sort_trade_request, 999) = 999 THEN 999 ELSE das.sort_trade_request END AS Sort_Trade_Request, v.HUB_Person_ID, 
+                         v.HUB_Volunteer_ID, e.Enrollment_Code AS hub_enrollment_code, CASE WHEN Vol_Start_Date <= GETDATE() AND (Vol_End_Date >= GETDATE() OR
+                         ISNULL(Vol_End_Date, '1/1/1901') = '1/1/1901') THEN 'Current' ELSE 'Not Current' END AS IsCurrentVolunteer, drv.HuBIncidentURL, drv.Candidate_Next_Step, drv.Invite_Chart_Comments, drv.PS_Notes, 
+                         ve.Enrollment_Code AS ps_enrollment_code, drv.Vol_Enrollment_Key, drv.Active_Flag
+FROM            dbo.Dept_Role_Volunteer AS drv LEFT OUTER JOIN
+                         dbo.Enrollment AS ve ON drv.Vol_Enrollment_Key = ve.Enrollment_Key LEFT OUTER JOIN
+                         dbo.Dept_Asgn_Status AS vt ON drv.Volunteer_Type = vt.Dept_Asgn_Status_Key LEFT OUTER JOIN
+                         dbo.Volunteer AS v ON drv.Volunteer_Key = v.Volunteer_Key LEFT OUTER JOIN
+                         dbo.Marital_Status AS ms ON v.Marital_Status_Key = ms.Marital_Status_Key LEFT OUTER JOIN
+                         dbo.Dept_Asgn_Status AS das ON drv.Dept_Asgn_Status_Key = das.Dept_Asgn_Status_Key LEFT OUTER JOIN
+                         dbo.Enrollment AS e ON v.Current_Enrollment_Key = e.Enrollment_Key AND e.Active_Flag = 'Y'
+GO
+
+
+CREATE VIEW [dbo].[Dept_Role_List_v]
+AS
+SELECT        TOP (100) PERCENT dbo.Dept_Role.Dept_Role_Key, dbo.HPR_Dept.CPC_Code, dbo.HPR_Dept.Work_Group_Name AS Dept, isnull(VN.Vol_Name, 'No Volunteer') AS Current_Volunteer, dbo.HPR_Dept_Role.Dept_Role AS Role, 
+                         dbo.Enrollment.Enrollment_Code AS Enroll, dbo.Dept_Role.Role_Start_Date as Role_StartDt, dbo.Dept_Role.Role_End_Date as Role_EndDt, dbo.Dept_Role.Dept_Role_Key AS [Key], dbo.Dept_Role.Active_Flag
+FROM            dbo.Dept_Role LEFT OUTER JOIN
+                         dbo.HPR_Dept ON dbo.Dept_Role.HPR_Dept_Key = dbo.HPR_Dept.HPR_Dept_Key LEFT OUTER JOIN
+                         dbo.HPR_Dept_Role ON dbo.Dept_Role.HPR_Dept_Role_Key = dbo.HPR_Dept_Role.HPR_Dept_Role_Key LEFT OUTER JOIN
+                         dbo.Enrollment ON dbo.Dept_Role.Enrollment_Key = dbo.Enrollment.Enrollment_Key LEFT OUTER JOIN
+                             (SELECT        A.Dept_Role_Key, A.Vol_Start_Date, A.Vol_End_Date, A.Vol_Name
+                               FROM            (SELECT        ROW_NUMBER() OVER (partition BY Dept_Role_Key
+                                                         ORDER BY vol_start_date ASC) AS RowNum, Dept_Role_Key, Vol_Start_Date, Vol_End_Date, Full_Name AS Vol_Name, Volunteer_Key AS Vol_Num
+                               FROM            dbo.Dept_Role_Volunteer_v
+                               WHERE        (Volunteer_Type_Description = 'Volunteer') AND (CAST(GETDATE() AS DATE) BETWEEN Vol_Start_Date AND COALESCE (Vol_End_Date, '2030-01-01')) OR
+                                                         CAST(GETDATE() AS DATE) < Vol_Start_Date) AS A
+WHERE        A.RowNum = 1) AS VN ON dbo.Dept_Role.Dept_Role_Key = VN.Dept_Role_Key
+WHERE        (dbo.Dept_Role.Active_Flag = 'Y')
+GO
+
+
+CREATE VIEW [dbo].[Dept_Role_wVolNm_Cand_Cnt_v]
+AS
+SELECT DISTINCT 
+                         DRv.Dept_Role_Key, DRv.CPC_Code, DRv.Dept_Name, DRv.Work_Group_Name, DRv.Level_02, DRv.Level_03, DRv.Level_04, DRv.full_dept_name, DRv.Crew_Name, DRv.Dept_Role, DRv.Skill_Level, DRv.Role_Start_Date, 
+                         DRv.Role_End_Date, VNC.Num_Vols AS [Number Volunteers], VN.Vol_Name, VN.Vol_Start_Date, VN.Vol_End_Date, CC.CountOfVolunteer_Key AS [Number Candidates], DRv.dept_enrollment_code, DRv.Notes, 
+                         DRv.Dept_Asgn_Status, DRv.Dept_Asgn_Status_Code, DRv.Priority_Key, DRv.priority, DRv.duration_in_months, DRv.PS_Notes, DRv.Job_Description, DRv.VTC_Meeting_Code, DRv.Active_Flag, DRv.HPR_Dept_Key, 
+                         DRv.HPR_Crew_Key, DRv.HPR_Dept_Role_Key, DRv.Enrollment_Key, DRv.Dept_Asgn_Status_Key, DRv.Until_Not_Needed, DRv.Short_Term_OK, DRv.Trade_To_Qualify, DRv.Sort_Trade_Request, DRv.Possible_Sister, 
+                         DRv.PC_Code, DRv.Dept_Asgn_Key, DRv.Dept_Volunteer_Name, DRv.Marital_Status_Key, DRv.Cong_Servant_Code, DRv.Current_Sync_Status
+FROM            dbo.Dept_Role_v AS DRv LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date, COUNT(Volunteer_Key) AS CountOfVolunteer_Key
+                               FROM            dbo.Dept_Role_Volunteer_v AS DRV_vC
+                               GROUP BY Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date
+                               HAVING         (Volunteer_Type_Description = N'Candidate')) AS CC ON DRv.Dept_Role_Key = CC.Dept_Role_Key LEFT OUTER JOIN
+
+							   (SELECT        Dept_Role_Key, Volunteer_Type_Description, COUNT(Volunteer_Key) AS Num_Vols
+								FROM            dbo.Dept_Role_Volunteer_v
+								WHERE (Vol_Start_Date is not null)
+								GROUP BY Dept_Role_Key, Volunteer_Type_Description
+								HAVING        (Volunteer_Type_Description = N'Volunteer')) as VNC  ON DRv.Dept_Role_Key = VNC.Dept_Role_Key LEFT OUTER JOIN
+
+								(Select A.Dept_Role_Key, A.Vol_Start_Date, A.Vol_End_Date, A.Vol_Name
+									from 
+									(
+									SELECT ROW_NUMBER() over (partition by Dept_Role_Key Order by vol_start_date asc ) as RowNum, Dept_Role_Key, Vol_Start_Date, Vol_End_Date, Full_Name AS Vol_Name, Volunteer_Key AS Vol_Num
+									FROM dbo.Dept_Role_Volunteer_v
+									WHERE (Volunteer_Type_Description = 'Volunteer') AND (CAST(GETDATE() AS DATE) BETWEEN Vol_Start_Date AND COALESCE(Vol_End_Date, '2030-01-01') ) OR CAST(GETDATE() AS DATE) < Vol_Start_Date 
+									) as A
+									Where A.RowNum = 1) as VN ON DRv.Dept_Role_Key = VN.Dept_Role_Key  
+GO
+
+
+CREATE VIEW [dbo].[Dept_Role_wVolNm_Cand_Cnt__VTC_v]
+AS
+SELECT        A.Dept_Role_Key, A.CPC_Code, A.Dept_Name, A.Work_Group_Name, A.Level_02, A.Level_03, A.Level_04, A.full_dept_name, A.Crew_Name, A.Dept_Role, A.Skill_Level, A.Role_Start_Date, A.Role_End_Date, 
+                         A.[Number Volunteers], A.Vol_Name, A.Vol_Start_Date, A.Vol_End_Date, A.[Number Candidates], A.dept_enrollment_code, A.Notes, A.Dept_Asgn_Status, A.Dept_Asgn_Status_Code, A.Priority_Key, A.priority, 
+                         A.duration_in_months, A.PS_Notes, A.Job_Description, A.VTC_Meeting_Code, A.Active_Flag, A.HPR_Dept_Key, A.HPR_Crew_Key, A.HPR_Dept_Role_Key, A.Enrollment_Key, A.Dept_Asgn_Status_Key, A.Until_Not_Needed, 
+                         A.Short_Term_OK, A.Trade_To_Qualify, A.Sort_Trade_Request, A.Possible_Sister, A.PC_Code, A.Dept_Asgn_Key, A.Dept_Volunteer_Name, A.Marital_Status_Key, A.Cong_Servant_Code, A.Current_Sync_Status, U.User_Key, 
+                         U.VTC_CPC_Code, U.VTC_Level_02, U.VTC_Level_03
+FROM            dbo.Dept_Role_wVolNm_Cand_Cnt_v AS A INNER JOIN
+                         dbo.[User] AS U ON A.CPC_Code = U.VTC_CPC_Code
+GO
+
+
+CREATE VIEW [dbo].[Dept_Role_w_Vols_Cand_ALL_v]
+AS
+SELECT        dbo.Dept_Role_v.Dept_Role_Key, dbo.Dept_Role_v.Dept_Asgn_Key, dbo.Dept_Role_v.CPC_Code, dbo.Dept_Role_v.Dept_Name, dbo.Dept_Role_v.Work_Group_Name, dbo.Dept_Role_v.Level_02, dbo.Dept_Role_v.Level_03, 
+                         dbo.Dept_Role_v.Level_04, dbo.Dept_Role_v.full_dept_name, dbo.Dept_Role_v.Crew_Name, dbo.Dept_Role_v.Dept_Role, dbo.Dept_Role_v.Skill_Level, dbo.Dept_Role_v.Role_Start_Date, dbo.Dept_Role_v.Role_End_Date, 
+                         dbo.Dept_Role_v.dept_enrollment_code, dbo.Dept_Role_v.Notes, dbo.Dept_Role_v.Dept_Asgn_Status, dbo.Dept_Role_v.Dept_Asgn_Status_Code, dbo.Dept_Role_v.Priority_Key, dbo.Dept_Role_v.priority, 
+                         dbo.Dept_Role_v.duration_in_months, dbo.Dept_Role_v.PS_Notes, dbo.Dept_Role_v.Job_Description, dbo.Dept_Role_v.VTC_Meeting_Code, dbo.Dept_Role_v.Active_Flag, dbo.Dept_Role_v.Load_Date, 
+                         dbo.Dept_Role_v.Update_Date, dbo.Dept_Role_v.HPR_Dept_Key, dbo.Dept_Role_v.HPR_Crew_Key, dbo.Dept_Role_v.HPR_Dept_Role_Key, dbo.Dept_Role_v.Enrollment_Key, dbo.Dept_Role_v.Dept_Asgn_Status_Key, 
+                         dbo.Dept_Role_v.Until_Not_Needed, dbo.Dept_Role_v.Short_Term_OK, dbo.Dept_Role_v.Trade_To_Qualify, dbo.Dept_Role_v.Sort_Trade_Request, dbo.Dept_Role_v.Possible_Sister, dbo.Dept_Role_v.Dept_Volunteer_Name, 
+                         dbo.Dept_Role_v.Marital_Status_Key, dbo.Dept_Role_v.Cong_Servant_Code, dbo.Dept_Role_v.Current_Sync_Status, dbo.Dept_Role_v.PC_Code, dbo.Dept_Role_Volunteer_v.Dept_Role_Vol_Key, 
+                         dbo.Dept_Role_Volunteer_v.Volunteer_Type_ID, dbo.Dept_Role_Volunteer_v.Volunteer_Type_Description, dbo.Dept_Role_Volunteer_v.Vol_Start_Date, dbo.Dept_Role_Volunteer_v.Vol_End_Date, 
+                         dbo.Dept_Role_Volunteer_v.Notes AS Expr1, dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status_Key AS Expr2, dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status_Code AS Expr3, 
+                         dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status AS Expr4, dbo.Dept_Role_Volunteer_v.Volunteer_Key, dbo.Dept_Role_Volunteer_v.Full_Name, dbo.Dept_Role_Volunteer_v.volunteer_name_short, 
+                         dbo.Dept_Role_Volunteer_v.Marital_Status_Code, dbo.Dept_Role_Volunteer_v.Cong_Servant_Code AS Expr5, dbo.Dept_Role_Volunteer_v.HUB_Person_ID, dbo.Dept_Role_Volunteer_v.HUB_Volunteer_ID, 
+                         dbo.Dept_Role_Volunteer_v.hub_enrollment_code, dbo.Dept_Role_Volunteer_v.IsCurrentVolunteer, dbo.Dept_Role_Volunteer_v.HuBIncidentURL, dbo.Dept_Role_Volunteer_v.Candidate_Next_Step, 
+                         dbo.Dept_Role_Volunteer_v.PS_Notes AS Expr6, dbo.Dept_Role_Volunteer_v.Vol_Enrollment_Key, dbo.Dept_Role_Volunteer_v.Active_Flag AS Expr7
+FROM            dbo.Dept_Role_v LEFT OUTER JOIN
+                         dbo.Dept_Role_Volunteer_v ON dbo.Dept_Role_v.Dept_Role_Key = dbo.Dept_Role_Volunteer_v.Dept_Role_Key
+GO
+
+
+CREATE VIEW [dbo].[Dept_Role_wVolNm_Cand_Cnt_v_BU]
+AS
+SELECT DISTINCT 
+                         DRv.Dept_Role_Key, DRv.CPC_Code, DRv.Dept_Name, DRv.Work_Group_Name, DRv.Level_02, DRv.Level_03, DRv.Level_04, DRv.full_dept_name, DRv.Crew_Name, DRv.Dept_Role, DRv.Skill_Level, DRv.Role_Start_Date, 
+                         DRv.Role_End_Date, VN.Num_Vols AS [Number Volunteers], VN.Vol_Name, VN.Vol_Start_Date, VN.Vol_End_Date, CC.CountOfVolunteer_Key AS [Number Candidates], DRv.dept_enrollment_code, DRv.Notes, 
+                         DRv.Dept_Asgn_Status, DRv.Dept_Asgn_Status_Code, DRv.Priority_Key, DRv.priority, DRv.duration_in_months, DRv.PS_Notes, DRv.Job_Description, DRv.VTC_Meeting_Code, DRv.Active_Flag, DRv.HPR_Dept_Key, 
+                         DRv.HPR_Crew_Key, DRv.HPR_Dept_Role_Key, DRv.Enrollment_Key, DRv.Dept_Asgn_Status_Key, DRv.Until_Not_Needed, DRv.Short_Term_OK, DRv.Trade_To_Qualify, DRv.Sort_Trade_Request, DRv.Possible_Sister, 
+                         DRv.PC_Code, DRv.Dept_Asgn_Key, DRv.Dept_Volunteer_Name, DRv.Marital_Status_Key, DRv.Cong_Servant_Code, DRv.Current_Sync_Status
+FROM            dbo.Dept_Role_v AS DRv LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date, COUNT(Volunteer_Key) AS CountOfVolunteer_Key
+                               FROM            dbo.Dept_Role_Volunteer_v AS DRV_vC
+                               GROUP BY Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date
+                               HAVING         (Volunteer_Type_Description = N'Candidate')) AS CC ON DRv.Dept_Role_Key = CC.Dept_Role_Key LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, Volunteer_Type_Description, MIN(Vol_Start_Date) AS Vol_Start_Date, MIN(Vol_End_Date) AS Vol_End_Date, MIN(Full_Name) AS Vol_Name, COUNT(Volunteer_Key) AS Num_Vols
+                               FROM            dbo.Dept_Role_Volunteer_v
+                               WHERE        (Vol_End_Date >= { fn NOW() })
+                               GROUP BY Dept_Role_Key, Volunteer_Type_Description
+                               HAVING         (Volunteer_Type_Description = N'Volunteer')) AS VN ON DRv.Dept_Role_Key = VN.Dept_Role_Key
+GO
+
+
 if object_id('dbo.ETL_Table_Run_v', 'V') is not null
 	drop view dbo.ETL_Table_Run_v
 go 
