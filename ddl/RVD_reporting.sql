@@ -1845,9 +1845,6 @@ where 1=1
 go
 
 
-if object_id('rpt.Resource_Plan_Vol_v', 'V') is not null
-	drop view rpt.Resource_Plan_Vol_v
-go 
 create view rpt.Resource_Plan_Vol_v
 as
 with cal as (
@@ -1880,13 +1877,13 @@ bbo as (
 actuals as (
 	select distinct
 		 v.volunteer_key
-		,null as dept_asgn_key
+		,dr.Dept_Role_Key as dept_asgn_key
 		,v.volunteer_name
 		,v.volunteer_name_short
 		,v.Enrollment_1_code as enrollment_code
 		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
-		,da.crew_name
-		,da.dept_role
+		,dr.crew_name
+		,dr.dept_role
 		,'ARRIVED' as dept_asgn_status_code		
 		,c.cal_dt
 		,case 
@@ -1922,18 +1919,22 @@ actuals as (
 		on c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' )
 	left join bbo 
 		on v.volunteer_key = bbo.volunteer_key
-	left join dbo.dept_asgn_v da
-		on v.volunteer_key = da.volunteer_key
-		and v.enrollment_1_code = da.dept_enrollment_code
-		and c.cal_dt between da.dept_start_date and coalesce( da.dept_end_date, '2030-12-31' )
-		and da.active_flag = 'Y'
-		and da.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+	left join dbo.Dept_Role_Volunteer_v drv  -- RG:  Believe this join of the Role_Volunteer data is needed to get the volunteer on a role that matches the HuB actual record by the volunteer key/enrollment code.  Will need to join in Role data to get the fields needed in this view.
+		on v.volunteer_key = drv.volunteer_key
+		and v.enrollment_1_code = drv.ps_enrollment_code
+		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )  -- RG:  Is this just double checking to make sure the RVD record start/end date lines up with HuB?  Don't think this needs to be the role start/end date, right?
+		and drv.active_flag = 'Y'
+		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+	left join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the two fields referenced in this view
+		on drv.Dept_Role_Key = dr.Dept_Role_Key
+	where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
+
 ),
 	
 projected as (
 	select 
 		 v.volunteer_key
-		,v.dept_asgn_key
+		,v.Dept_Role_Vol_Key as dept_asgn_key
 		,v.volunteer_name
 		,v.volunteer_name_short
 		,v.enrollment_code
@@ -2003,13 +2004,13 @@ bbo as (
 actuals as (
 	select distinct
 		 v.volunteer_key
-		,null as dept_asgn_key
+		,dr.Dept_Role_Key as dept_asgn_key
 		,v.volunteer_name
 		,v.volunteer_name_short
 		,v.Enrollment_1_code as enrollment_code
 		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
-		,da.crew_name
-		,da.dept_role
+		,dr.crew_name
+		,dr.dept_role
 		,'ARRIVED' as dept_asgn_status_code		
 		,c.cal_dt
 		,case 
@@ -2045,18 +2046,20 @@ actuals as (
 		on c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' )
 	left join bbo 
 		on v.volunteer_key = bbo.volunteer_key
-	left join dbo.dept_asgn_v da
-		on v.volunteer_key = da.volunteer_key
-		and v.enrollment_1_code = da.dept_enrollment_code
-		and c.cal_dt between da.dept_start_date and coalesce( da.dept_end_date, '2030-12-31' )
-		and da.active_flag = 'Y'
-		and da.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
-),
+	left join dbo.Dept_Role_Volunteer_v drv
+		on v.volunteer_key = drv.volunteer_key
+		and v.enrollment_1_code = drv.ps_enrollment_code
+		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )
+		and drv.active_flag = 'Y'
+		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+	left join dbo.Dept_Role_v dr
+		on drv.Dept_Role_Key = dr.Dept_Role_Key
+	where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' ),
 	
 projected as (
 	select 
 		 v.volunteer_key
-		,v.dept_asgn_key
+		,v.Dept_Role_Vol_Key
 		,v.volunteer_name
 		,v.volunteer_name_short
 		,v.enrollment_code
@@ -2443,32 +2446,32 @@ with cal as (
 
 select
 	 a.volunteer_key
-	,a.dept_asgn_key
+	,a.Dept_Role_Vol_Key
 	,a.full_name as volunteer_name
 	,a.volunteer_name_short
 	,c.cal_dt
-	,a.hpr_dept_key
-	,a.dept_enrollment_code as enrollment_code
-	,a.crew_name
-	,a.dept_role
+	,dr.hpr_dept_key
+	,a.ps_enrollment_code as enrollment_code
+	,dr.crew_name
+	,dr.dept_role
 	,a.dept_asgn_status_code	
 	,case 
-		when a.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
+		when a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
 		else 0 
 		end as bed_cnt
 	,case 
-		when a.dept_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-		when a.dept_enrollment_code in ( 'BBV', 'BCC' ) then 0.2
+		when a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+		when a.ps_enrollment_code in ( 'BBV', 'BCC' ) then 0.2
 		else 0
 		end as fte
 	,'N' as onsite_flag
 	,'PROJECTED' as record_type
 	-- ADDED FOR CI TOOL BEING BUILT BY OS
 	,a.HUB_Person_ID
-	,a.dept_enrollment_code as enrollment_1_code
-	,a.dept_start_date as enrollment_1_start_date
-	,a.dept_end_date as enrollment_1_end_date
-	,a.hpr_dept_key as dept_1_hpr_dept_key
+	,a.ps_enrollment_code as enrollment_1_code
+	,a.vol_start_date as enrollment_1_start_date
+	,a.vol_end_date as enrollment_1_end_date
+	,dr.hpr_dept_key as dept_1_hpr_dept_key
 	,d.HUB_Dept_ID as dept_1_hub_dept_id
 	,d.CPC_Code as dept_1_cpc_code
 	,case 
@@ -2486,14 +2489,16 @@ select
 		when d.level_02 is not null then d.level_02
 		else d.level_01
 	  end as dept_1_dept_name
-	 ,a.dept_start_date as dept_1_start_date
-	 ,a.dept_end_date as dept_1_end_date
+	 ,a.vol_start_date as dept_1_start_date
+	 ,a.vol_end_date as dept_1_end_date
 	 ,'Y' as dept_1_hpr_flag	
-from dbo.dept_asgn_v a
+from dbo.Dept_Role_Volunteer_v a
 inner join cal c
-	on c.cal_dt between coalesce( a.dept_start_date, a.ps_start_date ) and coalesce( coalesce( a.dept_end_date, a.ps_end_date ), '2030-12-31' )
+	on c.cal_dt between a.vol_start_date and coalesce( a.vol_end_date , '2030-12-31' )
+inner join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the three fields referenced in this view
+	on a.Dept_Role_Key = dr.Dept_Role_Key	
 inner join dbo.hpr_dept d
-	on a.hpr_dept_key = d.hpr_dept_key
+	on dr.hpr_dept_key = d.hpr_dept_key
 	and d.Active_Flag = 'Y'
 where a.active_flag = 'Y'
 	and a.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
@@ -2502,8 +2507,10 @@ where a.active_flag = 'Y'
 	and not exists ( 
 		select 1 from rpt.volunteer_rpt_v act 
 		where coalesce( a.volunteer_key, -1 ) = act.volunteer_key 
-			and a.dept_enrollment_code = act.enrollment_1_code
-			/*and a.HPR_Dept_Key = act.HPR_Dept_Key*/ )
+			and a.ps_enrollment_code = act.enrollment_1_code
+			/*and a.HPR_Dept_Key = act.HPR_Dept_Key*/ 
+			/*and a.Volunteer_Type_Description = 'VOLUNTEER'*/) -- RG:  Maybe not needed, need to double check
+			and a.Volunteer_Type_Description = 'VOLUNTEER'
 go
 
 

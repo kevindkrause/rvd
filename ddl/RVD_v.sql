@@ -455,7 +455,7 @@ FROM            dbo.Dept_Role_v AS DRv LEFT OUTER JOIN
 									FROM dbo.Dept_Role_Volunteer_v
 									WHERE (Volunteer_Type_Description = 'Volunteer') AND (CAST(GETDATE() AS DATE) BETWEEN Vol_Start_Date AND COALESCE(Vol_End_Date, '2030-01-01') ) OR CAST(GETDATE() AS DATE) < Vol_Start_Date 
 									) as A
-									Where A.RowNum = 1) as VN ON DRv.Dept_Role_Key = VN.Dept_Role_Key  
+									Where A.RowNum = 1) as VN ON DRv.Dept_Role_Key = VN.Dept_Role_Key 
 GO
 
 

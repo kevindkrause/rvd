@@ -6031,6 +6031,18 @@ begin
 		@End datetime
 		
 	begin try		
+begin
+	set nocount on
+	
+	declare 
+		@Table nvarchar(150) = 'Dept Role and Dept Role Volunteer', 
+		@Ins integer = 0,
+		@Upd integer = 0,
+		@Del integer = 0,
+		@Start datetime = getdate(), 
+		@End datetime
+		
+	begin try		
 		--Backup Dept_Role table
 		INSERT INTO arch.Dept_Role
 		SELECT *, cast(getdate() as date) FROM dbo.Dept_Role
@@ -6043,177 +6055,177 @@ begin
 
 		set @Ins = @Ins + @@rowcount	
 
+		--RG Note (9/29/25) - Commented out inserting new records into the Dept_Role and Dept_Role_Volunteer tables
+		----Step 1a - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role
+		--insert into dbo.dept_role(
+		--	hpr_dept_key
+  --         ,hpr_crew_key
+  --         ,hpr_dept_role_key
+  --         ,enrollment_key
+  --         ,skill_level
+  --         ,role_start_date
+  --         ,role_end_date
+  --         ,dept_asgn_status_key
+  --         ,priority_key
+  --         ,vtc_meeting_code
+  --         ,update_source
+  --         ,update_type
+  --         ,updatedate_source
+  --         ,update_reviewedbyuser
+		--   ,update_addlink1
+		--   ,update_addlink2
+  --         ,active_flag
+  --         ,load_date
+  --         ,update_date)
+		--select 
+		--	 coalesce( dept_1_hpr_dept_key, dept_2_hpr_dept_key )	as hpr_dept_key
+		--	,0														as hpr_crew_key -- Set to 'Unassigned'
+		--	,case coalesce( d.cpc_code, d2.cpc_code )
+		--		when 'CI' then 76
+		--		when 'DD' then 77
+		--		when 'PCC' then 78
+		--		when 'CO' then 79
+		--		when 'PS' then 54
+		--		else 95 -- VD
+		--	 end													as hpr_dept_role_key  -- Set to 'Volunteer' based on CPC_Code
+		--	,( select Enrollment_Key from dbo.Enrollment 
+		--	   where enrollment_code = vr.enrollment_1_code 
+		--			and Active_Flag = 'Y' )							as enrollment_key
+		--	,7														as skill_level -- Set to 'Not Assessed'
+		--	,dept_1_start_date										as dept_start_date
+		--	,dept_1_end_date										as dept_end_date
+		--	,(select dept_asgn_status_key 
+		--		from dbo.dept_asgn_status 
+		--		where dept_asgn_status_code = 'ACTIVE'
+		--		and Dept_Asgn_Status_Type = 'DR')					as dept_asgn_status_key  
+		--	,3														as priority_key -- set to 'normal'
+		--	,'N'													as vtc_meeting_code
+		--	,'HuB'													as Update_Source -- Indicate record added from HuB
+		--	,'New Role Record'										as Update_type -- Indicates update type
+		--	,cast( getdate() as date )								as UpdateDate_Source  -- Indicate date record added from HuB
+		--	,'N'													as Update_ReviewedByUser
+		--	,vr.volunteer_key										as Update_AddLink1
+		--	,( select Enrollment_Key from dbo.Enrollment 
+		--	   where enrollment_code = vr.enrollment_1_code 
+		--			and Active_Flag = 'Y' )							as Update_AddLink2
+		--	,'Y'													as active_flag
+		--	,cast( getdate() as date )								as load_date
+		--	,cast( getdate() as date )								as update_date
+		--FROM rpt.Volunteer_Rpt_v VR
+		--left outer join dbo.HPR_Dept D 
+		--	on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
+		--left outer join dbo.HPR_Dept D2 
+		--	on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
+		--left outer join 
+		--	( select da.volunteer_key, da.Vol_Enrollment_Key 
+		--	  from dbo.Dept_Role_Volunteer da 
+		--	  where Active_Flag = 'Y' and isnull( volunteer_key, 99999999 ) <> 99999999 ) A
+		--	on a.Volunteer_Key = vr.volunteer_key 
+		--	and a.Vol_Enrollment_Key = ( select Enrollment_Key from dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y' )
+		--where isnull( a.volunteer_key, 999999999 ) = 999999999 -- DOES NOT EXIST IN DEPT ROLE VOLUNTEER
+		--	and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
+		--		  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
 
-		--Step 1a - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role
-		insert into dbo.dept_role(
-			hpr_dept_key
-           ,hpr_crew_key
-           ,hpr_dept_role_key
-           ,enrollment_key
-           ,skill_level
-           ,role_start_date
-           ,role_end_date
-           ,dept_asgn_status_key
-           ,priority_key
-           ,vtc_meeting_code
-           ,update_source
-           ,update_type
-           ,updatedate_source
-           ,update_reviewedbyuser
-		   ,update_addlink1
-		   ,update_addlink2
-           ,active_flag
-           ,load_date
-           ,update_date)
-		select 
-			 coalesce( dept_1_hpr_dept_key, dept_2_hpr_dept_key )	as hpr_dept_key
-			,0														as hpr_crew_key -- Set to 'Unassigned'
-			,case coalesce( d.cpc_code, d2.cpc_code )
-				when 'CI' then 76
-				when 'DD' then 77
-				when 'PCC' then 78
-				when 'CO' then 79
-				when 'PS' then 54
-				else 95 -- VD
-			 end													as hpr_dept_role_key  -- Set to 'Volunteer' based on CPC_Code
-			,( select Enrollment_Key from dbo.Enrollment 
-			   where enrollment_code = vr.enrollment_1_code 
-					and Active_Flag = 'Y' )							as enrollment_key
-			,7														as skill_level -- Set to 'Not Assessed'
-			,dept_1_start_date										as dept_start_date
-			,dept_1_end_date										as dept_end_date
-			,(select dept_asgn_status_key 
-				from dbo.dept_asgn_status 
-				where dept_asgn_status_code = 'ACTIVE'
-				and Dept_Asgn_Status_Type = 'DR')					as dept_asgn_status_key  
-			,3														as priority_key -- set to 'normal'
-			,'N'													as vtc_meeting_code
-			,'HuB'													as Update_Source -- Indicate record added from HuB
-			,'New Role Record'										as Update_type -- Indicates update type
-			,cast( getdate() as date )								as UpdateDate_Source  -- Indicate date record added from HuB
-			,'N'													as Update_ReviewedByUser
-			,vr.volunteer_key										as Update_AddLink1
-			,( select Enrollment_Key from dbo.Enrollment 
-			   where enrollment_code = vr.enrollment_1_code 
-					and Active_Flag = 'Y' )							as Update_AddLink2
-			,'Y'													as active_flag
-			,cast( getdate() as date )								as load_date
-			,cast( getdate() as date )								as update_date
-		FROM rpt.Volunteer_Rpt_v VR
-		left outer join dbo.HPR_Dept D 
-			on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
-		left outer join dbo.HPR_Dept D2 
-			on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
-		left outer join 
-			( select da.volunteer_key, da.Vol_Enrollment_Key 
-			  from dbo.Dept_Role_Volunteer da 
-			  where Active_Flag = 'Y' and isnull( volunteer_key, 99999999 ) <> 99999999 ) A
-			on a.Volunteer_Key = vr.volunteer_key 
-			and a.Vol_Enrollment_Key = ( select Enrollment_Key from dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y' )
-		where isnull( a.volunteer_key, 999999999 ) = 999999999 -- DOES NOT EXIST IN DEPT ROLE VOLUNTEER
-			and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
-				  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
-
-		set @Ins = @Ins + @@rowcount	
-
-
-		--Step 1b - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role_Volunteer
-		insert into dbo.dept_role_volunteer(
-			dept_role_key
-           ,volunteer_type
-           ,vol_enrollment_key
-           ,vol_start_date
-           ,vol_end_date
-           ,dept_asgn_status_key
-           ,volunteer_key
-           ,active_flag
-           ,load_date
-           ,update_date
-           ,update_source
-           ,update_type
-           ,updatedate_source
-           ,update_reviewedbyuser
-           ,extension_flag
-           ,extension_flag_updatedate )
-		select 
-			 (select dr.dept_role_key 
-				from dept_role dr inner join
-				dept_role_volunteer drv on
-				coalesce(vr.dept_1_hpr_dept_key, vr.dept_2_hpr_dept_key ) 
-					= dr.hpr_dept_key
-				and case coalesce( d.cpc_code, d2.cpc_code )
-					when 'CI' then 76
-					when 'DD' then 77
-					when 'PCC' then 78
-					when 'CO' then 79
-					when 'PS' then 54
-					else 95
-					end = dr.hpr_dept_role_key
-				and dr.update_addlink1 = vr.volunteer_key
-				and dr.update_addlink2 = 
-					(select Enrollment_Key from dbo.Enrollment 
-					where enrollment_code = vr.enrollment_1_code 
-					and Active_Flag = 'Y' ))						as dept_role_key
-			,(select dept_asgn_status_key 
-				from dbo.dept_asgn_status 
-				where dept_asgn_status_code = 'VOLUNTEER'
-				and Dept_Asgn_Status_Type = 'RV')					as volunteer_type
-			,( select Enrollment_Key from dbo.Enrollment 
-			   where enrollment_code = vr.enrollment_1_code 
-					and Active_Flag = 'Y' )							as vol_enrollment_key
-			,dept_1_start_date										as vol_start_date
-			,dept_1_end_date										as vol_end_date
-			,case 
-				when dept_1_start_date > cast( getdate() as date )  
-					then ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' ) -- FUTURE START
-				when dept_1_start_date <= cast( getdate() as date ) and isnull( dept_1_end_date, '12/31/9999' ) >= cast( getdate() as date )
-					then ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' ) -- START IN PAST AND END IS NULL OR IN FUTURE
-				when dept_1_end_date < cast( getdate() as date ) 
-					then (select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'DEPARTED' ) -- END IN PAST
-				else ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING' )
-			 end													as dept_asgn_status_key  
-			,vr.volunteer_key
-			,'Y'													as active_flag
-			,cast( getdate() as date )								as load_date
-			,cast( getdate() as date )								as update_date
-			,'HuB'													as Update_Source -- Indicate record added from HuB
-			,'New Vol Record'										as Update_type -- Indicates update type
-			,cast( getdate() as date )								as UpdateDate_Source  -- Indicate date record added from HuB
-			,'N'													as Update_ReviewedByUser
-			,'N'													as Extension_Flag
-			,cast( getdate() as date )								as Extension_Flag_UpdateDate
-		FROM rpt.Volunteer_Rpt_v VR
-		left outer join dbo.HPR_Dept D 
-			on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
-		left outer join dbo.HPR_Dept D2 
-			on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
-		left outer join 
-			( select da.volunteer_key, da.vol_enrollment_key 
-			  from dbo.dept_role_volunteer da 
-			  where active_flag = 'Y' and isnull( volunteer_key, 99999999 ) <> 99999999 ) A
-			on a.volunteer_key = vr.volunteer_key 
-			and a.vol_enrollment_key = ( select enrollment_Key from dbo.enrollment where enrollment_code = VR.enrollment_1_code and active_flag = 'Y' )
-		where isnull( a.volunteer_key, 999999999 ) = 999999999 -- DOES NOT EXIST IN DEPT ASGN
-			and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
-				  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
-
-		set @Ins = @Ins + @@rowcount	
+		--set @Ins = @Ins + @@rowcount	
 
 
-		--STEP 1c - Clear update_addlink1 and update_addlink2 in Dept_Role table, which are temporary values to hold IDs when adding Dept_Role_Volunteer records in step 1b
-		update dept_role
-		set update_addlink1 = null
-		   ,update_addlink2 = null
-		where isnull(update_addlink1,99999999)<>99999999
+		----Step 1b - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role_Volunteer
+		--insert into dbo.dept_role_volunteer(
+		--	dept_role_key
+  --         ,volunteer_type
+  --         ,vol_enrollment_key
+  --         ,vol_start_date
+  --         ,vol_end_date
+  --         ,dept_asgn_status_key
+  --         ,volunteer_key
+  --         ,active_flag
+  --         ,load_date
+  --         ,update_date
+  --         ,update_source
+  --         ,update_type
+  --         ,updatedate_source
+  --         ,update_reviewedbyuser
+  --         ,extension_flag
+  --         ,extension_flag_updatedate )
+		--select 
+		--	 (select dr.dept_role_key 
+		--		from dept_role dr inner join
+		--		dept_role_volunteer drv on
+		--		coalesce(vr.dept_1_hpr_dept_key, vr.dept_2_hpr_dept_key ) 
+		--			= dr.hpr_dept_key
+		--		and case coalesce( d.cpc_code, d2.cpc_code )
+		--			when 'CI' then 76
+		--			when 'DD' then 77
+		--			when 'PCC' then 78
+		--			when 'CO' then 79
+		--			when 'PS' then 54
+		--			else 95
+		--			end = dr.hpr_dept_role_key
+		--		and dr.update_addlink1 = vr.volunteer_key
+		--		and dr.update_addlink2 = 
+		--			(select Enrollment_Key from dbo.Enrollment 
+		--			where enrollment_code = vr.enrollment_1_code 
+		--			and Active_Flag = 'Y' ))						as dept_role_key
+		--	,(select dept_asgn_status_key 
+		--		from dbo.dept_asgn_status 
+		--		where dept_asgn_status_code = 'VOLUNTEER'
+		--		and Dept_Asgn_Status_Type = 'RV')					as volunteer_type
+		--	,( select Enrollment_Key from dbo.Enrollment 
+		--	   where enrollment_code = vr.enrollment_1_code 
+		--			and Active_Flag = 'Y' )							as vol_enrollment_key
+		--	,dept_1_start_date										as vol_start_date
+		--	,dept_1_end_date										as vol_end_date
+		--	,case 
+		--		when dept_1_start_date > cast( getdate() as date )  
+		--			then ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' ) -- FUTURE START
+		--		when dept_1_start_date <= cast( getdate() as date ) and isnull( dept_1_end_date, '12/31/9999' ) >= cast( getdate() as date )
+		--			then ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' ) -- START IN PAST AND END IS NULL OR IN FUTURE
+		--		when dept_1_end_date < cast( getdate() as date ) 
+		--			then (select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'DEPARTED' ) -- END IN PAST
+		--		else ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING' )
+		--	 end													as dept_asgn_status_key  
+		--	,vr.volunteer_key
+		--	,'Y'													as active_flag
+		--	,cast( getdate() as date )								as load_date
+		--	,cast( getdate() as date )								as update_date
+		--	,'HuB'													as Update_Source -- Indicate record added from HuB
+		--	,'New Vol Record'										as Update_type -- Indicates update type
+		--	,cast( getdate() as date )								as UpdateDate_Source  -- Indicate date record added from HuB
+		--	,'N'													as Update_ReviewedByUser
+		--	,'N'													as Extension_Flag
+		--	,cast( getdate() as date )								as Extension_Flag_UpdateDate
+		--FROM rpt.Volunteer_Rpt_v VR
+		--left outer join dbo.HPR_Dept D 
+		--	on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
+		--left outer join dbo.HPR_Dept D2 
+		--	on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
+		--left outer join 
+		--	( select da.volunteer_key, da.vol_enrollment_key 
+		--	  from dbo.dept_role_volunteer da 
+		--	  where active_flag = 'Y' and isnull( volunteer_key, 99999999 ) <> 99999999 ) A
+		--	on a.volunteer_key = vr.volunteer_key 
+		--	and a.vol_enrollment_key = ( select enrollment_Key from dbo.enrollment where enrollment_code = VR.enrollment_1_code and active_flag = 'Y' )
+		--where isnull( a.volunteer_key, 999999999 ) = 999999999 -- DOES NOT EXIST IN DEPT ASGN
+		--	and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
+		--		  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
+
+		--set @Ins = @Ins + @@rowcount	
 
 
-		--STEP 1 (AUDIT) - Add records to Audit table
-		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, v.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'New Record Added', 'Y', NULL, NULL, NULL, NULL, NULL, NULL, cast(GETDATE() as date) 
-		FROM Dept_Role_Volunteer drv 
-			inner join Volunteer v on v.Volunteer_Key = drv.Volunteer_Key
-			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
-		WHERE drv.Update_Type = 'New Vol Record' and drv.update_date = cast(GETDATE() as date)
+		----STEP 1c - Clear update_addlink1 and update_addlink2 in Dept_Role table, which are temporary values to hold IDs when adding Dept_Role_Volunteer records in step 1b
+		--update dept_role
+		--set update_addlink1 = null
+		--   ,update_addlink2 = null
+		--where isnull(update_addlink1,99999999)<>99999999
+
+
+		----STEP 1 (AUDIT) - Add records to Audit table
+		--INSERT INTO [arch].[ETL_Status_Audit]
+		--SELECT drv.Volunteer_Key, v.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'New Record Added', 'Y', NULL, NULL, NULL, NULL, NULL, NULL, cast(GETDATE() as date) 
+		--FROM Dept_Role_Volunteer drv 
+		--	inner join Volunteer v on v.Volunteer_Key = drv.Volunteer_Key
+		--	inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
+		--WHERE drv.Update_Type = 'New Vol Record' and drv.update_date = cast(GETDATE() as date)
 
 
 		--STEP 2 (AUDIT) - Add records to Audit table before update to original data occurs
@@ -6461,8 +6473,6 @@ begin
 			and drv.active_flag = 'Y' 
 			and drv.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' )
 
-
-
 		set @End = getdate()		
 	
 		execute dbo.ETL_Table_Run_proc
@@ -6523,7 +6533,7 @@ begin
 	exec dbo.ETL_PRP_Data_proc
 	exec dbo.ETL_App_Attributes_Cleanup_proc
 	exec dbo.ETL_Bad_Data_Cleanup_proc
-	exec dbo.ETL_Status_Update_Process
+	exec dbo.ETL_Status_Update_Process_Roles
 	exec dbo.ETL_Reporting_Snapshots_proc
 end
 go

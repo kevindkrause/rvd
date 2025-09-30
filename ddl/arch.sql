@@ -1,10 +1,3 @@
-PRINT ''
-PRINT '-------------------------'
-PRINT 'Begin update rvd with Role Based objects...'
-PRINT ''
-PRINT 'Create table [arch].[Dept_Role]...'
-
--- Table: [arch].[Dept_Role]
 CREATE TABLE [arch].[Dept_Role](
 	[arch_DR_Key] [int] IDENTITY(1,1) NOT NULL,
 	[Dept_Role_Key] [int] NULL,
@@ -47,10 +40,6 @@ CREATE TABLE [arch].[Dept_Role](
 ) ON [PRIMARY]
 GO
 
-PRINT ''
-PRINT '-------------------------'
-PRINT ''
-PRINT 'Create table [arch].[Dept_Role_Volunteer]...'
 
 -- Table: [arch].[Dept_Role]
 CREATE TABLE [arch].[Dept_Role_Volunteer](
@@ -93,6 +82,7 @@ CREATE TABLE [arch].[Dept_Role_Volunteer](
 GO
 
 
+--Create ETL_Status_Audit table
 CREATE TABLE arch.ETL_Status_Audit
 ([ETLStatAud_Key] [int] IDENTITY(1,1) NOT NULL,
 [Volunteer_Key] int NULL,
@@ -116,5 +106,3 @@ CREATE TABLE arch.ETL_Status_Audit
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-
-

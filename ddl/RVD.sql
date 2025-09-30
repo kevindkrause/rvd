@@ -6,6 +6,10 @@ use rvdrehearsal
 go
 
 
+
+
+
+
 if object_id('dbo.App_Attribute', 'U') is not null
 	drop table dbo.App_Attribute
 go  
