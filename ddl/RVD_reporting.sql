@@ -1845,6 +1845,9 @@ where 1=1
 go
 
 
+if object_id('rpt.Resource_Plan_Vol_v', 'V') is not null
+	drop view rpt.Resource_Plan_Vol_v
+go 
 create view rpt.Resource_Plan_Vol_v
 as
 with cal as (
@@ -1934,7 +1937,7 @@ actuals as (
 projected as (
 	select 
 		 v.volunteer_key
-		,v.Dept_Role_Vol_Key as dept_asgn_key
+		,v.Dept_Role_Key as dept_asgn_key
 		,v.volunteer_name
 		,v.volunteer_name_short
 		,v.enrollment_code
@@ -2446,7 +2449,7 @@ with cal as (
 
 select
 	 a.volunteer_key
-	,a.Dept_Role_Vol_Key
+	,a.Dept_Role_Key
 	,a.full_name as volunteer_name
 	,a.volunteer_name_short
 	,c.cal_dt
@@ -3022,6 +3025,7 @@ guest as (
 	where 1=1
 		and r.overnight_guest_category is not null
 		and v.volunteer_key not in ( select volunteer_key from hpr )
+		and v.volunteer_key not in ( select volunteer_key from woodgrove )		
 		and v.hub_person_id <> 627794
 ),
 
