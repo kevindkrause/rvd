@@ -13,92 +13,92 @@ alter procedure dbo.ETL_BA_Event_Volunteer_Invite_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'BA_Event_Volunteer_Invite', 
+
+	declare
+		@Table nvarchar(150) = 'BA_Event_Volunteer_Invite',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.ba_event_volunteer_invite( 
-			 event_id 				
-			,volunteer_id			
-			,person_guid				
-			,event_name 				
-			,link					
-			,start_date				
-			,event_length 			
-			,maximum_confirmations 	
-			,status_day_1 			
-			,status_day_2 			
-			,status_day_3 			
-			,status_day_4 			
-			,status_day_5 			
-			,status_day_6 			
-			,status_day_7 			
-			,comments 				
+		insert into dbo.ba_event_volunteer_invite(
+			 event_id
+			,volunteer_id
+			,person_guid
+			,event_name
+			,link
+			,start_date
+			,event_length
+			,maximum_confirmations
+			,status_day_1
+			,status_day_2
+			,status_day_3
+			,status_day_4
+			,status_day_5
+			,status_day_6
+			,status_day_7
+			,comments
 			,manager_comments )
-		select 
-			 event_id 				
-			,volunteer_id			
-			,person_guid				
-			,event_name 				
-			,link					
-			,start_date				
-			,event_length 			
-			,maximum_confirmations 	
-			,status_day_1 			
-			,status_day_2 			
-			,status_day_3 			
-			,status_day_4 			
-			,status_day_5 			
-			,status_day_6 			
-			,status_day_7 			
-			,comments 				
-			,manager_comments 
-		from 
-			( select 
-				 event_id 				
-				,volunteer_id			
-				,person_guid				
-				,event_name 				
-				,link					
-				,start_date				
-				,event_length 			
-				,maximum_confirmations 	
-				,status_day_1 			
-				,status_day_2 			
-				,status_day_3 			
-				,status_day_4 			
-				,status_day_5 			
-				,status_day_6 			
-				,status_day_7 			
-				,comments 				
-				,max( manager_comments ) as manager_comments 
+		select
+			 event_id
+			,volunteer_id
+			,person_guid
+			,event_name
+			,link
+			,start_date
+			,event_length
+			,maximum_confirmations
+			,status_day_1
+			,status_day_2
+			,status_day_3
+			,status_day_4
+			,status_day_5
+			,status_day_6
+			,status_day_7
+			,comments
+			,manager_comments
+		from
+			( select
+				 event_id
+				,volunteer_id
+				,person_guid
+				,event_name
+				,link
+				,start_date
+				,event_length
+				,maximum_confirmations
+				,status_day_1
+				,status_day_2
+				,status_day_3
+				,status_day_4
+				,status_day_5
+				,status_day_6
+				,status_day_7
+				,comments
+				,max( manager_comments ) as manager_comments
 			  from stg.stg_ba_volunteer_invite
-			  group by 
-				 event_id 				
-				,volunteer_id			
-				,person_guid				
-				,event_name 				
-				,link					
-				,start_date				
-				,event_length 			
-				,maximum_confirmations 	
-				,status_day_1 			
-				,status_day_2 			
-				,status_day_3 			
-				,status_day_4 			
-				,status_day_5 			
-				,status_day_6 			
-				,status_day_7 			
+			  group by
+				 event_id
+				,volunteer_id
+				,person_guid
+				,event_name
+				,link
+				,start_date
+				,event_length
+				,maximum_confirmations
+				,status_day_1
+				,status_day_2
+				,status_day_3
+				,status_day_4
+				,status_day_5
+				,status_day_6
+				,status_day_7
 				,comments ) ei
-		where not exists 
-			( select 1 from dbo.ba_event_volunteer_invite ei2 
+		where not exists
+			( select 1 from dbo.ba_event_volunteer_invite ei2
 			  where ei.event_id = ei2.event_id
 				and ei.volunteer_id = ei2.volunteer_id )
 
@@ -106,60 +106,60 @@ begin
 
 		-- UPDATE
 		update dbo.ba_event_volunteer_invite
-		set 
+		set
 			event_name = src.event_name,
 			link = src.link,
 			start_date = src.start_date,
 			event_length = src.event_length,
-			maximum_confirmations = src.maximum_confirmations, 	
-			status_day_1 = src.status_day_1, 			
-			status_day_2 = src.status_day_2, 			
-			status_day_3 = src.status_day_3, 			
-			status_day_4 = src.status_day_4, 			
-			status_day_5 = src.status_day_5, 			
-			status_day_6 = src.status_day_6, 			
-			status_day_7 = src.status_day_7,			
-			comments = src.comments,			
+			maximum_confirmations = src.maximum_confirmations,
+			status_day_1 = src.status_day_1,
+			status_day_2 = src.status_day_2,
+			status_day_3 = src.status_day_3,
+			status_day_4 = src.status_day_4,
+			status_day_5 = src.status_day_5,
+			status_day_6 = src.status_day_6,
+			status_day_7 = src.status_day_7,
+			comments = src.comments,
 			manager_comments = src.manager_comments,
 			update_date = getdate()
 		from dbo.ba_event_volunteer_invite tgt
-		inner join 
-			( select 
-				 event_id 				
-				,volunteer_id			
-				,person_guid				
-				,event_name 				
-				,link					
-				,start_date				
-				,event_length 			
-				,maximum_confirmations 	
-				,status_day_1 			
-				,status_day_2 			
-				,status_day_3 			
-				,status_day_4 			
-				,status_day_5 			
-				,status_day_6 			
-				,status_day_7 			
-				,comments 				
-				,manager_comments 
+		inner join
+			( select
+				 event_id
+				,volunteer_id
+				,person_guid
+				,event_name
+				,link
+				,start_date
+				,event_length
+				,maximum_confirmations
+				,status_day_1
+				,status_day_2
+				,status_day_3
+				,status_day_4
+				,status_day_5
+				,status_day_6
+				,status_day_7
+				,comments
+				,manager_comments
 			  from stg.stg_ba_volunteer_invite
-			  group by 
-				 event_id 				
-				,volunteer_id			
-				,person_guid				
-				,event_name 				
-				,link					
-				,start_date				
-				,event_length 			
-				,maximum_confirmations 	
-				,status_day_1 			
-				,status_day_2 			
-				,status_day_3 			
-				,status_day_4 			
-				,status_day_5 			
-				,status_day_6 			
-				,status_day_7 			
-				,comments 				
+			  group by
+				 event_id
+				,volunteer_id
+				,person_guid
+				,event_name
+				,link
+				,start_date
+				,event_length
+				,maximum_confirmations
+				,status_day_1
+				,status_day_2
+				,status_day_3
+				,status_day_4
+				,status_day_5
+				,status_day_6
+				,status_day_7
+				,comments
 				,manager_comments ) src
 			on tgt.event_id = src.event_id
 			and tgt.volunteer_id = src.volunteer_id
@@ -167,42 +167,42 @@ begin
 			or tgt.link <> src.link
 			or tgt.start_date <> src.start_date
 			or tgt.event_length <> src.event_length
-			or tgt.maximum_confirmations <> src.maximum_confirmations 	
-			or tgt.status_day_1 <> src.status_day_1 			
-			or tgt.status_day_2 <> src.status_day_2 			
-			or tgt.status_day_3 <> src.status_day_3 			
-			or tgt.status_day_4 <> src.status_day_4 			
-			or tgt.status_day_5 <> src.status_day_5 			
-			or tgt.status_day_6 <> src.status_day_6 			
-			or tgt.status_day_7 <> src.status_day_7			
-			or tgt.comments <> src.comments			
+			or tgt.maximum_confirmations <> src.maximum_confirmations
+			or tgt.status_day_1 <> src.status_day_1
+			or tgt.status_day_2 <> src.status_day_2
+			or tgt.status_day_3 <> src.status_day_3
+			or tgt.status_day_4 <> src.status_day_4
+			or tgt.status_day_5 <> src.status_day_5
+			or tgt.status_day_6 <> src.status_day_6
+			or tgt.status_day_7 <> src.status_day_7
+			or tgt.comments <> src.comments
 			or tgt.manager_comments <> src.manager_comments
 
 		set @Upd = @@rowcount
-		
-		-- UPDATE SET INACTIVE		
+
+		-- UPDATE SET INACTIVE
 		update dbo.ba_event_volunteer_invite
 		set active_flag = 'N'
 		from dbo.ba_event_volunteer_invite tgt
 		where 1=1
 			and start_date >= 1 + dateadd( week, datediff( week, 0, getdate() ), -1 )
-			and not exists 
-				( select 1 from stg.stg_ba_volunteer_invite src 
+			and not exists
+				( select 1 from stg.stg_ba_volunteer_invite src
 				  where tgt.event_id = src.event_id
 					and tgt.volunteer_id = src.volunteer_id )
-					
+
 		set @Upd = @Upd + @@rowcount
-		
-		
+
+
 		-- DELETE BA EVENT SNAPSHOT
 		truncate table dbo.ba_event_snp
-		
-		set @Del = @Del + @@rowcount	
+
+		set @Del = @Del + @@rowcount
 
 		-- INSERT BA EVENT SNAPSHOT
 		insert into dbo.ba_event_snp
-		select * from rpt.ba_event_v 
-		
+		select * from rpt.ba_event_v
+
 		set @Ins = @Ins + @@rowcount
 
 		set @End = getdate()
@@ -214,8 +214,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -225,7 +225,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -241,24 +241,24 @@ alter procedure dbo.ETL_BA_Project_Group_Volunteer_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'BA_Project_Group_Volunteer', 
+
+	declare
+		@Table nvarchar(150) = 'BA_Project_Group_Volunteer',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.ba_project_group_volunteer( 
+		insert into dbo.ba_project_group_volunteer(
 			 ba_project_group_key
 			,volunteer_key
 			,project_id
 			,group_id
-			,person_guid )		
-		select 
+			,person_guid )
+		select
 			 pg.ba_project_group_key
 			,v.volunteer_key
 			,vg.project_id
@@ -270,8 +270,8 @@ begin
 			and vg.group_id = pg.group_id
 		inner join dbo.volunteer v
 			on vg.person_guid = v.hub_person_guid
-		where not exists 
-			( select 1 from dbo.ba_project_group_volunteer pg2 
+		where not exists
+			( select 1 from dbo.ba_project_group_volunteer pg2
 			  where pg2.project_id = vg.project_id
 				and pg2.group_id = vg.group_id
 				and pg2.person_guid = vg.person_guid )
@@ -280,11 +280,11 @@ begin
 
 		-- UPDATE
 		update dbo.ba_project_group_volunteer
-		set 
+		set
 			active_flag = 'N',
 			update_date = getdate()
 		from dbo.ba_project_group_volunteer tgt
-		where not exists 
+		where not exists
 			( select 1 from stg.stg_ba_volunteer_group vg
 			  where tgt.project_id = vg.project_id
 				and tgt.group_id = vg.group_id
@@ -301,8 +301,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -312,7 +312,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -328,43 +328,43 @@ alter procedure dbo.ETL_BA_Project_Volunteer_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'BA_Project_Volunteer', 
+
+	declare
+		@Table nvarchar(150) = 'BA_Project_Volunteer',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.ba_project_volunteer( 
+		insert into dbo.ba_project_volunteer(
 			 project_id
 			,volunteer_id
 			,person_guid
 			,invited_flag
 			,accepted_flag
-			,attended_flag )		
-		select 
+			,attended_flag )
+		select
 			 project_id
 			,volunteer_id
 			,person_guid
 			,invited_flag
 			,accepted_flag
 			,attended_flag
-		from 
-			( select 
+		from
+			( select
 				 project_id
-				,volunteer_id 
+				,volunteer_id
 				,person_guid
 				,case when max( invited ) = 1 then 'Y' else 'N' end as invited_flag
 				,case when max( accepted ) = 1 then 'Y' else 'N' end as accepted_flag
-				,case when max( attended ) = 1 then 'Y' else 'N' end as attended_flag			
+				,case when max( attended ) = 1 then 'Y' else 'N' end as attended_flag
 			  from stg.stg_ba_project_volunteer
 			  group by project_id, volunteer_id, person_guid ) pv
-		where not exists 
-			( select 1 from dbo.ba_project_volunteer pv2 
+		where not exists
+			( select 1 from dbo.ba_project_volunteer pv2
 			  where pv.project_id = pv2.project_id
 				and pv.volunteer_id = pv2.volunteer_id )
 
@@ -372,20 +372,20 @@ begin
 
 		-- UPDATE
 		update dbo.ba_project_volunteer
-		set 
+		set
 			invited_flag = src.invited_flag,
 			accepted_flag = src.accepted_flag,
 			attended_flag = src.attended_flag,
 			update_date = getdate()
 		from dbo.ba_project_volunteer tgt
-		inner join 
-			( select 
+		inner join
+			( select
 				 project_id
-				,volunteer_id 
+				,volunteer_id
 				,person_guid
 				,case when max( invited ) = 1 then 'Y' else 'N' end as invited_flag
 				,case when max( accepted ) = 1 then 'Y' else 'N' end as accepted_flag
-				,case when max( attended ) = 1 then 'Y' else 'N' end as attended_flag			
+				,case when max( attended ) = 1 then 'Y' else 'N' end as attended_flag
 			  from stg.stg_ba_project_volunteer
 			  group by project_id, volunteer_id, person_guid ) src
 			on tgt.project_id = src.project_id
@@ -406,7 +406,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -416,7 +416,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -432,44 +432,44 @@ alter procedure dbo.ETL_BA_Project_Volunteer_Attendance_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'BA_Project_Volunteer_Attendance', 
+
+	declare
+		@Table nvarchar(150) = 'BA_Project_Volunteer_Attendance',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.ba_project_volunteer_attendance( 
+		insert into dbo.ba_project_volunteer_attendance(
 			 project_id
 			,volunteer_id
 			,person_guid
 			,check_in_date
 			,event_id
 			,event_name
-			,status )		
-		select 
+			,status )
+		select
 			 project_id
 			,volunteer_id
 			,person_guid
 			,check_in_date
 			,event_id
 			,event_name
-			,status 
-		from 
-			( select 
+			,status
+		from
+			( select
 				 project_id
-				,volunteer_id 
+				,volunteer_id
 				,person_guid
 				,checkin_date as check_in_date
 				,event_id
 				,event_name
 				,status
 			  from stg.stg_ba_volunteer_attendance
-			  group by 
+			  group by
 				 project_id
 				,volunteer_id
 				,person_guid
@@ -477,8 +477,8 @@ begin
 				,event_id
 				,event_name
 				,status ) pva
-		where not exists 
-			( select 1 from dbo.ba_project_volunteer_attendance pva2 
+		where not exists
+			( select 1 from dbo.ba_project_volunteer_attendance pva2
 			  where pva.project_id = pva2.project_id
 				and pva.volunteer_id = pva2.volunteer_id
 				and pva.event_id = pva2.event_id
@@ -488,22 +488,22 @@ begin
 
 		-- UPDATE
 		update dbo.ba_project_volunteer_attendance
-		set 
+		set
 			event_name = src.event_name,
 			status = src.status,
 			update_date = getdate()
 		from dbo.ba_project_volunteer_attendance tgt
-		inner join 
-			( select 
+		inner join
+			( select
 				 project_id
-				,volunteer_id 
+				,volunteer_id
 				,person_guid
 				,checkin_date as check_in_date
 				,event_id
 				,event_name
 				,status
 			  from stg.stg_ba_volunteer_attendance
-			  group by 
+			  group by
 				 project_id
 				,volunteer_id
 				,person_guid
@@ -530,7 +530,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -540,7 +540,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -556,18 +556,18 @@ alter procedure dbo.ETL_Volunteer_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.volunteer( 
+		insert into dbo.volunteer(
 			 full_name
 			,first_name
 			,last_name
@@ -577,7 +577,7 @@ begin
 			,address
 			,address2
 			,city
-			,postal_code_key 
+			,postal_code_key
 			,state_key
 			,country_key
 			,home_phone
@@ -587,7 +587,7 @@ begin
 			,birth_date
 			,baptism_date
 			,gender_code
-			,marital_status_key 
+			,marital_status_key
 			,cong_servant_code
 			,pioneer_flag
 			,cong_key
@@ -602,7 +602,7 @@ begin
 			,tracking_status_key
 			,whatsapp_flag
 			,sms_flag )
-		select 
+		select
 			 last_name + ', ' + first_name + ' ' + coalesce( middle_name, '' ) as full_name
 			,first_name
 			,last_name
@@ -625,7 +625,7 @@ begin
 			,coalesce( ms.marital_status_key, 6 ) as marital_status_key
 			,cong_servant_code
 			,case when pioneer_status = 1 then 'Y' else 'N' end as pioneer_flag
-			,coalesce( cong.cong_key, 16957 ) as cong_key 
+			,coalesce( cong.cong_key, 16957 ) as cong_key
 			,person_id as hub_person_id
 			,person_guid as hub_person_guid
 			,volunteer_number as hub_volunteer_num
@@ -644,7 +644,7 @@ begin
 			on p.country_code = c.country_code
 		left join dbo.state s
 			on p.state_code = s.state_code
-			and c.Country_Key = s.Country_Key			
+			and c.Country_Key = s.Country_Key
 		left join dbo.marital_status ms
 			on p.marital_status = ms.marital_status
 		left join dbo.cong cong
@@ -653,9 +653,9 @@ begin
 
 		set @Ins = @@rowcount
 
-		-- UPDATE		
+		-- UPDATE
 		update dbo.volunteer
-		set 
+		set
 			first_name = src.first_name,
 			last_name = src.last_name,
 			full_name = src.last_name + ', ' + src.first_name + ' ' + coalesce( src.middle_name, '' ),
@@ -680,7 +680,7 @@ begin
 			jw_username = replace( src.jwpub_email, '@jwpub.org', '' ),
 			mate_hub_person_id = src.mate_person_id,
 			mate_hub_person_guid = src.mate_person_guid,
-			whatsapp_flag = case when src.whatsapp = 0 then 'N' else 'Y' end, 
+			whatsapp_flag = case when src.whatsapp = 0 then 'N' else 'Y' end,
 			sms_flag = case when src.text_message = 0 then 'N' else 'Y' end,
 			update_date = getdate()
 		from dbo.volunteer tgt
@@ -704,16 +704,16 @@ begin
 			or coalesce( tgt.cong_servant_code, '' ) <> coalesce( src.cong_servant_code, '' )
 			or tgt.pioneer_flag <> case when coalesce( src.pioneer_status, 0 ) = 1 then 'Y' else 'N' end
 			or coalesce( tgt.hub_volunteer_num, 0 ) <> coalesce( src.volunteer_number, 0 )
-			or coalesce( tgt.hub_volunteer_id, 0 ) <> coalesce( src.volunteer_id, 0 )			
-			or coalesce( cast( tgt.hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.person_guid as nvarchar(64) ) , '' )					
+			or coalesce( tgt.hub_volunteer_id, 0 ) <> coalesce( src.volunteer_id, 0 )
+			or coalesce( cast( tgt.hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.person_guid as nvarchar(64) ) , '' )
 			or coalesce( tgt.jw_username, '' ) <> coalesce( replace( src.jwpub_email, '@jwpub.org', '' ), '' )
 			or coalesce( tgt.mate_hub_person_id, 0 ) <> coalesce( src.mate_person_id, 0 )
 			or coalesce( cast( tgt.mate_hub_person_guid as nvarchar(64) ), '' ) <> coalesce( cast( src.mate_person_guid as nvarchar(64) ), '' )
-			or tgt.whatsapp_flag <> case when coalesce( src.whatsapp, 0 ) = 0 then 'N' else 'Y' end 
-			or tgt.sms_flag <> case when coalesce( src.text_message, 0 ) = 0 then 'N' else 'Y' end	
+			or tgt.whatsapp_flag <> case when coalesce( src.whatsapp, 0 ) = 0 then 'N' else 'Y' end
+			or tgt.sms_flag <> case when coalesce( src.text_message, 0 ) = 0 then 'N' else 'Y' end
 
 		update dbo.volunteer
-		set 
+		set
 			postal_code_key = coalesce( pc.postal_code_key, 1 ),
 			state_key = coalesce( s.state_key, 1 ),
 			country_key = coalesce( c.country_key, 1 ),
@@ -734,18 +734,18 @@ begin
 		left join dbo.marital_status ms
 			on src.marital_status = ms.marital_status
 		left join dbo.cong cong
-			on src.cong_number = cong.cong_number		
-		where 
+			on src.cong_number = cong.cong_number
+		where
 			   coalesce( tgt.postal_code_key, 1 ) <> coalesce( pc.postal_code_key, 1 )
 			or coalesce( tgt.state_key, 1 ) <> coalesce( s.state_key, 1 )
 			or coalesce( tgt.country_key, 1 ) <> coalesce( c.country_key, 1 )
 			or coalesce( tgt.marital_status_key, 6 ) <> coalesce( ms.marital_status_key, 6 )
 			or coalesce( tgt.cong_key, 16957 ) <> coalesce( cong.cong_key, 16957 )
-			
+
 		set @Upd = @@rowcount
 
-		-- UPDATE - VOLUNTEER NUMBER SYNC		
-		update dbo.volunteer 
+		-- UPDATE - VOLUNTEER NUMBER SYNC
+		update dbo.volunteer
 		set hub_volunteer_num = null
 		where hub_volunteer_num is not null
 			and not exists ( select 1 from stg.stg_person where person_id = hub_person_id and volunteer_number = hub_volunteer_num )
@@ -754,7 +754,7 @@ begin
 
 		-- UPDATE - TURN HUB TRACKING ON
 		update dbo.volunteer
-		set 
+		set
 			hub_tracking_flag = 'Y',
 			update_date = getdate()
 		where hub_tracking_flag = 'N'
@@ -764,7 +764,7 @@ begin
 
 		-- UPDATE - TURN HUB TRACKING OFF
 		update dbo.volunteer
-		set 
+		set
 			hub_tracking_flag = 'N',
 			update_date = getdate()
 		where hub_tracking_flag = 'Y'
@@ -773,12 +773,12 @@ begin
 		set @Upd = @Upd + @@rowcount
 
 		-- UPDATE - BA INFO
-		select 
+		select
 			tgt.volunteer_key,
 			src.volunteer_id						as ba_volunteer_id,
 			src.volunteer_banumber					as ba_volunteer_num,
 			src.mate_volunteer_id					as mate_ba_volunteer_id,
-			src.mate_volunteer_banumber				as mate_ba_volunteer_num, 
+			src.mate_volunteer_banumber				as mate_ba_volunteer_num,
 			left( src.preferred_name, 150 )			as preferred_name,
 			left( src.preferred_phone_number, 20 )	as preferred_phone,
 			src.preferred_phone_type,
@@ -797,11 +797,11 @@ begin
 			or coalesce( tgt.ba_safety_orientation_date, '2999-12-31' ) <> coalesce( src.Safety_Orientation_Date, '2999-12-31' )
 
 		update dbo.volunteer
-		set 
+		set
 			ba_volunteer_id = src.ba_volunteer_id,
 			ba_volunteer_num = src.ba_volunteer_num,
 			mate_ba_volunteer_id = src.mate_ba_volunteer_id,
-			mate_ba_volunteer_num = src.mate_ba_volunteer_num, 
+			mate_ba_volunteer_num = src.mate_ba_volunteer_num,
 			preferred_name = src.preferred_name,
 			preferred_phone = src.preferred_phone,
 			preferred_phone_type = src.preferred_phone_type,
@@ -811,12 +811,12 @@ begin
 		from dbo.volunteer tgt
 		inner join #ba_tmp src
 			on tgt.volunteer_key = src.volunteer_key
-			
-		set @Upd = @Upd + @@rowcount	
-		
+
+		set @Upd = @Upd + @@rowcount
+
 		-- UPDATE - TURN ALL KEY ROLES OFF
 		update dbo.volunteer
-		set 
+		set
 			person_key_roles_flag = 'N',
 			update_date = getdate()
 		where person_key_roles_flag = 'Y'
@@ -825,7 +825,7 @@ begin
 
 		-- UPDATE - TURN KEY ROLES ON FOR HID
 		update dbo.volunteer
-		set 
+		set
 			person_key_roles_flag = 'Y',
 			update_date = getdate()
 		where person_key_roles_flag = 'N'
@@ -835,11 +835,11 @@ begin
 
 		-- UPDATE - TURN KEY ROLES ON FOR SERVICE
 		update dbo.volunteer
-		set 
+		set
 			person_key_roles_flag = 'Y',
 			update_date = getdate()
 		where person_key_roles_flag = 'N'
-			and volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role in (			
+			and volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role in (
 				'Kingdom Ministry School Instructor',
 				'Substitute Circuit Overseer',
 				'Bible School Graduate',
@@ -856,41 +856,50 @@ begin
 				'Witnessing group coordinator' ) )
 
 		set @Upd = @Upd + @@rowcount
-				
+
 		-- UPDATE - TURN KEY ROLES ON FOR LDC
 		update dbo.volunteer
-		set 
+		set
 			person_key_roles_flag = 'Y',
 			update_date = getdate()
 		where person_key_roles_flag = 'N'
-			and volunteer_key in 
-				( select volunteer_key from dbo.volunteer_role 
+			and volunteer_key in
+				( select volunteer_key from dbo.volunteer_role
 				  where active_flag = 'Y'
-					and role = 'LDC Entity Person' 
-					and ( role_data in ( 'LDC Department', 'Disaster Relief', 'Design Section', 'Maintenance Section', 'Planning Section', 'Project Management Section',
-										   'Quality Assurance Section', 'Support Section' ) 
-						or role_data like 'Design Zone%'
-						or role_data like 'CFR %'
-						or role_data like 'CCGO %'
-						or role_data like 'FR %'
-						or role_data like 'FR-P %'
-						or role_data like 'Construction Group %' ) )
+					and role = 'LDC Entity Person'
+					and role_data not like 'z%'
+					and role_data not like '*%'
+					and ( role_data in ( 'Arc Flash Group',	'Architectural Specialty Group', 'Branchwide Staffing', 'E-AVITS Specialty Group', 'Facility Support',
+							'Kam IV, Hawaii', 'Mechanical Specialty Group', 'Palm Coast, Florida (Bible Education Center)', 'Shop Drawings Group',
+							'Site/Structural Specialty Group', 'Willow St, Brooklyn, NY' )
+						  or role_data  like '%(AH)%'
+						  or role_data  like '% - Construction Group%'
+						  or role_data  like '%Design%'  -- ???
+						  or role_data  like '%Housing%'
+						  or role_data  like '%Maintenance Trainer%'
+						  or role_data  like 'Personnel%'
+						  or role_data  like '%Project Delivery %'
+						  or role_data  like '%(RTO)%'
+						  or role_data  like 'Safety Coordinator%'
+						  or role_data  like 'Training%'
+						)
+                )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- ROOMING
 		update dbo.volunteer
-		set 
+		set
 			Room_Site_Code 	= null,
 			Room_Bldg 		= null,
 			Room_Bldg_Code 	= null,
 			Room 			= null
-		where room is not null			
+		where room is not null
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		update dbo.volunteer
-		set 
+		set
 			Room_Site_Code 	= src.room_site_code,
 			Room_Bldg 		= src.room_building_name,
 			Room_Bldg_Code 	= src.room_building_code,
@@ -901,55 +910,55 @@ begin
 			on tgt.hub_person_id = src.person_id
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- DELETE DECEASED
 		delete from dbo.volunteer_role
-		where volunteer_key in 
+		where volunteer_key in
 			( select volunteer_key from dbo.volunteer
-	 		  where hub_person_id in 
+	 		  where hub_person_id in
 	 		  	( select person_id
 				  from stg.stg_person
 				  where deceased_date is not null ) )
 
 		set @Del = @Del + @@rowcount
-		
+
 		delete from dbo.volunteer
-		where hub_person_id in ( 
+		where hub_person_id in (
 			select person_id
 			from stg.stg_person
 			where deceased_date is not null )
 
 		set @Del = @Del + @@rowcount
-		
+
 		-- TENTATIVE END DATE
 		update dbo.volunteer
 		set tentative_end_date = null
 		where tentative_end_date is not null
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		update dbo.volunteer
-		set 
+		set
 			tentative_end_date = src.tentative_end_date,
 			update_date 	= getdate()
 		from dbo.volunteer tgt
 		inner join ( select personid, max( tentativeenddate ) as tentative_end_date
-					 from stg.stg_bethel_member_availability 
+					 from stg.stg_bethel_member_availability
 					 group by personid ) src
 			on tgt.hub_person_id = src.personid
 			and src.tentative_end_date is not null
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- CONG RELOCATION DATE
 		update dbo.volunteer
 		set cong_relocation_date = null
 		where cong_relocation_date is not null
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		update dbo.volunteer
-		set 
+		set
 			cong_relocation_date = src.min_dt,
 			update_date	= getdate()
 		from dbo.volunteer tgt
@@ -957,12 +966,12 @@ begin
 			on tgt.hub_person_id = src.person_id
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- FIX BAD BA VOLUNTEER NUMBERS
 		update dbo.volunteer set ba_volunteer_num = null where ba_volunteer_num = 0
-		
+
 		set @Upd = @Upd + @@rowcount
-				
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -973,7 +982,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -983,7 +992,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -993,24 +1002,24 @@ go
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_App_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_App_proc as set nocount on;' )
-go
+goß
 
 alter procedure dbo.ETL_Volunteer_App_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_App', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_App',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.volunteer_app( 
+		insert into dbo.volunteer_app(
 			 volunteer_key
 			,app_type_key
 			,app_status_key
@@ -1023,8 +1032,8 @@ begin
 			,review_stage_co_date
 			,applicant_id
 			,expired_flag
-			,active_flag )		
-		select 
+			,active_flag )
+		select
 			 v.volunteer_key
 			,apt.app_type_key
 			,aps.app_status_key
@@ -1051,7 +1060,7 @@ begin
 
 		-- UPDATE
 		update dbo.volunteer_app
-		set 
+		set
 			app_date = src.app_date,
 			expiration_date = src.app_expiry_date,
 			app_status_key = aps.app_status_key,
@@ -1065,7 +1074,7 @@ begin
 		inner join stg.stg_app src
 			on tgt.applicant_id = src.applicant_id
 		inner join dbo.app_status aps
-			on src.app_status = aps.app_status		
+			on src.app_status = aps.app_status
 		where tgt.app_date <> src.app_date
 			or tgt.expiration_date <> src.app_expiry_date
 			or tgt.app_status_key <> aps.app_status_key
@@ -1073,7 +1082,7 @@ begin
 			or coalesce( tgt.app_notes, '' ) <> coalesce( src.app_notes, '' )
 			or coalesce( tgt.review_status_submitted_date, '1900-01-01' ) <> coalesce( src.app_review_status_submitted_date, '1900-01-01' )
 			or coalesce( tgt.review_stage_elders_date, '1900-01-01' ) <> coalesce( src.app_review_stage_elders_date, '1900-01-01' )
-			or coalesce( tgt.review_stage_co_date, '1900-01-01' ) <> coalesce( src.app_review_stage_co_date, '1900-01-01' ) 
+			or coalesce( tgt.review_stage_co_date, '1900-01-01' ) <> coalesce( src.app_review_stage_co_date, '1900-01-01' )
 
 		set @Upd = @@rowcount
 
@@ -1082,93 +1091,93 @@ begin
 		set active_flag = 'Y'
 		where active_flag <> 'Y'
 			and expiration_date >= getdate()
-			
+
 		set @Upd = @Upd + @@rowcount
-		
+
 		update dbo.volunteer_app
 		set active_flag = 'N'
 		where active_flag = 'Y'
 			and expired_flag = 'Y'
-			
-		set @Upd = @Upd + @@rowcount			
-		
-		
+
+		set @Upd = @Upd + @@rowcount
+
+
 		update dbo.volunteer_app
-		set 
+		set
 			expired_flag = case when getdate() > expiration_date then 'Y' else 'N' end,
 			active_flag = case when getdate() > expiration_date then 'N' else 'Y' end,
 			update_date = getdate()
 		from dbo.volunteer_app tgt
-		where 
+		where
 			   ( expired_flag = 'N' and getdate() > expiration_date )
 			or ( active_flag = 'Y' and getdate() > expiration_date )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- UPDATE - FLAGS WHERE THE EXPIRE DATE CHANGED AND WE DIDNT RECEIVE NOTIFICATION
 		update dbo.volunteer_app
-		set 
+		set
 			expired_flag = 'Y',
 			active_flag = 'N',
 			update_date = getdate()
 		where expired_flag = 'N'
 			and active_flag = 'Y'
-			and not exists ( select 1 from stg.stg_app a where volunteer_app.applicant_Id = a.applicant_id )		
+			and not exists ( select 1 from stg.stg_app a where volunteer_app.applicant_Id = a.applicant_id )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- UPDATE - ATTRIBUTES
 		update dbo.volunteer_app
-		set 
-			attrib_approval_level_app_attrib_id = src.attrib_approval_level_app_attrib_id,			
+		set
+			attrib_approval_level_app_attrib_id = src.attrib_approval_level_app_attrib_id,
 			attrib_approval_level_attrib_id = src.attrib_approval_level_attrib_id,
 			attrib_approval_level_val = src.attrib_approval_level_val,
-			
+
 			attrib_pursued_by_app_attrib_id = src.attrib_pursued_by_app_attrib_id,
 			attrib_pursued_by_attrib_id = src.attrib_pursued_by_attrib_id,
-			attrib_pursued_by_val = src.attrib_pursued_by_val,			
-			
+			attrib_pursued_by_val = src.attrib_pursued_by_val,
+
 			attrib_contacted_app_attrib_id = src.attrib_contacted_app_attrib_id,
 			attrib_contacted_attrib_id = src.attrib_contacted_attrib_id,
-			attrib_contacted_val = src.attrib_contacted_val,			
-			
+			attrib_contacted_val = src.attrib_contacted_val,
+
 			attrib_ske_app_attrib_id = src.attrib_ske_app_attrib_id,
 			attrib_ske_attrib_id = src.attrib_ske_attrib_id,
-			attrib_ske_val = src.attrib_ske_val,			
-			
+			attrib_ske_val = src.attrib_ske_val,
+
 			attrib_other_app_attrib_id = src.attrib_other_app_attrib_id,
 			attrib_other_attrib_id = src.attrib_other_attrib_id,
 			attrib_other_val = src.attrib_other_val,
-			
+
 			update_date = getdate()
 		from dbo.volunteer_app tgt
-		inner join 
+		inner join
 			( select applicant_id
 				,max( case when attribute = 'Approval Level' then applicant_attribute_id else 0 end ) as attrib_approval_level_app_attrib_id
-				,max( case when attribute = 'Approval Level' then attribute_id else 0 end ) as attrib_approval_level_attrib_id				
+				,max( case when attribute = 'Approval Level' then attribute_id else 0 end ) as attrib_approval_level_attrib_id
 				,max( case when attribute = 'Approval Level' then attribute_value else '' end ) as attrib_approval_level_val
 
 				,max( case when attribute = 'Applicant Being Pursued By:' then applicant_attribute_id else 0 end ) as attrib_pursued_by_app_attrib_id
-				,max( case when attribute = 'Applicant Being Pursued By:' then attribute_id else 0 end ) as attrib_pursued_by_attrib_id				
+				,max( case when attribute = 'Applicant Being Pursued By:' then attribute_id else 0 end ) as attrib_pursued_by_attrib_id
 				,max( case when attribute = 'Applicant Being Pursued By:' then attribute_value else '' end ) as attrib_pursued_by_val
-				
+
 				,max( case when attribute = 'Contacted' then applicant_attribute_id else 0 end ) as attrib_contacted_app_attrib_id
 				,max( case when attribute = 'Contacted' then attribute_id else 0 end ) as attrib_contacted_attrib_id
-				,max( case when attribute = 'Contacted' then attribute_value else '' end ) as attrib_contacted_val				
-				
+				,max( case when attribute = 'Contacted' then attribute_value else '' end ) as attrib_contacted_val
+
 				,max( case when attribute like '%SKE%' then applicant_attribute_id else 0 end ) as attrib_ske_app_attrib_id
 				,max( case when attribute like '%SKE%' then attribute_id else 0 end ) as attrib_ske_attrib_id
-				,max( case when attribute like '%SKE%' then attribute_value else '' end ) as attrib_ske_val				
-				
-				,max( case when attribute not in ( 'Approval Level', 'Applicant Being Pursued By:', 'Contacted' ) and attribute not like '%SKE%' 
+				,max( case when attribute like '%SKE%' then attribute_value else '' end ) as attrib_ske_val
+
+				,max( case when attribute not in ( 'Approval Level', 'Applicant Being Pursued By:', 'Contacted' ) and attribute not like '%SKE%'
 					then applicant_attribute_id else 0 end ) as attrib_other_app_attrib_id
-				,max( case when attribute not in ( 'Approval Level', 'Applicant Being Pursued By:', 'Contacted' ) and attribute not like '%SKE%' 
+				,max( case when attribute not in ( 'Approval Level', 'Applicant Being Pursued By:', 'Contacted' ) and attribute not like '%SKE%'
 					then attribute_id else 0 end ) as attrib_other_attrib_id
-				,max( case when attribute not in ( 'Approval Level', 'Applicant Being Pursued By:', 'Contacted' ) and attribute not like '%SKE%' 
-					then attribute_value else '' end ) as attrib_other_val				
+				,max( case when attribute not in ( 'Approval Level', 'Applicant Being Pursued By:', 'Contacted' ) and attribute not like '%SKE%'
+					then attribute_value else '' end ) as attrib_other_val
 			  from stg.stg_app_attribute
 			  group by applicant_id ) src
-			on tgt.applicant_id = src.applicant_id	
+			on tgt.applicant_id = src.applicant_id
 		where coalesce( tgt.attrib_approval_level_val, '' ) <> coalesce( src.attrib_approval_level_val, '' )
 			or coalesce( tgt.attrib_pursued_by_val, '' ) <> coalesce( src.attrib_pursued_by_val, '' )
 			or coalesce( tgt.attrib_contacted_val, '' ) <> coalesce( src.attrib_contacted_val, '' )
@@ -1184,7 +1193,7 @@ begin
 
 		-- UPDATE - VOLUNTEER A-8
 		update dbo.volunteer
-		set 
+		set
 			a8_approved_flag = case when src.app_status_key in ( 1, 4, 9 ) then 'Y' else 'N' end,
 			a8_app_status_key = src.app_status_key,
 			a8_app_date = src.app_date,
@@ -1195,17 +1204,17 @@ begin
 			and src.app_type_key = 2
 		inner join ( select volunteer_key, max( app_date ) as max_dt from dbo.volunteer_app where app_type_key = 2 group by volunteer_key ) curr
 			on src.volunteer_key = curr.volunteer_key
-			and src.app_date = curr.max_dt			
+			and src.app_date = curr.max_dt
 		where src.expired_flag = 'N'
 			and ( coalesce( tgt.a8_app_status_key, 0 ) <> src.app_status_key
 				or coalesce( tgt.a8_app_date, '1900-01-01' ) <> src.app_date
 				or coalesce( tgt.a8_approved_flag, '' ) <> case when src.app_status_key in ( 1, 4, 9 ) then 'Y' else 'N' end )
 
-		set @Upd = @Upd + @@rowcount		
+		set @Upd = @Upd + @@rowcount
 
 		-- UPDATE - VOLUNTEER A-19
 		update dbo.volunteer
-		set 
+		set
 			a19_approved_flag = case when src.app_status_key in ( 1, 4, 9 ) then 'Y' else 'N' end,
 			a19_app_status_key = src.app_status_key,
 			a19_app_date = src.app_date,
@@ -1216,17 +1225,17 @@ begin
 			and src.app_type_key = 1
 		inner join ( select volunteer_key, max( app_date ) as max_app_date from dbo.volunteer_app where app_type_key = 1 group by volunteer_key ) curr
 			on src.volunteer_key = curr.volunteer_key
-			and src.app_date = curr.max_app_date			
+			and src.app_date = curr.max_app_date
 		where src.expired_flag = 'N'
 			and ( coalesce( tgt.a19_app_status_key, 0 ) <> src.app_status_key
 				or coalesce( tgt.a19_app_date, '1900-01-01' ) <> src.app_date
 				or coalesce( tgt.a19_approved_flag, '' ) <> case when src.app_status_key in ( 1, 4, 9 ) then 'Y' else 'N' end )
 
-		set @Upd = @Upd + @@rowcount	
-		
+		set @Upd = @Upd + @@rowcount
+
 		-- EXPIRED - VOLUNTEER A-8
 		update dbo.volunteer
-		set 
+		set
 			a8_app_status_key = 16,
 			update_date = getdate()
 		from dbo.volunteer tgt
@@ -1235,16 +1244,16 @@ begin
 			and src.app_type_key = 2
 		inner join ( select volunteer_key, max( app_date ) as max_dt from dbo.volunteer_app where app_type_key = 2 group by volunteer_key ) curr
 			on src.volunteer_key = curr.volunteer_key
-			and src.app_date = curr.max_dt			
+			and src.app_date = curr.max_dt
 		where src.expired_flag = 'Y'
 			and tgt.A8_App_Status_Key is not null
-			and tgt.A8_App_Status_Key <> 16 -- EXPIRED		
+			and tgt.A8_App_Status_Key <> 16 -- EXPIRED
 
-		set @Upd = @Upd + @@rowcount			
+		set @Upd = @Upd + @@rowcount
 
 		-- EXPIRED - VOLUNTEER A-19
 		update dbo.volunteer
-		set 
+		set
 			a19_app_status_key = 16,
 			update_date = getdate()
 		from dbo.volunteer tgt
@@ -1253,16 +1262,16 @@ begin
 			and src.app_type_key = 1
 		inner join ( select volunteer_key, max( app_date ) as max_dt from dbo.volunteer_app where app_type_key = 1 group by volunteer_key ) curr
 			on src.volunteer_key = curr.volunteer_key
-			and src.app_date = curr.max_dt			
+			and src.app_date = curr.max_dt
 		where src.expired_flag = 'Y'
 			and tgt.A19_App_Status_Key is not null
-			and tgt.A19_App_Status_Key <> 16 -- EXPIRED		
+			and tgt.A19_App_Status_Key <> 16 -- EXPIRED
 
-		set @Upd = @Upd + @@rowcount		
-		
+		set @Upd = @Upd + @@rowcount
+
 		-- PURSUED BY - ALL VALUES
 		update dbo.volunteer
-		set 
+		set
 			App_Pursued_By_Value = src.attrib_pursued_by_val,
 			update_date = getdate()
 		from dbo.volunteer tgt
@@ -1271,11 +1280,11 @@ begin
 			on tgt.volunteer_key = src.volunteer_key
 		where 1=1
 
-		set @Upd = @Upd + @@rowcount			
+		set @Upd = @Upd + @@rowcount
 
 		-- PURSUED BY - RVD VALUES
 		update dbo.volunteer
-		set 
+		set
 			App_Pursued_By_Value = src.attrib_pursued_by_val,
 			update_date = getdate()
 		from dbo.volunteer tgt
@@ -1284,8 +1293,8 @@ begin
 			on tgt.volunteer_key = src.volunteer_key
 		where 1=1
 
-		set @Upd = @Upd + @@rowcount			
-		
+		set @Upd = @Upd + @@rowcount
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -1295,8 +1304,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -1306,7 +1315,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -1322,30 +1331,30 @@ alter procedure dbo.ETL_Volunteer_App_Collection_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_App_Collection_Flag', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_App_Collection_Flag',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
 	begin try
 		-- UPDATE RESET APP COLLECTION FLAG
 		update dbo.volunteer
-		set 
+		set
 			App_Request_Collection_Flag = 'N',
 			update_date = getdate()
-		where App_Request_Collection_Flag = 'Y'			
+		where App_Request_Collection_Flag = 'Y'
 
-		set @Upd = @@rowcount	
-	
+		set @Upd = @@rowcount
+
 		-- UPDATE
 		update dbo.volunteer
-		set 
+		set
 			App_Request_Collection_Flag = 'Y',
-			update_date = getdate()		
+			update_date = getdate()
 		where volunteer_key in (
 			select v.volunteer_key
 			from dbo.volunteer_app_v a
@@ -1356,7 +1365,7 @@ begin
 				on v.Current_Enrollment_Key = e.Enrollment_Key
 				and e.SFTS_Flag = 'N'			-- NOT SFTS
 			where a.app_status_code = 'RES' 	-- RESERVED = ON AN APP REQ COLLECTION
-				   and a.active_flag = 'Y' )      
+				   and a.active_flag = 'Y' )
 
 		set @Upd = @Upd + @@rowcount
 
@@ -1369,8 +1378,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -1380,13 +1389,13 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 /***********************************************************
-**				  VOLUNTEER APPROVAL LEVEL 
+**				  VOLUNTEER APPROVAL LEVEL
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Approval_Level_Hist_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Approval_Level_Hist_proc as set nocount on;' )
@@ -1396,22 +1405,22 @@ alter procedure dbo.ETL_Volunteer_Approval_Level_Hist_proc
 as
 begin
 	set nocount on
-	
-	declare 
+
+	declare
 		@Table nvarchar(150) = 'Volunteer_Approval_Level_Hist',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.volunteer_approval_level_hist( 
+		insert into dbo.volunteer_approval_level_hist(
 			 volunteer_key
 			,approval_level
-			,start_date )		
-		select 
+			,start_date )
+		select
 			 volunteer_key
 			,approval_level
 			,getdate() as start_date
@@ -1426,21 +1435,21 @@ begin
 
 		-- UPDATE
 		update dbo.volunteer_approval_level_hist
-		set 
+		set
 			active_flag = 'N',
 			end_date = getdate() - 1,
 			update_date = getdate()
 		from dbo.volunteer_approval_level_hist tgt
-		inner join 
-			( select volunteer_key, max( start_date ) as start_date 
-			  from dbo.volunteer_approval_level_hist 
-			  where active_flag = 'Y' 
+		inner join
+			( select volunteer_key, max( start_date ) as start_date
+			  from dbo.volunteer_approval_level_hist
+			  where active_flag = 'Y'
 			  group by volunteer_key ) src
 			on tgt.volunteer_key = src.volunteer_key
 		where tgt.start_date <> src.start_date
 
 		set @Upd = @@rowcount
-		
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -1451,7 +1460,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -1461,7 +1470,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -1477,61 +1486,61 @@ alter procedure dbo.ETL_Volunteer_Availability_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Availability', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Availability',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.volunteer_availability( 
+		insert into dbo.volunteer_availability(
 			 volunteer_key
 			,avail_as_consultant_flag
-			,avail_as_commuter_flag 
-			,avail_as_commuter_as_needed_flag 
-			,avail_as_commuter_closest_site 	
-			,avail_as_commuter_days_per_wk 		
-			,avail_as_commuter_weekly_flag 		
-			,avail_as_commuter_notes 			
-			,avail_as_commuter_mon_am_flag		
-			,avail_as_commuter_mon_pm_flag		
-			,avail_as_commuter_tue_am_flag		
-			,avail_as_commuter_tue_pm_flag		
-			,avail_as_commuter_wed_am_flag		
-			,avail_as_commuter_wed_pm_flag		
-			,avail_as_commuter_thu_am_flag		
-			,avail_as_commuter_thu_pm_flag		
-			,avail_as_commuter_fri_am_flag		
-			,avail_as_commuter_fri_pm_flag		
-			,avail_as_commuter_sat_am_flag		
-			,avail_as_commuter_sat_pm_flag		
-			,avail_as_commuter_sun_am_flag		
-			,avail_as_commuter_sun_pm_flag		
-			,avail_as_remote_vol_flag 			
-			,avail_as_remote_vol_days_per_wk 
-			,avail_as_remote_vol_notes 			
-			,avail_as_vol_flag 					
-			,avail_as_vol_anytime_flag 			
-			,avail_as_vol_start_date 			
-			,avail_as_vol_end_date 				
-			,avail_as_vol_date_notes 			
+			,avail_as_commuter_flag
+			,avail_as_commuter_as_needed_flag
+			,avail_as_commuter_closest_site
+			,avail_as_commuter_days_per_wk
+			,avail_as_commuter_weekly_flag
+			,avail_as_commuter_notes
+			,avail_as_commuter_mon_am_flag
+			,avail_as_commuter_mon_pm_flag
+			,avail_as_commuter_tue_am_flag
+			,avail_as_commuter_tue_pm_flag
+			,avail_as_commuter_wed_am_flag
+			,avail_as_commuter_wed_pm_flag
+			,avail_as_commuter_thu_am_flag
+			,avail_as_commuter_thu_pm_flag
+			,avail_as_commuter_fri_am_flag
+			,avail_as_commuter_fri_pm_flag
+			,avail_as_commuter_sat_am_flag
+			,avail_as_commuter_sat_pm_flag
+			,avail_as_commuter_sun_am_flag
+			,avail_as_commuter_sun_pm_flag
+			,avail_as_remote_vol_flag
+			,avail_as_remote_vol_days_per_wk
+			,avail_as_remote_vol_notes
+			,avail_as_vol_flag
+			,avail_as_vol_anytime_flag
+			,avail_as_vol_start_date
+			,avail_as_vol_end_date
+			,avail_as_vol_date_notes
 			,avail_as_vol_date_short_term_days
-			,avail_as_vol_long_term_flag 						
+			,avail_as_vol_long_term_flag
 			,avail_as_vol_notes
-			,last_update_date )		
-		select 
+			,last_update_date )
+		select
 			 v.volunteer_key
 			,case when a.avail_as_consultant = 1 then 'Y' else 'N' end as avail_as_consultant_flag
 			,case when a.avail_as_commuter = 1 then 'Y' else 'N' end as avail_as_commuter_flag
 			,case when a.avail_as_commuter_as_needed = 1 then 'Y' else 'N' end as avail_as_commuter_as_needed_flag
-			,a.avail_as_commuter_closest_site 				
-			,a.avail_as_commuter_days_per_wk 				
+			,a.avail_as_commuter_closest_site
+			,a.avail_as_commuter_days_per_wk
 			,case when a.avail_as_commuter_weekly = 1 then 'Y' else 'N' end as avail_as_commuter_weekly_flag
-			,a.avail_as_commuter_notes 					
+			,a.avail_as_commuter_notes
 			,case when a.avail_as_commuter_mon_am = 1 then 'Y' else 'N' end as avail_as_commuter_mon_am_flag
 			,case when a.avail_as_commuter_mon_pm = 1 then 'Y' else 'N' end as avail_as_commuter_mon_pm_flag
 			,case when a.avail_as_commuter_tue_am = 1 then 'Y' else 'N' end as avail_as_commuter_tue_am_flag
@@ -1547,23 +1556,23 @@ begin
 			,case when a.avail_as_commuter_sun_am = 1 then 'Y' else 'N' end as avail_as_commuter_sun_am_flag
 			,case when a.avail_as_commuter_sun_pm = 1 then 'Y' else 'N' end as avail_as_commuter_sun_pm_flag
 			,case when a.avail_as_remote_vol = 1 then 'Y' else 'N' end as avail_as_remote_vol_flag
-			,a.avail_as_remote_vol_days_per_wk 			
-			,a.avail_as_remote_vol_notes 					
+			,a.avail_as_remote_vol_days_per_wk
+			,a.avail_as_remote_vol_notes
 			,case when a.avail_as_vol = 1 then 'Y' else 'N' end as avail_as_vol_flag
 			,case when a.avail_as_vol_anytime = 1 then 'Y' else 'N' end as avail_as_vol_anytime_flag
 			,coalesce( a.avail_as_vol_start_date, cast( getdate() as date) ) as avail_as_vol_start_date
-			,a.avail_as_vol_end_date 						
-			,a.avail_as_vol_date_notes 					
-			,a.avail_as_vol_date_short_term_days 			
+			,a.avail_as_vol_end_date
+			,a.avail_as_vol_date_notes
+			,a.avail_as_vol_date_short_term_days
 			,case when a.avail_as_vol_long_term = 1 then 'Y' else 'N' end as avail_as_vol_long_term_flag
 			,a.avail_as_vol_notes
 			,a.last_update_date
 		from stg.stg_person_availability a
-		inner join 
-			( select person_id, max( coalesce( avail_as_vol_start_date, cast( getdate() as date ) ) ) as max_dt 
+		inner join
+			( select person_id, max( coalesce( avail_as_vol_start_date, cast( getdate() as date ) ) ) as max_dt
 			  from stg.stg_person_availability group by person_id ) a2
 			on a.person_id = a2.person_id
-			and coalesce( a.avail_as_vol_start_date, cast( getdate() as date ) ) = a2.max_dt	
+			and coalesce( a.avail_as_vol_start_date, cast( getdate() as date ) ) = a2.max_dt
 		inner join dbo.volunteer v
 			on a.person_id = v.hub_person_id
 		where v.volunteer_key not in ( select volunteer_key from dbo.volunteer_availability )
@@ -1572,38 +1581,38 @@ begin
 
 		-- UPDATE
 		update dbo.volunteer_availability
-		set 
+		set
 			avail_as_consultant_flag = case when src.avail_as_consultant = 1 then 'Y' else 'N' end,
-			avail_as_commuter_flag = case when src.avail_as_commuter = 1 then 'Y' else 'N' end,		
-			avail_as_commuter_as_needed_flag = case when src.avail_as_commuter_as_needed = 1 then 'Y' else 'N' end, 				
+			avail_as_commuter_flag = case when src.avail_as_commuter = 1 then 'Y' else 'N' end,
+			avail_as_commuter_as_needed_flag = case when src.avail_as_commuter_as_needed = 1 then 'Y' else 'N' end,
 			avail_as_commuter_closest_site = src.avail_as_commuter_closest_site,
-			avail_as_commuter_days_per_wk = src.avail_as_commuter_days_per_wk, 				
-			avail_as_commuter_weekly_flag = case when src.avail_as_commuter_weekly = 1 then 'Y' else 'N' end, 					
-			avail_as_commuter_notes = src.avail_as_commuter_notes, 					
-			avail_as_commuter_mon_am_flag = case when src.avail_as_commuter_mon_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_mon_pm_flag = case when src.avail_as_commuter_mon_pm = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_tue_am_flag = case when src.avail_as_commuter_tue_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_tue_pm_flag = case when src.avail_as_commuter_tue_pm = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_wed_am_flag = case when src.avail_as_commuter_wed_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_wed_pm_flag = case when src.avail_as_commuter_wed_pm = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_thu_am_flag = case when src.avail_as_commuter_thu_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_thu_pm_flag = case when src.avail_as_commuter_thu_pm = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_fri_am_flag = case when src.avail_as_commuter_fri_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_fri_pm_flag = case when src.avail_as_commuter_fri_pm = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_sat_am_flag = case when src.avail_as_commuter_sat_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_sat_pm_flag = case when src.avail_as_commuter_sat_pm = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_sun_am_flag = case when src.avail_as_commuter_sun_am = 1 then 'Y' else 'N' end,					
-			avail_as_commuter_sun_pm_flag = case when src.avail_as_commuter_sun_pm = 1 then 'Y' else 'N' end,					
-			avail_as_remote_vol_flag = case when src.avail_as_remote_vol = 1 then 'Y' else 'N' end, 						
-			avail_as_remote_vol_days_per_wk = src.avail_as_remote_vol_days_per_wk, 			
-			avail_as_remote_vol_notes = src.avail_as_remote_vol_notes,					
-			avail_as_vol_flag = case when src.avail_as_vol = 1 then 'Y' else 'N' end,						
+			avail_as_commuter_days_per_wk = src.avail_as_commuter_days_per_wk,
+			avail_as_commuter_weekly_flag = case when src.avail_as_commuter_weekly = 1 then 'Y' else 'N' end,
+			avail_as_commuter_notes = src.avail_as_commuter_notes,
+			avail_as_commuter_mon_am_flag = case when src.avail_as_commuter_mon_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_mon_pm_flag = case when src.avail_as_commuter_mon_pm = 1 then 'Y' else 'N' end,
+			avail_as_commuter_tue_am_flag = case when src.avail_as_commuter_tue_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_tue_pm_flag = case when src.avail_as_commuter_tue_pm = 1 then 'Y' else 'N' end,
+			avail_as_commuter_wed_am_flag = case when src.avail_as_commuter_wed_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_wed_pm_flag = case when src.avail_as_commuter_wed_pm = 1 then 'Y' else 'N' end,
+			avail_as_commuter_thu_am_flag = case when src.avail_as_commuter_thu_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_thu_pm_flag = case when src.avail_as_commuter_thu_pm = 1 then 'Y' else 'N' end,
+			avail_as_commuter_fri_am_flag = case when src.avail_as_commuter_fri_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_fri_pm_flag = case when src.avail_as_commuter_fri_pm = 1 then 'Y' else 'N' end,
+			avail_as_commuter_sat_am_flag = case when src.avail_as_commuter_sat_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_sat_pm_flag = case when src.avail_as_commuter_sat_pm = 1 then 'Y' else 'N' end,
+			avail_as_commuter_sun_am_flag = case when src.avail_as_commuter_sun_am = 1 then 'Y' else 'N' end,
+			avail_as_commuter_sun_pm_flag = case when src.avail_as_commuter_sun_pm = 1 then 'Y' else 'N' end,
+			avail_as_remote_vol_flag = case when src.avail_as_remote_vol = 1 then 'Y' else 'N' end,
+			avail_as_remote_vol_days_per_wk = src.avail_as_remote_vol_days_per_wk,
+			avail_as_remote_vol_notes = src.avail_as_remote_vol_notes,
+			avail_as_vol_flag = case when src.avail_as_vol = 1 then 'Y' else 'N' end,
 			avail_as_vol_anytime_flag = case when src.avail_as_vol_anytime = 1 then 'Y' else 'N' end,
-			avail_as_vol_start_date = coalesce( src.avail_as_vol_start_date, cast( getdate() as date) ), 					
-			avail_as_vol_end_date = src.avail_as_vol_end_date, 						
-			avail_as_vol_date_notes = src.avail_as_vol_date_notes, 					
-			avail_as_vol_date_short_term_days = src.avail_as_vol_date_short_term_days, 			
-			avail_as_vol_long_term_flag = case when src.avail_as_vol_long_term = 1 then 'Y' else 'N' end, 						
+			avail_as_vol_start_date = coalesce( src.avail_as_vol_start_date, cast( getdate() as date) ),
+			avail_as_vol_end_date = src.avail_as_vol_end_date,
+			avail_as_vol_date_notes = src.avail_as_vol_date_notes,
+			avail_as_vol_date_short_term_days = src.avail_as_vol_date_short_term_days,
+			avail_as_vol_long_term_flag = case when src.avail_as_vol_long_term = 1 then 'Y' else 'N' end,
 			avail_as_vol_notes = src.avail_as_vol_notes,
 			update_date = getdate(),
 			last_update_date = src.last_update_date
@@ -1612,38 +1621,38 @@ begin
 			on tgt.volunteer_key = v.volunteer_key
 		inner join stg.stg_person_availability src
 			on v.hub_person_id = src.person_id
-		where coalesce( tgt.avail_as_consultant_flag, 'N' ) <> case when src.avail_as_consultant = 1 then 'Y' else 'N' end			
-			or coalesce( tgt.avail_as_commuter_flag, 'N' ) <> case when src.avail_as_commuter = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_as_needed_flag, 'N' ) <> case when src.avail_as_commuter_as_needed = 1 then 'Y' else 'N' end 				
+		where coalesce( tgt.avail_as_consultant_flag, 'N' ) <> case when src.avail_as_consultant = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_flag, 'N' ) <> case when src.avail_as_commuter = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_as_needed_flag, 'N' ) <> case when src.avail_as_commuter_as_needed = 1 then 'Y' else 'N' end
 			or coalesce( tgt.avail_as_commuter_closest_site, '' ) <> coalesce( src.avail_as_commuter_closest_site, '' )
 			or coalesce( tgt.avail_as_commuter_days_per_wk, 0 ) <> coalesce( src.avail_as_commuter_days_per_wk, 0 )
-			or coalesce( tgt.avail_as_commuter_weekly_flag, 'N' ) <> case when src.avail_as_commuter_weekly = 1 then 'Y' else 'N' end					
+			or coalesce( tgt.avail_as_commuter_weekly_flag, 'N' ) <> case when src.avail_as_commuter_weekly = 1 then 'Y' else 'N' end
 			or coalesce( tgt.avail_as_commuter_notes, '' ) <> coalesce( src.avail_as_commuter_notes, '' )
-			or coalesce( tgt.avail_as_commuter_mon_am_flag, 'N' ) <> case when src.avail_as_commuter_mon_am = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_mon_pm_flag, 'N' ) <> case when src.avail_as_commuter_mon_pm = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_tue_am_flag, 'N' ) <> case when src.avail_as_commuter_tue_am = 1 then 'Y' else 'N' end				
-			or coalesce( tgt.avail_as_commuter_tue_pm_flag, 'N' ) <> case when src.avail_as_commuter_tue_pm = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_wed_am_flag, 'N' ) <> case when src.avail_as_commuter_wed_am = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_wed_pm_flag, 'N' ) <> case when src.avail_as_commuter_wed_pm = 1 then 'Y' else 'N' end				
-			or coalesce( tgt.avail_as_commuter_thu_am_flag, 'N' ) <> case when src.avail_as_commuter_thu_am = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_thu_pm_flag, 'N' ) <> case when src.avail_as_commuter_thu_pm = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_fri_am_flag, 'N' ) <> case when src.avail_as_commuter_fri_am = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_fri_pm_flag, 'N' ) <> case when src.avail_as_commuter_fri_pm = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_sat_am_flag, 'N' ) <> case when src.avail_as_commuter_sat_am = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_sat_pm_flag, 'N' ) <> case when src.avail_as_commuter_sat_pm = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_sun_am_flag, 'N' ) <> case when src.avail_as_commuter_sun_am = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_commuter_sun_pm_flag, 'N' ) <> case when src.avail_as_commuter_sun_pm = 1 then 'Y' else 'N' end					
-			or coalesce( tgt.avail_as_remote_vol_flag, 'N' ) <> case when src.avail_as_remote_vol = 1 then 'Y' else 'N' end					
+			or coalesce( tgt.avail_as_commuter_mon_am_flag, 'N' ) <> case when src.avail_as_commuter_mon_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_mon_pm_flag, 'N' ) <> case when src.avail_as_commuter_mon_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_tue_am_flag, 'N' ) <> case when src.avail_as_commuter_tue_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_tue_pm_flag, 'N' ) <> case when src.avail_as_commuter_tue_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_wed_am_flag, 'N' ) <> case when src.avail_as_commuter_wed_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_wed_pm_flag, 'N' ) <> case when src.avail_as_commuter_wed_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_thu_am_flag, 'N' ) <> case when src.avail_as_commuter_thu_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_thu_pm_flag, 'N' ) <> case when src.avail_as_commuter_thu_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_fri_am_flag, 'N' ) <> case when src.avail_as_commuter_fri_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_fri_pm_flag, 'N' ) <> case when src.avail_as_commuter_fri_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_sat_am_flag, 'N' ) <> case when src.avail_as_commuter_sat_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_sat_pm_flag, 'N' ) <> case when src.avail_as_commuter_sat_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_sun_am_flag, 'N' ) <> case when src.avail_as_commuter_sun_am = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_commuter_sun_pm_flag, 'N' ) <> case when src.avail_as_commuter_sun_pm = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_remote_vol_flag, 'N' ) <> case when src.avail_as_remote_vol = 1 then 'Y' else 'N' end
 			or coalesce( tgt.avail_as_remote_vol_days_per_wk, 0 ) <> coalesce( src.avail_as_remote_vol_days_per_wk, 0 )
 			or coalesce( tgt.avail_as_remote_vol_notes, '' ) <> coalesce( src.avail_as_remote_vol_notes, '' )
-			or coalesce( tgt.avail_as_vol_flag, 'N' ) <> case when src.avail_as_vol = 1 then 'Y' else 'N' end 								
-			or coalesce( tgt.avail_as_vol_anytime_flag, 'N' ) <> case when src.avail_as_vol_anytime = 1 then 'Y' else 'N' end 						
+			or coalesce( tgt.avail_as_vol_flag, 'N' ) <> case when src.avail_as_vol = 1 then 'Y' else 'N' end
+			or coalesce( tgt.avail_as_vol_anytime_flag, 'N' ) <> case when src.avail_as_vol_anytime = 1 then 'Y' else 'N' end
 			or ( src.avail_as_vol_start_date is not null
-				and coalesce( tgt.avail_as_vol_start_date, '1900-01-01' ) <> coalesce( src.avail_as_vol_start_date, '1900-01-01' ) )		
+				and coalesce( tgt.avail_as_vol_start_date, '1900-01-01' ) <> coalesce( src.avail_as_vol_start_date, '1900-01-01' ) )
 			or coalesce( tgt.avail_as_vol_end_date, '1900-01-01' ) <> coalesce( src.avail_as_vol_end_date, '1900-01-01' )
-			or coalesce( tgt.avail_as_vol_date_notes, '' ) <> coalesce( src.avail_as_vol_date_notes, '' ) 					
+			or coalesce( tgt.avail_as_vol_date_notes, '' ) <> coalesce( src.avail_as_vol_date_notes, '' )
 			or coalesce( tgt.avail_as_vol_date_short_term_days, 0 ) <> coalesce( src.avail_as_vol_date_short_term_days, 0 )
-			or coalesce( tgt.avail_as_vol_long_term_flag, 'N' ) <> case when src.avail_as_vol_long_term = 1 then 'Y' else 'N' end 						
+			or coalesce( tgt.avail_as_vol_long_term_flag, 'N' ) <> case when src.avail_as_vol_long_term = 1 then 'Y' else 'N' end
 			or coalesce( tgt.avail_as_vol_notes, '' ) <> coalesce( src.avail_as_vol_notes, '' )
 			or coalesce( tgt.last_update_date, '1900-01-01' ) <> coalesce( src.last_update_date, '1900-01-01' )
 
@@ -1659,7 +1668,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -1669,13 +1678,13 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 /***********************************************************
-**					   VOLUNTEER DEPT 
+**					   VOLUNTEER DEPT
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Dept_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Dept_proc as set nocount on;' )
@@ -1685,16 +1694,16 @@ alter procedure dbo.ETL_Volunteer_Dept_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Dept', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Dept',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- DELETE
 		if object_id('stg.tmp_vol_dept', 'U') is not null
 			drop table stg.tmp_vol_dept
@@ -1713,7 +1722,7 @@ begin
 		rvd as (
 			select vd.person_id, count(*) as rvd_cnt, max( src.cnt ) as src_cnt, max( src.min_dt ) as src_dt
 			from dbo.Volunteer_Dept vd
-			inner join src 
+			inner join src
 				on vd.Person_ID = src.Person_ID
 				and vd.Start_Date >= src.min_dt
 			--where vd.person_id = 46057
@@ -1722,27 +1731,27 @@ begin
 		select *
 		into stg.tmp_vol_dept
 		from rvd
-		where rvd_cnt != src_cnt 
+		where rvd_cnt != src_cnt
 
 		--select * from stg.tmp_vol_dept
 
 		select vd.*
 		into stg.tmp_vol_dept_rvd
 		from dbo.Volunteer_Dept vd
-		inner join stg.tmp_vol_dept tmp 
-			on vd.person_id = tmp.person_id 
-			and vd.start_date >= tmp.src_dt 
+		inner join stg.tmp_vol_dept tmp
+			on vd.person_id = tmp.person_id
+			and vd.start_date >= tmp.src_dt
 
 		--select count(*) from stg.tmp_vol_dept_rvd
 
 		delete from dbo.volunteer_dept
 		where volunteer_dept_key in ( select volunteer_dept_key from stg.tmp_vol_dept_rvd )
-		
-		set @Del = @@rowcount		
+
+		set @Del = @@rowcount
 
 		-- UPDATE
 		update dbo.volunteer_dept
-		set 
+		set
 			site_code = src.site_code,
 			end_date = src.end_date,
 			update_date = getdate()
@@ -1755,15 +1764,15 @@ begin
 			and tgt.temp_flag = case when src.temporary_flag = 1 then 'Y' else 'N' end
 			and tgt.primary_flag = case when src.primary_flag = 1 then 'Y' else 'N' end
 			and coalesce( tgt.enrollment_code, 'x' ) = coalesce( src.effective_enrollment_code, 'x' )
-			and coalesce( tgt.dept_role, 'x' ) = coalesce( src.role, 'x' )			
+			and coalesce( tgt.dept_role, 'x' ) = coalesce( src.role, 'x' )
 			and tgt.start_date = src.start_date
 			and coalesce( tgt.notes, 'x' ) = coalesce( src.notes, 'x' )
 		where coalesce( tgt.end_date, '2999-12-31' ) <> coalesce( src.end_date, '2999-12-31' )
 
-		set @Upd = @@rowcount		
-	
+		set @Upd = @@rowcount
+
 		-- INSERT
-		insert into dbo.volunteer_dept( 
+		insert into dbo.volunteer_dept(
 			 volunteer_key
 			,person_id
 			,hub_dept_id
@@ -1777,7 +1786,7 @@ begin
 			,start_date
 			,end_date
 			,notes
-			,active_flag )		
+			,active_flag )
 		select distinct
 			 v.volunteer_key
 			,d.person_id
@@ -1794,13 +1803,13 @@ begin
 			,d.notes
 			,case when getdate() between d.start_date and coalesce( d.end_date, '2999-12-31' ) then 'Y' else 'N' end as active_flag
 		from stg.stg_person_dept_history d
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on d.person_id = v.hub_person_id
-		where not exists 
-			( select 1 from dbo.volunteer_dept vd 
+		where not exists
+			( select 1 from dbo.volunteer_dept vd
 			  where vd.person_id = d.person_id
 				and coalesce( vd.site_code, 'x' ) = coalesce( d.site_code, 'x' )
 				and coalesce( vd.parent_dept_name, 'x' ) = coalesce( d.parent_department_name, 'x' )
@@ -1817,27 +1826,27 @@ begin
 
 		-- UPDATE - FLAG INACTIVE
 		update dbo.volunteer_dept
-		set 
+		set
 			active_flag = 'N',
 			update_date = getdate()
 		where active_flag = 'Y'
 			and getdate() > coalesce( end_date, '2999-12-31' )
 
-		set @Upd = @Upd + @@rowcount	
-		
+		set @Upd = @Upd + @@rowcount
+
 		-- UPDATE - FLAG ACTIVE
 		update dbo.volunteer_dept
-		set 
+		set
 			active_flag = 'Y',
 			update_date = getdate()
 		where active_flag = 'N'
 			and ( end_date is null or end_date > getdate() )
 
-		set @Upd = @Upd + @@rowcount			
+		set @Upd = @Upd + @@rowcount
 
 		-- UPDATE - WORKDAYS FOR COMMUTERS
 		update dbo.volunteer_dept
-		set 
+		set
 			mon_am_flag = case when src.daysperweekbitwise_mon_am = 1 then 'Y' else 'N' end,
 			mon_pm_flag = case when src.daysperweekbitwise_mon_pm = 1 then 'Y' else 'N' end,
 			tue_am_flag = case when src.daysperweekbitwise_tue_am = 1 then 'Y' else 'N' end,
@@ -1877,9 +1886,9 @@ begin
 
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		update dbo.volunteer_dept
-		set 
+		set
 			mon_am_flag = 'Y',
 			mon_pm_flag = 'Y',
 			tue_am_flag = 'Y',
@@ -1895,14 +1904,14 @@ begin
 			and enrollment_code in ( 'BBF', 'BBL', 'BBR', 'BBT', 'BCF', 'BCL', 'BCS', 'BRS' )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- DELETE ORPHANED RECORDS FROM HUB HARD DELETES
 		delete dbo.Volunteer_Dept
 		where 1=1
 			and active_flag = 'Y'
 			and hub_dept_id is null
-			
-		set @Del = @Del + @@rowcount			
+
+		set @Del = @Del + @@rowcount
 
 		set @End = getdate()
 
@@ -1913,8 +1922,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -1924,7 +1933,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -1940,23 +1949,23 @@ alter procedure dbo.ETL_Volunteer_Dept_Rpt_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Dept_Rpt', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Dept_Rpt',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- DELETE
 	 	delete from dbo.volunteer_dept_rpt
-		
-		set @Del = @@rowcount	
+
+		set @Del = @@rowcount
 
 		-- INSERT
-		insert into dbo.volunteer_dept_rpt( 
+		insert into dbo.volunteer_dept_rpt(
 			 volunteer_key
 			,full_name
 			,hub_dept_id
@@ -1976,7 +1985,7 @@ begin
 			,sat_flag
 			,sun_flag
 			,row_num )
-		select 
+		select
 			 volunteer_key
 			,full_name
 			,hub_dept_id
@@ -1994,11 +2003,11 @@ begin
 			,thu_flag
 			,fri_flag
 			,sat_flag
-			,sun_flag			
+			,sun_flag
 			,row_num
-		from 
+		from
 			( -- TEMP ASSIGNMENTS
-			  select 
+			  select
 			  	 volunteer_key
 				,full_name
 				,hub_dept_id
@@ -2016,11 +2025,11 @@ begin
 				,thu_flag
 				,fri_flag
 				,sat_flag
-				,sun_flag			
+				,sun_flag
 				,hpr_volunteer_exception_flag
 				,row_num
-			  from 
-				( select 
+			  from
+				( select
 					 vd.volunteer_key
 					,v.full_name
 					,vd.hub_dept_id
@@ -2047,21 +2056,21 @@ begin
 					on vd.volunteer_key = v.volunteer_key
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
-					and d.Active_Flag = 'Y' 
+					and d.Active_Flag = 'Y'
 					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				  where 1=1
 					and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
-					--and vd.volunteer_dept_key not in ( 71744681, 76839101 ) -- JUSTIN POTTER RDC  KEVIN KUZMINSKI PCC	
+					--and vd.volunteer_dept_key not in ( 71744681, 76839101 ) -- JUSTIN POTTER RDC  KEVIN KUZMINSKI PCC
 					and vd.hub_dept_id != 10418  -- REMOVE UNASSIGNED RECORDS
 					and vd.temp_flag = 'Y' ) x
-			  where row_seq = 1					
+			  where row_seq = 1
 
 			  union all
 
 			  -- PRIMARY ASSIGNMENTS MOST RECENT START DATE
 			  select *
-			  from 
-				( select 
+			  from
+				( select
 					 vd.volunteer_key
 					,v.full_name
 					,vd.hub_dept_id
@@ -2088,7 +2097,7 @@ begin
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
 					and d.Active_Flag = 'Y'
-					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )					
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				  where 1=1
 					and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
 					and vd.primary_flag = 'Y'
@@ -2099,8 +2108,8 @@ begin
 
 			  -- PRIMARY ASSIGNMENTS OLDEST START DATE
 			  select *
-			  from 
-				( select 
+			  from
+				( select
 					 vd.volunteer_key
 					,v.full_name
 					,vd.hub_dept_id
@@ -2127,7 +2136,7 @@ begin
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
 					and d.Active_Flag = 'Y'
-					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )					
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				  where 1=1
 					and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
 					and vd.primary_flag = 'Y'
@@ -2137,7 +2146,7 @@ begin
 			  --union all
 
 			  ---- NON-US BRANCH VOLUNTEERS
-			  --select 
+			  --select
 			--	 fb.volunteer_number * -1 as volunteer_key  -- ARTIFICIAL VOL KEY
 			--	,fb.last_name + ', ' + fb.first_name as full_name
 			--	,fb.hub_dept_id
@@ -2163,10 +2172,10 @@ begin
 			) vd
 
 		set @Ins = @@rowcount;
-		
+
 		-- INSERT NON-PRIMARY HPR ASSIGNMENTS WHERE VOLUNTEERS DONT ALREADY HAVE A HPR ASSIGNMENT
 		with tmp as (
-			select 
+			select
 				 vd.volunteer_key
 				,v.full_name
 				,vd.hub_dept_id
@@ -2186,22 +2195,22 @@ begin
 				,case when ( vd.sat_AM_Flag = 'Y' or vd.sat_PM_Flag = 'Y' ) then 'Y' else 'N' end as sat_flag
 				,case when ( vd.sun_AM_Flag = 'Y' or vd.sun_PM_Flag = 'Y' ) then 'Y' else 'N' end as sun_flag
 				,2 as row_num
-				,vd.volunteer_dept_key				
+				,vd.volunteer_dept_key
 			from dbo.Volunteer_Dept vd
 			inner join dbo.volunteer v
 				on vd.volunteer_key = v.volunteer_key
 			inner join dbo.HPR_Dept d
 				on vd.hub_dept_id = d.hub_dept_id
 				and d.Active_Flag = 'Y'
-				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )	
+				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				and d.level_01 = 'Headquarters Project Ramapo'
 			where 1=1
 				and v.volunteer_key not in ( select volunteer_key from dbo.volunteer_dept_rpt where hpr_flag = 'Y' group by volunteer_key )
 				and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
 				and vd.primary_flag = 'N'
 				and vd.temp_flag = 'N' )
-			
-		insert into dbo.volunteer_dept_rpt( 
+
+		insert into dbo.volunteer_dept_rpt(
 			 volunteer_key
 			,full_name
 			,hub_dept_id
@@ -2219,9 +2228,9 @@ begin
 			,thu_flag
 			,fri_flag
 			,sat_flag
-			,sun_flag			
+			,sun_flag
 			,row_num )
-		select 
+		select
 			 tmp.volunteer_key
 			,full_name
 			,hub_dept_id
@@ -2240,17 +2249,17 @@ begin
 			,fri_flag
 			,sat_flag
 			,sun_flag
-			,row_num		
+			,row_num
 		from tmp
 		inner join ( select volunteer_key, max( volunteer_dept_key ) as max_key from tmp group by volunteer_key ) x
 			on tmp.volunteer_key = x.volunteer_key
-			and tmp.volunteer_dept_key = x.max_key	 
+			and tmp.volunteer_dept_key = x.max_key
 
 		set @Ins = @Ins + @@rowcount;
-		
+
 		-- INSERT NON-PRIMARY ASSIGNMENTS WHERE VOLUNTEERS DONT ALREADY HAVE 2 ASSIGNMENTS
 		with tmp as (
-			select 
+			select
 				 vd.volunteer_key
 				,v.full_name
 				,vd.hub_dept_id
@@ -2277,7 +2286,7 @@ begin
 		  	left join dbo.HPR_Dept d
 				on vd.hub_dept_id = d.hub_dept_id
 				and d.Active_Flag = 'Y'
-				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )	
+				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				and d.level_01 = 'Headquarters Project Ramapo'
 			where 1=1
 				and v.volunteer_key not in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
@@ -2285,7 +2294,7 @@ begin
 				and vd.primary_flag = 'N'
 				and vd.temp_flag = 'N' )
 
-		insert into dbo.volunteer_dept_rpt( 
+		insert into dbo.volunteer_dept_rpt(
 			 volunteer_key
 			,full_name
 			,hub_dept_id
@@ -2303,9 +2312,9 @@ begin
 			,thu_flag
 			,fri_flag
 			,sat_flag
-			,sun_flag			
+			,sun_flag
 			,row_num )
-		select 
+		select
 			 tmp.volunteer_key
 			,full_name
 			,hub_dept_id
@@ -2324,67 +2333,67 @@ begin
 			,fri_flag
 			,sat_flag
 			,sun_flag
-			,row_num 
+			,row_num
 		from tmp
 		inner join ( select volunteer_key, max( volunteer_dept_key ) as max_key from tmp group by volunteer_key ) x
 			on tmp.volunteer_key = x.volunteer_key
-			and tmp.volunteer_dept_key = x.max_key	
+			and tmp.volunteer_dept_key = x.max_key
 			and not exists ( select * from dbo.volunteer_dept_rpt d where tmp.volunteer_key = d.volunteer_key and d.row_num = 2 )
-			
-		set @Ins = @Ins + @@rowcount		
-		
+
+		set @Ins = @Ins + @@rowcount
+
 		-- DELETE MULTIPLE ROW_NUM 2 IF NOT HPR ASSIGNMENT
 		delete from volunteer_dept_rpt
 		where 1=1
 			and row_num = 2
 			and hpr_flag = 'N'
-			and volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt 
-								   where row_num = 2 
-								   group by volunteer_key 
+			and volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt
+								   where row_num = 2
+								   group by volunteer_key
 								   having count(*) > 1 )
 
 		set @Del = @@rowcount
-		
+
 		-- DELETE MULTIPLE ROW_NUM 2 CAUSING DUPS
 		delete top(1) from volunteer_dept_rpt
 		where 1=1
 			and row_num = 2
 			and volunteer_key in ( 247599 )
-			and volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt 
-								   where row_num = 2 
-								   group by volunteer_key 
+			and volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt
+								   where row_num = 2
+								   group by volunteer_key
 								   having count(*) > 1 )
 
-		set @Del = @@rowcount		
+		set @Del = @@rowcount
 
-		-- DELETE MULTIPLE FUTURE ROW_NUM 0		
+		-- DELETE MULTIPLE FUTURE ROW_NUM 0
 		delete vd
 		from dbo.volunteer_dept_rpt vd
-		where exists 
-			( select * from 
-				( select volunteer_key, min( start_date ) as min_start_date from dbo.volunteer_dept_rpt 
+		where exists
+			( select * from
+				( select volunteer_key, min( start_date ) as min_start_date from dbo.volunteer_dept_rpt
 				  where row_num = 0 and start_date > cast( getdate() as date )
 				  group by volunteer_key
-				  having count(*) > 1 ) x 
+				  having count(*) > 1 ) x
 			  where vd.volunteer_Key = x.volunteer_key and vd.start_date = x.min_start_date )
-			  
+
 		set @Del = @Del + @@rowcount;
-		
+
 		-- UPDATE ROW_NUM TO 1 IF NO 1 EXISTS
 		with tmp as (
 			select volunteer_key, min( row_num ) as min_row_num, count(*) as cnt
 			from dbo.volunteer_dept_rpt
 			group by volunteer_key
 			having min( row_num ) = 2 )
-		
+
 		update dbo.volunteer_dept_rpt
 		set row_num = 1
 		from dbo.volunteer_dept_rpt d
 		inner join tmp
 			on d.volunteer_key = tmp.volunteer_key
-			
+
 		set @Upd = @Upd + @@rowcount;
-		
+
 		-- REMOVE TEMP UNASSIGNED ENTRIES
 		with dept1 as (
 			select volunteer_key, hub_dept_id as dept1, parent_dept_name as dept1_parent_dept_name, dept_name as dept1_dept_name, start_date as dept1_start_date, end_date as dept1_end_date, row_num
@@ -2400,11 +2409,11 @@ begin
 			where vd.End_Date is null or d1.dept1_end_date = dateadd(day,1,d1.dept1_start_date) )
 
 		delete
-		from dbo.volunteer_dept_rpt 
+		from dbo.volunteer_dept_rpt
 		where volunteer_key in ( select volunteer_key from src )
 			and hub_dept_id = 9966
 
-		set @Del = @Del + @@rowcount		
+		set @Del = @Del + @@rowcount
 
 		set @End = getdate()
 
@@ -2415,8 +2424,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -2426,14 +2435,14 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 
 /***********************************************************
-**					   VOLUNTEER ENROLLMENT 
+**					   VOLUNTEER ENROLLMENT
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Enrollment_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Enrollment_proc as set nocount on;' )
@@ -2443,24 +2452,24 @@ alter procedure dbo.ETL_Volunteer_Enrollment_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Enrollment', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Enrollment',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- GET RECORDCOUNT AND MINIMUM DATE FROM HUB FEED FOR A PERSON
-		-- COMPARE TO WHAT EXISTS IN RVD	
+		-- COMPARE TO WHAT EXISTS IN RVD
 		if object_id('stg.tmp_vol_enrl', 'U') is not null
 			drop table stg.tmp_vol_enrl;
-		
+
 		if object_id('stg.tmp_vol_enrl_rvd', 'U') is not null
 			drop table stg.tmp_vol_enrl_rvd;
-		
+
 		with src as (
 			select person_id, min(start_date) as min_dt, count(*) as cnt
 			from stg.stg_person_enrollment
@@ -2470,7 +2479,7 @@ begin
 		rvd as (
 			select ve.hub_Person_ID as person_id, count(*) as rvd_cnt, max( src.cnt ) as src_cnt, max( src.min_dt ) as src_dt
 			from dbo.Volunteer_enrollment_v ve
-			inner join src 
+			inner join src
 				on ve.hub_Person_ID = src.Person_ID
 				and ve.Start_Date >= src.min_dt
 			where 1=1
@@ -2482,25 +2491,25 @@ begin
 		select *
 		into stg.tmp_vol_enrl
 		from rvd
-		where rvd_cnt != src_cnt 
+		where rvd_cnt != src_cnt
 
 		select ve.*
 		into stg.tmp_vol_enrl_rvd
 		from dbo.Volunteer_enrollment_v ve
-		inner join stg.tmp_vol_enrl tmp 
-			on ve.hub_Person_ID = tmp.person_id 
+		inner join stg.tmp_vol_enrl tmp
+			on ve.hub_Person_ID = tmp.person_id
 			and ( ve.end_date is null or ve.end_date > getdate() )
 			and ve.enrollment_key not in ( 137, 138 )
-			and ve.start_date >= tmp.src_dt 
+			and ve.start_date >= tmp.src_dt
 
 		delete
 		from dbo.volunteer_enrollment
 			where volunteer_enrollment_key in ( select volunteer_enrollment_key from stg.tmp_vol_enrl_rvd )
 
-		set @Del = @@rowcount	
-	
+		set @Del = @@rowcount
+
 		-- INSERT
-		insert into dbo.volunteer_enrollment( 
+		insert into dbo.volunteer_enrollment(
 			 volunteer_key
 			,enrollment_Key
 			,geo_name
@@ -2508,8 +2517,8 @@ begin
 			,notes
 			,start_date
 			,end_date
-			,active_flag )		
-		select 
+			,active_flag )
+		select
 			 v.volunteer_key
 			,enrl.enrollment_key
 			,max( e.geo_location ) as geo_name
@@ -2519,34 +2528,34 @@ begin
 			,max( e.end_date ) as end_date
 			,max( case when getdate() between e.start_date and e.end_date then 'Y' else 'N' end ) as active_flag
 		from stg.stg_person_enrollment e
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on e.person_id = v.hub_person_id
 		inner join dbo.enrollment enrl
-			on e.enrollment_code = enrl.enrollment_code		
+			on e.enrollment_code = enrl.enrollment_code
 			and enrl.active_flag = 'Y'
-		where not exists 
-			( select 1 from dbo.volunteer_enrollment ve 
+		where not exists
+			( select 1 from dbo.volunteer_enrollment ve
 			  where ve.volunteer_key = v.volunteer_key
 				and ve.enrollment_key = enrl.enrollment_key
 				and ve.start_date = e.start_date )
-		group by v.volunteer_key, enrl.enrollment_key, e.start_date				
+		group by v.volunteer_key, enrl.enrollment_key, e.start_date
 
 		set @Ins = @@rowcount
 
 		-- UPDATE
 		update dbo.volunteer_enrollment
-		set 
+		set
 			geo_name = src.geo_location,
 			site_code = src.site_code,
 			notes = src.notes,
 			end_date = src.end_date,
 			update_date = getdate()
 		from dbo.volunteer_enrollment tgt
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -2564,10 +2573,10 @@ begin
 		--	or tgt.end_date <> src.end_date
 
 		set @Upd = @@rowcount
-		
+
 		-- DELETE MISSING ENROLLMENTS, WE DONT RECEIVE HARD DELETES
 		delete from dbo.volunteer_enrollment
-		where volunteer_enrollment_key in ( 
+		where volunteer_enrollment_key in (
 			select ve.volunteer_enrollment_key
 			from dbo.volunteer v
 			inner join dbo.volunteer_enrollment ve
@@ -2582,9 +2591,9 @@ begin
 				and stg.start_date = ve.start_date
 			where stg.person_id is null )
 			and enrollment_key <> 137
-		
-		set @Del = @Del + @@rowcount		
-		
+
+		set @Del = @Del + @@rowcount
+
 		-- UPDATE CURRENT ENRL ON VOLUNTEER
 		-- RESET ALL TO NULL
 --		update dbo.volunteer
@@ -2592,41 +2601,41 @@ begin
 --		where current_enrollment_key is not null
 
 		set @Upd = @Upd + @@rowcount
-				
+
 		update dbo.volunteer
-		set 
+		set
 			current_Enrollment_Key = src.enrollment_key,
 			update_date = getdate()
 		from dbo.volunteer tgt
-		left join 
+		left join
 			( select ve.Volunteer_Key, e.enrollment_key
 			  from Volunteer_Enrollment ve
 			  inner join enrollment e
 				on ve.Enrollment_Key = e.Enrollment_Key
 				and e.active_flag = 'Y'
 			  where getdate() between ve.start_date and coalesce( ve.end_Date,'12/31/9999' )
-				and exists ( select 1 from 
+				and exists ( select 1 from
 								( select ve.Volunteer_Key, min( e.rank_num ) as min_rank_num
 								  from Volunteer_Enrollment ve
 								  inner join enrollment e
 									on ve.Enrollment_Key = e.Enrollment_Key
 								  where getdate() between ve.start_date and coalesce( ve.end_Date,'12/31/9999' )
-								  group by ve.volunteer_Key ) x 
+								  group by ve.volunteer_Key ) x
 							 where x.volunteer_Key = ve.Volunteer_Key and e.Rank_Num = x.min_rank_num )  ) src
 			on tgt.volunteer_key = src.volunteer_key
-		where coalesce( tgt.current_enrollment_key, 0 ) <> coalesce( src.enrollment_key, 0 )		
+		where coalesce( tgt.current_enrollment_key, 0 ) <> coalesce( src.enrollment_key, 0 )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- UPDATE INVITATION NOTES
 		update dbo.volunteer_enrollment
-		set 
+		set
 			notes = src.notes,
 			applicant_id = src.applicant_id,
 			update_date = getdate()
 		from dbo.volunteer_enrollment tgt
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -2640,11 +2649,11 @@ begin
 			and tgt.start_date = src.invited_from
 			and src.invitation_sent = 1
 			and nullif( src.notes, '' ) is not null
-		where coalesce( tgt.notes, '' ) <> src.notes	
+		where coalesce( tgt.notes, '' ) <> src.notes
 			or coalesce( tgt.applicant_id, 0 ) <> coalesce( src.applicant_id, 0 )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 
 		-- ADD IN 5 DAY BA EVENTS
 		insert into dbo.volunteer_enrollment(
@@ -2653,13 +2662,13 @@ begin
 			,notes
 			,start_date
 			,end_date )
-		select 
+		select
 			 v.volunteer_key
 			,137 as enrollment_key
 			,max( 'PROJECT: ' + coalesce( p.project_type,'' ) +
-				' (' + coalesce( p.project_number, '' ) + ')' + 
-				' DESC: ' + coalesce( p.project_desc, '' ) + 
-				' EVENT: ' + coalesce( event_Name, '' ) + 
+				' (' + coalesce( p.project_number, '' ) + ')' +
+				' DESC: ' + coalesce( p.project_desc, '' ) +
+				' EVENT: ' + coalesce( event_Name, '' ) +
 				' (' + coalesce( cast( event_id as varchar ), '' ) + ')' ) as notes
 			,max( start_dt ) as start_date
 			,max( end_dt ) as end_date
@@ -2668,29 +2677,29 @@ begin
 			on va.project_id = p.project_id
 		inner join (
 			select volunteer_id, check_in_date as start_dt, dateadd( day, 4, check_in_date ) as end_dt
-			from dbo.BA_Project_Volunteer_Attendance 
+			from dbo.BA_Project_Volunteer_Attendance
 			where ( datename( weekday, check_in_date ) = 'Monday' or datename( weekday, check_in_date ) = 'Tuesday' ) ) dt
 			on va.Volunteer_ID = dt.volunteer_id
 			and va.Check_In_Date between dt.start_dt and dt.end_dt
 		inner join dbo.volunteer v
 			on va.Person_GUID = v.HUB_Person_GUID
-		where not exists 
-			( select 1 from dbo.volunteer_enrollment ve 
+		where not exists
+			( select 1 from dbo.volunteer_enrollment ve
 			  where ve.volunteer_key = v.volunteer_key
 				and ve.enrollment_key = 137
-				and ve.start_date = dt.start_dt )			
-		group by v.volunteer_key 
+				and ve.start_date = dt.start_dt )
+		group by v.volunteer_key
 		having count(*) = 5
 
 		set @Ins = @Ins + @@rowcount
-		
+
 		-- ADD IN HPR BA EVENTS
 		insert into dbo.volunteer_enrollment(
 		 	 volunteer_key
 			,enrollment_key
 			,notes
 			,start_date
-			,end_date )	
+			,end_date )
 		select
 			 volunteer_key
 			,enrollment_key
@@ -2698,10 +2707,10 @@ begin
 			,start_date
 			,end_date
 		from
-			( select 
+			( select
 				 v.volunteer_key
 				,138 as enrollment_key
-				,' EVENT: ' + coalesce( event_Name, '' ) + ' (' + coalesce( cast( event_id as varchar ), '' ) + ')' + 
+				,' EVENT: ' + coalesce( event_Name, '' ) + ' (' + coalesce( cast( event_id as varchar ), '' ) + ')' +
 					' STATUS: ' + concat( status_day_1, '|', status_day_2, '|', status_day_3, '|', status_day_4, '|', status_day_5, '|', status_day_6, '|', status_day_7 ) as notes
 				,start_date
 				,dateadd( day, 6, start_date ) as end_date
@@ -2720,29 +2729,29 @@ begin
 					or status_day_5 = 'C'
 					or status_day_6 = 'C'
 					or status_day_7 = 'C' )
-				and not exists 
-					( select 1 from dbo.volunteer_enrollment ve 
+				and not exists
+					( select 1 from dbo.volunteer_enrollment ve
 					  where ve.volunteer_key = v.volunteer_key
 						and ve.enrollment_key = 138
 						and ve.start_date = vi.start_date )	) x
 		where ranking = 1
-			
+
 		set @Ins = @Ins + @@rowcount
-		
+
 		-- UPDATE - FLAG OFF
 		update dbo.volunteer_enrollment
-		set 
+		set
 			active_flag = 'N',
 			update_date = getdate()
 		where active_flag = 'Y'
-			and (  getdate() > end_date 
+			and (  getdate() > end_date
 				or start_date > getdate() )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- UPDATE - FLAG ON
 		update dbo.volunteer_enrollment
-		set 
+		set
 			active_flag = 'Y',
 			update_date = getdate()
 		where active_flag = 'N'
@@ -2750,18 +2759,18 @@ begin
 			and start_date <= cast( getdate() as date )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- UPDATE - BAD DATA FIX
 		update dbo.volunteer_enrollment
-		set 
+		set
 			active_flag = 'N',
 			end_date = '2016-05-31',
 			update_date = getdate()
 		where volunteer_enrollment_key in (
 			8369689 )
 
-		set @Upd = @Upd + @@rowcount				
-		
+		set @Upd = @Upd + @@rowcount
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -2772,7 +2781,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -2782,7 +2791,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -2798,23 +2807,23 @@ alter procedure dbo.ETL_Volunteer_Enrollment_Rpt_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Enrollment_Rpt', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Enrollment_Rpt',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- DELETE
 	 	delete from dbo.volunteer_enrollment_rpt
-		
-		set @Del = @@rowcount	
+
+		set @Del = @@rowcount
 
 		-- INSERT
-		insert into dbo.volunteer_enrollment_rpt( 
+		insert into dbo.volunteer_enrollment_rpt(
 			 volunteer_key
 			,full_name
 			,enrollment_key
@@ -2823,7 +2832,7 @@ begin
 			,start_date
 			,end_date
 			,row_num )
-		select 
+		select
 			 volunteer_key
 			,full_name
 			,enrollment_key
@@ -2832,11 +2841,11 @@ begin
 			,start_date
 			,end_date
 			,row_num
-		from 
+		from
 			( -- MOST RECENT START DATE NOT IN FUTURE  NEW LOGIC = OLDEST ACTIVE START DATE
 			  select *
-			  from 
-				( select 
+			  from
+				( select
 					 ve.volunteer_key
 					,v.full_name
 					,ve.enrollment_key
@@ -2860,7 +2869,7 @@ begin
 			  union all
 
 			  -- FUTURE ENROLLMENTS
-			  select 
+			  select
 			  	 volunteer_key
 				,full_name
 				,enrollment_key
@@ -2869,8 +2878,8 @@ begin
 				,start_date
 				,end_date
 				,row_num
-			  from 
-				( select 
+			  from
+				( select
 					 ve.volunteer_key
 					,v.full_name
 					,ve.enrollment_key
@@ -2891,13 +2900,13 @@ begin
 					and ve.start_Date > getdate()
 					/*and ve.Geo_Name = 'USA'*/ ) x
 			  where row_seq = 1
-			  
+
 			  union all
 
 			  -- OTHER CURRENT ENROLLMENTS
 			  select *
-			  from 
-				( select 
+			  from
+				( select
 					 ve.volunteer_key
 					,v.full_name
 					,ve.enrollment_key
@@ -2921,7 +2930,7 @@ begin
 			  --union all
 
 			  ---- NON-US BRANCH VOLUNTEERS
-			  --select 
+			  --select
 				-- fb.volunteer_number * -1 as volunteer_key  -- ARTIFICIAL VOL KEY
 				--,fb.last_name + ', ' + fb.first_name as full_name
 				--,e.enrollment_key
@@ -2937,7 +2946,7 @@ begin
 			) ve
 
 		set @Ins = @@rowcount
-		
+
 		-- UPDATE IF MISSING ROW_NUM = 1
 		update dbo.volunteer_enrollment_rpt
 		set row_num = 1
@@ -2946,8 +2955,8 @@ begin
 								   where not exists ( select 1 from dbo.volunteer_enrollment_rpt v2 where v.volunteer_key = v2.volunteer_key and v2.row_num = 1 ) )
 
 		set @Upd = @@rowcount;
-		
-		-- DELETE MULTIPLE ROW_NUM = 2		
+
+		-- DELETE MULTIPLE ROW_NUM = 2
 		with dups as (
 			select ve.volunteer_key, ve.enrollment_code, ve.start_date, max(e.rank_num) as rank_num
 			from ( select volunteer_key from dbo.volunteer_enrollment_rpt where row_num = 2 group by volunteer_key having count(*) > 1 ) dup
@@ -2957,25 +2966,25 @@ begin
 			inner join dbo.enrollment e
 				on ve.enrollment_code = e.enrollment_code
 			group by ve.volunteer_key, ve.enrollment_code, ve.start_date ),
-		
+
 		max_rank as (
 			select volunteer_key, max( rank_num ) as max_rank_num
 			from dups
 			group by volunteer_key ),
-		
+
 		del as (
 			select d.volunteer_key, d.enrollment_code, d.start_date
 			from dups d
 			inner join max_rank m
 				on d.volunteer_key = m.volunteer_Key
 				and d.rank_num = m.max_rank_num )
-		
+
 		delete ve
 		from dbo.volunteer_enrollment_rpt ve
 		where row_num = 2
 			and exists ( select * from del where ve.volunteer_key = del.volunteer_key and ve.enrollment_code = del.enrollment_code and ve.start_date = del.start_date )
-			
-		set @Del = @Del + @@rowcount				
+
+		set @Del = @Del + @@rowcount
 
 		set @End = getdate()
 
@@ -2986,8 +2995,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -2997,7 +3006,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -3014,29 +3023,29 @@ alter procedure dbo.ETL_Volunteer_FTS_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_FTS', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_FTS',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- DELETE
 	 	delete from dbo.volunteer_fts
-		
-		set @Del = @@rowcount	
+
+		set @Del = @@rowcount
 
 		-- INSERT
-		insert into dbo.volunteer_fts( 
+		insert into dbo.volunteer_fts(
 			 volunteer_key
 			,fts
 			,sfts
 			,rounded_fts
 			,rounded_sfts )
-		select 
+		select
 			 volunteer_key
 			,fts
 			,sfts
@@ -3045,7 +3054,7 @@ begin
 		from dbo.volunteer_fts_v
 
 		set @Ins = @@rowcount
-		
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -3055,8 +3064,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -3066,14 +3075,14 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 
 /***********************************************************
-**					   VOLUNTEER ROLE 
+**					   VOLUNTEER ROLE
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Role_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Role_proc as set nocount on;' )
@@ -3083,25 +3092,25 @@ alter procedure dbo.ETL_Volunteer_Role_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Role', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Role',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.volunteer_role( 
+		insert into dbo.volunteer_role(
 			 volunteer_key
 			,role
 			,role_data
 			,start_date
 			,end_date
-			,active_flag )		
-		select  
+			,active_flag )
+		select
 			 v.volunteer_key
 			,r.role
 			,max( pr.role_data ) as role_data
@@ -3109,31 +3118,31 @@ begin
 			,max( pr.end_date ) as end_date
 			,max( case when getdate() between pr.start_date and coalesce( pr.end_date, '2999-12-31' ) then 'Y' else 'N' end ) as active_flag
 		from stg.stg_person_role pr
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on pr.person_id = v.hub_person_id
 		inner join stg.stg_role r
-			on pr.role_code = r.role_code				
-		where not exists 
-			( select 1 from dbo.volunteer_role vr 
+			on pr.role_code = r.role_code
+		where not exists
+			( select 1 from dbo.volunteer_role vr
 			  where vr.volunteer_key = v.volunteer_key
 				and vr.role = r.role
-				and vr.start_date = pr.start_date )	
-		group by v.volunteer_key, r.role, pr.start_date			
+				and vr.start_date = pr.start_date )
+		group by v.volunteer_key, r.role, pr.start_date
 
 		set @Ins = @@rowcount
 
 		-- UPDATE
 		update dbo.volunteer_role
-		set 
+		set
 			role_data = src.role_data,
 			end_date = src.end_date,
 			update_date = getdate()
 		from dbo.volunteer_role tgt
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3152,46 +3161,46 @@ begin
 
 		-- UPDATE - FLAG OFF
 		update dbo.volunteer_role
-		set 
+		set
 			active_flag = 'N',
 			update_date = getdate()
 		where active_flag = 'Y'
 			and getdate() > coalesce( end_date, '2999-12-31' )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- UPDATE - FLAG ON
 		update dbo.volunteer_role
-		set 
+		set
 			active_flag = 'Y',
 			update_date = getdate()
 		where active_flag = 'N'
 			and coalesce( end_date, getdate() + 1 ) >= cast( getdate() as date )
 
-		set @Upd = @Upd + @@rowcount	
-		
+		set @Upd = @Upd + @@rowcount
+
 		-- UPDATE - HARD DELETE IN HUB
 		update dbo.volunteer_role
-		set 
+		set
 			end_date = '1/1/1900',
 			active_flag = 'N',
 			update_date = getdate()
 		from dbo.volunteer_role vr
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 				from dbo.volunteer
 				group by volunteer_key ) v
 			on vr.volunteer_key = v.volunteer_key
 		inner join stg.stg_role r
 			on vr.Role = r.role
 		where 1=1
-			and not exists 
+			and not exists
 					( select 1 from stg.stg_person_role pr
 					  where pr.person_id = v.hub_person_id
 						and pr.role_code = r.role_code
 				and pr.start_date = vr.start_date )
-				
-		set @Upd = @Upd + @@rowcount	
+
+		set @Upd = @Upd + @@rowcount
 
 		set @End = getdate()
 
@@ -3202,8 +3211,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -3213,13 +3222,13 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 /***********************************************************
-**					   VOLUNTEER ROOMING 
+**					   VOLUNTEER ROOMING
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Rooming_Hist_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Rooming_Hist_proc as set nocount on;' )
@@ -3229,26 +3238,26 @@ alter procedure dbo.ETL_Volunteer_Rooming_Hist_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Rooming_Hist', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Rooming_Hist',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-		
+
 	-- ONLY INSERT DATA IF MONDAY
-	begin try	
+	begin try
 		-- INSERT
-		insert into dbo.volunteer_rooming_hist( 
+		insert into dbo.volunteer_rooming_hist(
 			 volunteer_key
 			,cal_dt
 			,room_site_code
 			,room_bldg
 			,room_bldg_code
 			,room_bldg_desc
-			,room )		
+			,room )
 		select
 			 volunteer_key
 			,cast( getdate() as date ) as cal_dt
@@ -3271,7 +3280,7 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
+	end try
 
 	begin catch
 		execute dbo.ETL_Table_Run_proc
@@ -3282,13 +3291,13 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 /***********************************************************
-**					   VOLUNTEER SEARCH 
+**					   VOLUNTEER SEARCH
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Search_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Search_proc as set nocount on;' )
@@ -3298,26 +3307,26 @@ alter procedure dbo.ETL_Volunteer_Search_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Search_Phone', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Search_Phone',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
 
-	begin try	
+	begin try
 		-- DELETE
 	 	delete from dbo.volunteer_search_phone
-		
-		set @Del = @@rowcount	
-	
+
+		set @Del = @@rowcount
+
 		-- INSERT
-		insert into dbo.volunteer_search_phone( 
+		insert into dbo.volunteer_search_phone(
 			 volunteer_key
-			,phone_num )		
-		select 
+			,phone_num )
+		select
 			 volunteer_key
 			,phone_num
 		from (
@@ -3342,8 +3351,8 @@ begin
 			@Rows_Deleted = @Del,
 			@Start_Time = @Start,
 			@End_Time = @End
-	end try			
-		
+	end try
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -3353,13 +3362,13 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 /***********************************************************
-**					   VOLUNTEER SKILL 
+**					   VOLUNTEER SKILL
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Skill_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Skill_proc as set nocount on;' )
@@ -3369,18 +3378,18 @@ alter procedure dbo.ETL_Volunteer_Skill_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Skill', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Skill',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
+
 	begin try
 		-- INSERT
-		insert into dbo.volunteer_skill( 
+		insert into dbo.volunteer_skill(
 			 volunteer_key
 			,skill_speciality_key
 			,skill_level_key
@@ -3388,8 +3397,8 @@ begin
 			,skill_description
 			,office_notes
 			,yrs_exp
-			,skill_update_date )		
-		select 
+			,skill_update_date )
+		select
 			 v.volunteer_key
 			,ss.skill_speciality_key
 			,case when coalesce( bsl.skill_level_key, 1 ) = 1 then coalesce( psl.skill_level_key, 7 ) else coalesce( bsl.skill_level_key, 7 ) end as skill_level_key
@@ -3402,8 +3411,8 @@ begin
 			,s.yrs_exp
 			,s.update_date
 		from stg.stg_person_skill s
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on s.person_id = v.hub_person_id
@@ -3415,7 +3424,7 @@ begin
 			on s.skill_proficiency = bsl.skill_level_code -- BRANCH
 		left join dbo.skill_level psl
 			on coalesce( s.skill_proficiency_publisher, 0 ) = psl.skill_level_code -- PUBLISHER
-		where not exists 
+		where not exists
 			( select 1 from dbo.volunteer_skill vs
 			  where vs.volunteer_key = v.volunteer_key
 				and vs.skill_speciality_key = ss.skill_speciality_key )
@@ -3424,11 +3433,11 @@ begin
 
 		-- UPDATE
 		update dbo.volunteer_skill
-		set 
+		set
 			skill_level_key = case when coalesce( bsl.skill_level_key, 1 ) = 1 then coalesce( psl.skill_level_key, 7 ) else coalesce( bsl.skill_level_key, 7 ) end,
 			source_system_key = case when coalesce( bsl.skill_level_key, 1 ) = 1 then 2 else 7 end, -- 2 = PUBLISHER, 7 = BRANCH
 			yrs_exp = src.yrs_exp,
-			skill_description = 
+			skill_description =
 				case when src.licensed = 1 then 'Licensed - ' else '' end +
 					case when src.yrs_schooling is not null then 'Schooling: ' + cast( src.yrs_schooling as varchar(30) ) else '' end +
 					case when src.licensed = 1 or src.yrs_schooling is not null then ' - ' else '' end +
@@ -3437,8 +3446,8 @@ begin
 			skill_update_date = src.update_date,
 			update_date = getdate()
 		from dbo.volunteer_skill tgt
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3453,15 +3462,15 @@ begin
 		left join dbo.skill_level bsl
 			on src.skill_proficiency = bsl.skill_level_code -- BRANCH
 		left join dbo.skill_level psl
-			on coalesce( src.skill_proficiency_publisher, 0 ) = psl.skill_level_code -- PUBLISHER		
+			on coalesce( src.skill_proficiency_publisher, 0 ) = psl.skill_level_code -- PUBLISHER
 		where coalesce( tgt.skill_level_key, 0 ) <> case when coalesce( bsl.skill_level_key, 1 ) = 1 then coalesce( psl.skill_level_key, 7 ) else coalesce( bsl.skill_level_key, 7 ) end
-			or coalesce( tgt.source_system_key, 0 ) <> case when coalesce( bsl.skill_level_key, 1 ) = 1 then 2 else 7 end		
+			or coalesce( tgt.source_system_key, 0 ) <> case when coalesce( bsl.skill_level_key, 1 ) = 1 then 2 else 7 end
 			or coalesce( tgt.yrs_exp, 0 ) <> coalesce( src.yrs_exp, 0 )
 			or coalesce( tgt.skill_description, '' ) <>
 				case when src.licensed = 1 then 'Licensed - ' else '' end +
 					case when src.yrs_schooling is not null then 'Schooling: ' + cast( src.yrs_schooling as varchar(30) ) else '' end +
 					 case when src.licensed = 1 or src.yrs_schooling is not null then ' - ' else '' end +
-				coalesce( src.skill_speciality_notes, '' ) + coalesce( src.office_notes, '' ) 
+				coalesce( src.skill_speciality_notes, '' ) + coalesce( src.office_notes, '' )
 			or coalesce( tgt.office_notes, '' ) <> coalesce( src.office_notes, '' )
 			or coalesce( tgt.skill_update_date, '2999-12-31' ) <> coalesce( src.update_date, '2999-12-31' )
 
@@ -3471,8 +3480,8 @@ begin
 		if object_id( 'dbo.tmp_volunteer_skill', 'U' ) is not null
 			drop table dbo.tmp_volunteer_skill
 
-		-- NON-COMPUTER SKILLS			
-		select 
+		-- NON-COMPUTER SKILLS
+		select
 			 tgt.volunteer_skill_key
 			,case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end as skill_level_key
 			,src.personal_notes
@@ -3480,10 +3489,10 @@ begin
 			,case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end as ovsr_assessment_skill_level_key
 			,src.overseer_assessment_notes as ovsr_assessment_notes
 			,case when src.overseer_assessment_date = '0001-01-01' then null else src.overseer_assessment_date end as ovsr_assessment_date
-		into dbo.tmp_volunteer_skill			
+		into dbo.tmp_volunteer_skill
 		from dbo.volunteer_skill tgt
-		inner join 
-			( select volunteer_key, max( hub_person_guid ) as hub_person_guid 
+		inner join
+			( select volunteer_key, max( hub_person_guid ) as hub_person_guid
 				from dbo.volunteer
 				group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3492,15 +3501,15 @@ begin
 		inner join dbo.skill s
 			on ss.skill_key = s.skill_key
 		inner join stg.stg_ba_volunteer_skill src
-			on v.hub_person_guid = src.person_guid	
-			and ss.ba_subskill_guid = src.subskill_guid 
+			on v.hub_person_guid = src.person_guid
+			and ss.ba_subskill_guid = src.subskill_guid
 			and ss.ba_skill_speciality_guid is null
-		where tgt.skill_update_date >= getdate() - 30			
+		where tgt.skill_update_date >= getdate() - 30
 
-	/*			
+	/*
 		-- UPDATE - BA OVERSEER ASSESSMENT - NON-COMPUTER
 		update dbo.volunteer_skill
-		set 
+		set
 			skill_level_key = case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end,
 			personal_notes = src.personal_notes,
 			ovsr_assessment_name = src.overseer_assessment_name,
@@ -3510,8 +3519,8 @@ begin
 			ovsr_assessment_date = case when src.overseer_assessment_date = '0001-01-01' then null else src.overseer_assessment_date end,
 			update_date = getdate()
 		from dbo.volunteer_skill tgt
-		inner join 
-			( select volunteer_key, max( hub_person_guid ) as hub_person_guid 
+		inner join
+			( select volunteer_key, max( hub_person_guid ) as hub_person_guid
 				from dbo.volunteer
 				group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3520,19 +3529,19 @@ begin
 		inner join dbo.skill s
 			on ss.skill_key = s.skill_key
 		inner join stg.stg_ba_volunteer_skill src
-			on v.hub_person_guid = src.person_guid	
-			and ss.ba_subskill_guid = src.subskill_guid 
+			on v.hub_person_guid = src.person_guid
+			and ss.ba_subskill_guid = src.subskill_guid
 			and ss.ba_skill_speciality_guid is null
 		where coalesce( tgt.skill_level_key, 0 ) <> case when coalesce( src.overseer_assessment, 0 ) = 0 then 7 else src.overseer_assessment end
 			or coalesce( tgt.personal_notes, '' ) <> coalesce( src.personal_notes, '' )
 			or coalesce( tgt.ovsr_assessment_name, '' ) <> coalesce( src.overseer_assessment_name, '' )
-			or coalesce( tgt.ovsr_assessment_skill_level_key, 0 ) <> 
+			or coalesce( tgt.ovsr_assessment_skill_level_key, 0 ) <>
 				case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end
 			or coalesce( tgt.ovsr_assessment_notes, '' ) <> coalesce( src.overseer_assessment_notes, '' )
-			or coalesce( tgt.ovsr_assessment_date, '2999-12-31' ) <> coalesce( src.overseer_assessment_date, '2999-12-31' )		
-	*/			
+			or coalesce( tgt.ovsr_assessment_date, '2999-12-31' ) <> coalesce( src.overseer_assessment_date, '2999-12-31' )
+	*/
 
-		-- COMPUTER SKILLS			
+		-- COMPUTER SKILLS
 		insert into dbo.tmp_volunteer_skill(
 		 	 volunteer_skill_key
 			,skill_level_key
@@ -3541,17 +3550,17 @@ begin
 			,ovsr_assessment_skill_level_key
 			,ovsr_assessment_notes
 			,ovsr_assessment_date )
-		select 
+		select
 			 tgt.volunteer_skill_key
 			,case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end as skill_level_key
 			,src.personal_notes
 			,src.overseer_assessment_name as ovsr_assessment_name
 			,case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end as ovsr_assessment_skill_level_key
 			,src.overseer_assessment_notes as ovsr_assessment_notes
-			,case when src.overseer_assessment_date = '0001-01-01' then null else src.overseer_assessment_date end as ovsr_assessment_date		
+			,case when src.overseer_assessment_date = '0001-01-01' then null else src.overseer_assessment_date end as ovsr_assessment_date
 		from dbo.volunteer_skill tgt
-		inner join 
-			( select volunteer_key, max( hub_person_guid ) as hub_person_guid 
+		inner join
+			( select volunteer_key, max( hub_person_guid ) as hub_person_guid
 				from dbo.volunteer
 				group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3560,11 +3569,11 @@ begin
 		inner join dbo.skill s
 			on ss.skill_key = s.skill_key
 		inner join stg.stg_ba_volunteer_skill src
-			on v.hub_person_guid = src.person_guid	
+			on v.hub_person_guid = src.person_guid
 			and ss.ba_skill_speciality_guid = src.subskill_guid
 			and ss.ba_skill_speciality_guid is not null
-		where tgt.skill_update_date >= getdate() - 30			
-			
+		where tgt.skill_update_date >= getdate() - 30
+
 		--create nonclustered index stg_person_skill_idx_skill_subskill_id
 		--	on stg.stg_person_skill (skill_subskill_id)
 		--include (person_id, Skill_Speciality_ID, Licensed, Yrs_Exp, Yrs_Schooling, Skill_Speciality_Notes, Skill_Proficiency, Skill_Proficiency_Publisher, Office_Notes, Update_Date )
@@ -3574,12 +3583,12 @@ begin
 		--include ( personal_notes, Overseer_Assessment_Name, Overseer_Assessment, Overseer_Assessment_Notes, Overseer_Assessment_Date )
 
 		create index tmp_volunteer_skill_idx_id
-			on dbo.tmp_volunteer_skill (volunteer_skill_key )			
+			on dbo.tmp_volunteer_skill (volunteer_skill_key )
 
 	/*
 		-- UPDATE - BA OVERSEER ASSESSMENT - COMPUTER
 		update dbo.volunteer_skill
-		set 
+		set
 			skill_level_key = case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end,
 			personal_notes = src.personal_notes,
 			ovsr_assessment_name = src.overseer_assessment_name,
@@ -3589,8 +3598,8 @@ begin
 			ovsr_assessment_date = case when src.overseer_assessment_date = '0001-01-01' then null else src.overseer_assessment_date end,
 			update_date = getdate()
 		from dbo.volunteer_skill tgt
-		inner join 
-			( select volunteer_key, max( hub_person_guid ) as hub_person_guid 
+		inner join
+			( select volunteer_key, max( hub_person_guid ) as hub_person_guid
 				from dbo.volunteer
 				group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3599,20 +3608,20 @@ begin
 		inner join dbo.skill s
 			on ss.skill_key = s.skill_key
 		inner join stg.stg_ba_volunteer_skill src
-			on v.hub_person_guid = src.person_guid	
+			on v.hub_person_guid = src.person_guid
 			and ss.ba_skill_speciality_guid = src.subskill_guid
-			and ss.ba_skill_speciality_guid is not null			
+			and ss.ba_skill_speciality_guid is not null
 		--		where coalesce( tgt.personal_notes, '' ) <> coalesce( src.personal_notes, '' )
 		--	or coalesce( tgt.ovsr_assessment_name, '' ) <> coalesce( src.overseer_assessment_name, '' )
-		--	or coalesce( tgt.ovsr_assessment_skill_level_key, 0 ) <> 
+		--	or coalesce( tgt.ovsr_assessment_skill_level_key, 0 ) <>
 		--		case when src.overseer_assessment = 0 then 7 else src.overseer_assessment end
 		--	or coalesce( tgt.ovsr_assessment_notes, '' ) <> coalesce( src.overseer_assessment_notes, '' )
 		--	or coalesce( tgt.ovsr_assessment_date, '2999-12-31' ) <> coalesce( src.overseer_assessment_date, '2999-12-31' )
-	*/	
-	
+	*/
+
 		-- UPDATE - BA OVERSEER ASSESSMENT
 		update dbo.volunteer_skill
-		set 
+		set
 			skill_level_key = src.skill_level_key,
 			personal_notes = src.personal_notes,
 			ovsr_assessment_name = src.ovsr_assessment_name,
@@ -3623,9 +3632,9 @@ begin
 		from dbo.volunteer_skill tgt
 		inner join dbo.tmp_volunteer_skill src
 			on tgt.volunteer_skill_key = src.volunteer_skill_key
-	
-		
-	/*			
+
+
+	/*
 		update dbo.volunteer_skill
 		set
 			skill_level_key = src.skill_level_key,
@@ -3637,7 +3646,7 @@ begin
 			update_date = getdate()
 		from dbo.volunteer_skill tgt
 		inner join
-			( select 
+			( select
 				 v.volunteer_key
 				,ss.skill_speciality_key
 				,sl.skill_level_key
@@ -3663,8 +3672,8 @@ begin
 			or tgt.ovsr_assessment_date <> src.ovsr_assessment_date
 		*/
 
-		set @Upd = @Upd + @@rowcount		
-	
+		set @Upd = @Upd + @@rowcount
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -3675,7 +3684,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -3685,13 +3694,13 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
 
 /***********************************************************
-**				   VOLUNTEER TRAINING 
+**				   VOLUNTEER TRAINING
 ***********************************************************/
 if object_id('dbo.ETL_Volunteer_Training_proc') is null
     exec( 'create procedure dbo.ETL_Volunteer_Training_proc as set nocount on;' )
@@ -3701,18 +3710,18 @@ alter procedure dbo.ETL_Volunteer_Training_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer_Training', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer_Training',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
+
 	begin try
 		-- INSERT BA
-		insert into dbo.volunteer_training( 
+		insert into dbo.volunteer_training(
 			 volunteer_key
 			,volunteer_id
 			,person_guid
@@ -3722,8 +3731,8 @@ begin
 			,assign_date
 			,complete_date
 			,modified_date
-			,active_flag )		
-		select 
+			,active_flag )
+		select
 			 v.volunteer_key
 			,ba.volunteer_id
 			,ba.person_guid
@@ -3735,12 +3744,12 @@ begin
 			,ba.modified_date
 			,case when ba.active_flag = 1 then 'Y' else 'N' end as active_flag
 		from stg.stg_ba_volunteer_training ba
-		inner join 
-			( select volunteer_key, max( hub_person_guid ) as hub_person_guid 
+		inner join
+			( select volunteer_key, max( hub_person_guid ) as hub_person_guid
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on ba.person_guid = v.hub_person_guid
-		where not exists 
+		where not exists
 			( select 1 from dbo.volunteer_training vt
 			  where vt.volunteer_key = v.volunteer_key
 				and vt.course_name = ba.course_name )
@@ -3749,7 +3758,7 @@ begin
 
 		-- UPDATE BA
 		update dbo.volunteer_training
-		set 
+		set
 			course_desc = src.course_desc,
 			course_type = src.course_type,
 			assign_date = case when src.assign_date = '0001-01-01 00:00:00.0000000 +00:00' then null else src.assign_date end,
@@ -3758,8 +3767,8 @@ begin
 			active_flag = case when src.active_flag = 1 then 'Y' else 'N' end,
 			update_date = getdate()
 		from dbo.volunteer_training tgt
-		inner join 
-			( select volunteer_key, max( hub_person_guid ) as hub_person_guid 
+		inner join
+			( select volunteer_key, max( hub_person_guid ) as hub_person_guid
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3774,9 +3783,9 @@ begin
 			or coalesce( tgt.active_flag, 'N' ) <> case when src.active_flag = 1 then 'Y' else 'N' end
 
 		set @Upd = @@rowcount
-		
+
 		-- INSERT HUB
-		insert into dbo.volunteer_training( 
+		insert into dbo.volunteer_training(
 			 volunteer_key
 			,volunteer_id
 			,person_guid
@@ -3799,7 +3808,7 @@ begin
 			,modified_date
 			,host_branch_code
 			,active_flag )
-		select 
+		select
 			 v.volunteer_key
 			,0 as volunteer_id
 			,src.person_guid
@@ -3825,19 +3834,19 @@ begin
 		from stg.stg_person_education src
 		inner join dbo.volunteer v
 			on src.person_id = v.hub_person_id
-		where not exists 
-			( select 1 from dbo.Volunteer_Training t 
-			  where v.volunteer_key = t.volunteer_key 
+		where not exists
+			( select 1 from dbo.Volunteer_Training t
+			  where v.volunteer_key = t.volunteer_key
 			  	and coalesce( src.training_course, src.education_type_description ) = t.course_name
 				and coalesce( src.person_education_id, 0 ) = coalesce( t.person_education_id, 0 )
 				and coalesce( src.class_name, '' ) = coalesce( t.class_name, '' )
 				and coalesce( src.class_number, '' ) = coalesce( t.class_number, '' ) )
 
-		set @Ins = @Ins + @@rowcount		
-		
+		set @Ins = @Ins + @@rowcount
+
 		-- UPDATE HUB
 		update dbo.volunteer_training
-		set 
+		set
 			person_education_guid = coalesce( convert( nvarchar(36), src.person_education_guid ), '' ),
 			course_desc = coalesce( src.training_course_long_description, src.training_course, src.education_type_description ),
 			course_type_id = coalesce( src.education_type_id, 0 ),
@@ -3846,16 +3855,16 @@ begin
 			class_completion_notes = coalesce( src.class_completion_notes, '' ),
 			course_objective = coalesce( src.course_objective, '' ),
 			student_met_objective = coalesce( src.student_met_objective, '' ),
-			attendance_status = coalesce( src.attendance_status, '' ),			
+			attendance_status = coalesce( src.attendance_status, '' ),
 			assign_date = src.started_date,
-			start_date = src.started_date,			
+			start_date = src.started_date,
 			complete_date = cast( src.completed_date as date ),
 			modified_date = src.student_record_last_update,
 			host_branch_code = coalesce( src.host_branch_code, '' ),
-			update_date = getdate()			
+			update_date = getdate()
 		from dbo.volunteer_training tgt
-		inner join 
-			( select volunteer_key, max( hub_person_id ) as hub_person_id 
+		inner join
+			( select volunteer_key, max( hub_person_id ) as hub_person_id
 			  from dbo.volunteer
 			  group by volunteer_key ) v
 			on tgt.volunteer_key = v.volunteer_key
@@ -3864,30 +3873,30 @@ begin
 			and tgt.course_name = coalesce( src.training_course, src.education_type_description )
 			and tgt.person_education_id = coalesce( src.person_education_id, 0 )
 			and tgt.class_name = coalesce( src.class_name, '' )
-			and tgt.class_number = coalesce( src.class_number, '' )			
+			and tgt.class_number = coalesce( src.class_number, '' )
 		where coalesce( convert( nvarchar(36), tgt.person_education_guid ), '' ) <> coalesce( convert( nvarchar(36), src.person_education_guid ), '' )
 			or coalesce( tgt.course_desc, '' ) <> coalesce( src.training_course_long_description, src.training_course, src.education_type_description )
 			or coalesce( tgt.course_type_id, 0 ) <> coalesce( src.education_type_id, 0 )
 			or coalesce( tgt.course_type, '' ) <> coalesce( src.education_type_description, '' )
 			or coalesce( tgt.course_type_desc, '' ) <> coalesce( src.education_type_local_description, '' )
-			or coalesce( tgt.class_completion_notes, '' ) <> coalesce( src.class_completion_notes, '' )			
-			or coalesce( tgt.course_objective, '' ) <> coalesce( src.course_objective, '' )	
-			or coalesce( tgt.student_met_objective, '' ) <> coalesce( src.student_met_objective, '' )	
+			or coalesce( tgt.class_completion_notes, '' ) <> coalesce( src.class_completion_notes, '' )
+			or coalesce( tgt.course_objective, '' ) <> coalesce( src.course_objective, '' )
+			or coalesce( tgt.student_met_objective, '' ) <> coalesce( src.student_met_objective, '' )
 			or coalesce( tgt.attendance_status, '' ) <> coalesce( src.attendance_status, '' )
 			or coalesce( tgt.assign_date, '2999-12-31' ) <> coalesce( src.started_date, '2999-12-31' )
-			or coalesce( tgt.start_date, '2999-12-31' ) <> coalesce( src.started_date, '2999-12-31' )			
+			or coalesce( tgt.start_date, '2999-12-31' ) <> coalesce( src.started_date, '2999-12-31' )
 			or coalesce( tgt.complete_date, '2999-12-31' ) <> coalesce( cast( src.completed_date as date ), '2999-12-31' )
 			or coalesce( tgt.modified_date, '2999-12-31' ) <> coalesce( src.student_record_last_update, '2999-12-31' )
 			or coalesce( tgt.host_branch_code, '' ) <> coalesce( src.host_branch_code, '' )
-		
+
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- SET EMPTY COURSE_DESC VALUES TO WHITESPACE TO AVOID ERROR IN ACCESS
-		update dbo.volunteer_training 
-		set course_desc = ' ' 
+		update dbo.volunteer_training
+		set course_desc = ' '
 		where course_desc = ''
 
-		set @Upd = @Upd + @@rowcount		
+		set @Upd = @Upd + @@rowcount
 
 		set @End = getdate()
 
@@ -3899,7 +3908,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -3909,7 +3918,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -3925,35 +3934,35 @@ alter procedure dbo.ETL_RVD_Banner_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'RVD_Banner', 
+
+	declare
+		@Table nvarchar(150) = 'RVD_Banner',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
+
 	begin try
 		-- RESET ALL
 		update dbo.volunteer
 		set rvd_banner = ''
 		where rvd_banner <> ''
-		
-		-- VOL DESK USER 
+
+		-- VOL DESK USER
 		update dbo.volunteer
-		set 
+		set
 			rvd_banner = 'Applicant Being Pursued',
 			update_date = getdate()
 		where Vol_Desk_User_Key <> 1
 
 		set @Upd = @@rowcount
-		
-		-- APP REQUEST COLLECTION		
+
+		-- APP REQUEST COLLECTION
 		update dbo.volunteer
-		set 
+		set
 			rvd_banner = 'Applicant Being Pursued',
-			update_date = getdate()		
+			update_date = getdate()
 		where rvd_banner <> 'Applicant Being Pursued'
 			and volunteer_key in (
 				select v.volunteer_key
@@ -3965,56 +3974,56 @@ begin
 					on v.Current_Enrollment_Key = e.Enrollment_Key
 					and e.SFTS_Flag = 'N'			-- NOT SFTS
 				where a.app_status_code = 'RES' 	-- RESERVED = ON AN APP REQ COLLECTION
-					   and a.active_flag = 'Y' ) 	
-					   
-		set @Upd = @@rowcount					   
+					   and a.active_flag = 'Y' )
+
+		set @Upd = @@rowcount
 
 		-- APP ATTRIBUTE PURSUED BY
 		update dbo.volunteer
-		set 
+		set
 			rvd_banner = 'Applicant Being Pursued',
 			update_date = getdate()
 		where rvd_banner <> 'Applicant Being Pursued'
-			and coalesce( App_Pursued_By_Value, '' ) <> ''		
-		
+			and coalesce( App_Pursued_By_Value, '' ) <> ''
+
 		set @Upd = @@rowcount
-		
+
 		-- PERSON IS TRACKED
 --		update dbo.volunteer
---		set 
---			rvd_banner = case 
---							when rvd_banner = '' then 'Person is Tracked' 
---							else rvd_banner + char(13) + char(10) + 'Person is Tracked' 
+--		set
+--			rvd_banner = case
+--							when rvd_banner = '' then 'Person is Tracked'
+--							else rvd_banner + char(13) + char(10) + 'Person is Tracked'
 --						 end,
 --			update_date = getdate()
---		where hub_person_id in ( select person_id from stg.stg_person_tracking )	
-		
-		set @Upd = @@rowcount	
-		
+--		where hub_person_id in ( select person_id from stg.stg_person_tracking )
+
+		set @Upd = @@rowcount
+
 		-- DO NOT INVITE
 		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Do Not Invite' 
-							else rvd_banner + char(13) + char(10) + 'Do Not Invite' 
+		set
+			rvd_banner = case
+							when rvd_banner = '' then 'Do Not Invite'
+							else rvd_banner + char(13) + char(10) + 'Do Not Invite'
 						 end,
 			update_date = getdate()
 		where tracking_status_key = 12
-		
-		set @Upd = @@rowcount		
-		
+
+		set @Upd = @@rowcount
+
 		-- ROLE CHECK REQUIRED
 		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Role Check Required' 
-							else rvd_banner + char(13) + char(10) + 'Role Check Required' 
+		set
+			rvd_banner = case
+							when rvd_banner = '' then 'Role Check Required'
+							else rvd_banner + char(13) + char(10) + 'Role Check Required'
 						 end,
 			update_date = getdate()
 		where 1=1
 			and (
 				    -- HID
-				   ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role = 'HLC Member' ) ) 
+				   ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role = 'HLC Member' ) )
 				    -- SERVICE
 				or ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role in (
 						'Kingdom Ministry School Instructor',
@@ -4030,60 +4039,60 @@ begin
 						'SKE Instructor',
 						'Convention Equipment Pool Committee',
 						'Convention Responsibility',		-- CONVENTION COMMITTEE COORDINATOR
-						'Witnessing group coordinator' ) ) ) 
+						'Witnessing group coordinator' ) ) )
 					-- LDC
-				or ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role = 'LDC Entity Person' 
+				or ( volunteer_key in ( select volunteer_key from dbo.volunteer_role where active_flag = 'Y' and role = 'LDC Entity Person'
 						and ( role_data in ( 'LDC Department', 'Disaster Relief', 'Design Section', 'Maintenance Section', 'Planning Section', 'Project Management Section',
-										   'Quality Assurance Section', 'Support Section' ) 
+										   'Quality Assurance Section', 'Support Section' )
 						or role_data like 'Design Zone%'
 						or role_data like 'CFR %'
 						or role_data like 'CCGO %'
 						or role_data like 'FR %'
 						or role_data like 'FR-P %'
 						or role_data like 'Construction Group %' ) ) )
-				)				
+				)
 
 		set @Upd = @Upd + @@rowcount
 
 		-- SCHOOL GRAD
 		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'School Graduate' 
-							else rvd_banner + char(13) + char(10) + 'School Graduate' 
+		set
+			rvd_banner = case
+							when rvd_banner = '' then 'School Graduate'
+							else rvd_banner + char(13) + char(10) + 'School Graduate'
 						 end,
 			update_date = getdate()
-		where volunteer_key in ( select ve.volunteer_key from dbo.Volunteer_Enrollment ve inner join dbo.enrollment e on ve.Enrollment_Key = e.Enrollment_Key 
+		where volunteer_key in ( select ve.volunteer_key from dbo.Volunteer_Enrollment ve inner join dbo.enrollment e on ve.Enrollment_Key = e.Enrollment_Key
 								 where e.Enrollment_Code in ( 'FGC', 'FGM', 'BBG', 'SKE' ) )
 
 		set @Upd = @Upd + @@rowcount
 
 		-- CURRENT ENROLLMENT
 --		update dbo.volunteer
---		set 
---			rvd_banner = case 
---							when rvd_banner = '' then 'Currently Enrolled' 
---							else rvd_banner + char(13) + char(10) + 'Currently Enrolled' 
+--		set
+--			rvd_banner = case
+--							when rvd_banner = '' then 'Currently Enrolled'
+--							else rvd_banner + char(13) + char(10) + 'Currently Enrolled'
 --						 end,
 --			update_date = getdate()
---		where volunteer_key in ( select v.volunteer_key from dbo.Volunteer v inner join dbo.enrollment e on v.current_Enrollment_Key = e.Enrollment_Key 
+--		where volunteer_key in ( select v.volunteer_key from dbo.Volunteer v inner join dbo.enrollment e on v.current_Enrollment_Key = e.Enrollment_Key
 --								 where e.Enrollment_Code not in ( 'BBC', 'BSE', 'FR', 'FRT', 'FST' ) )
 
 		set @Upd = @Upd + @@rowcount
 
 		-- INFORM DEPARTMENT
 		update dbo.volunteer
-		set 
-			rvd_banner = case 
-							when rvd_banner = '' then 'Inform Dept if Pursued' 
-							else rvd_banner + char(13) + char(10) + 'Inform Dept if Pursued' 
+		set
+			rvd_banner = case
+							when rvd_banner = '' then 'Inform Dept if Pursued'
+							else rvd_banner + char(13) + char(10) + 'Inform Dept if Pursued'
 						 end,
 			update_date = getdate()
 		where volunteer_key in ( select volunteer_key from dbo.Volunteer_role where active_flag = 'Y'
-			and ( 
+			and (
 				 ( role in ( 'PID Key Role', 'PID Support Role' ) )
 			  or ( role = 'HLC Member' and role_data is null )
-			  or ( role = 'LDC Entity Person' 
+			  or ( role = 'LDC Entity Person'
 				and (
 					   role_data = 'Training Courses'
 					or role_data like '%,%'
@@ -4096,30 +4105,30 @@ begin
 				) )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- ZIP CLOSEST TO HPR
 --		update dbo.volunteer
---		set 
---			rvd_banner = case 
---							when rvd_banner = '' then 'Zip Code Closest to HPR' 
---							else rvd_banner + char(13) + char(10) + 'Zip Closest to HPR' 
+--		set
+--			rvd_banner = case
+--							when rvd_banner = '' then 'Zip Code Closest to HPR'
+--							else rvd_banner + char(13) + char(10) + 'Zip Closest to HPR'
 --						 end,
 --			update_date = getdate()
 --		where postal_code_key in ( select postal_code_key from dbo.postal_code where local_flag = 'Y' and hpr_flag = 'Y' )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- ZIP CLOSEST TO OTHER COMPLEXES
 --		update dbo.volunteer
---		set 
---			rvd_banner = case 
---							when rvd_banner = '' then 'Zip Code Closest to Other Complexes' 
---							else rvd_banner + char(13) + char(10) + 'Zip Code Closest to Other Complexes' 
+--		set
+--			rvd_banner = case
+--							when rvd_banner = '' then 'Zip Code Closest to Other Complexes'
+--							else rvd_banner + char(13) + char(10) + 'Zip Code Closest to Other Complexes'
 --						 end,
 --			update_date = getdate()
 --		where postal_code_key in ( select postal_code_key from dbo.postal_code where local_flag = 'Y' and hpr_flag = 'N' )
 
-		set @Upd = @Upd + @@rowcount			
+		set @Upd = @Upd + @@rowcount
 
 		set @End = getdate()
 
@@ -4131,7 +4140,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -4141,7 +4150,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -4157,18 +4166,18 @@ alter procedure dbo.ETL_PRP_Data_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'PRP', 
+
+	declare
+		@Table nvarchar(150) = 'PRP',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
+
 	begin try
 		-- FIX PRP DATA
-		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TE' where teamtrade = 'Site Logistics - Telehandler' 
+		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TE' where teamtrade = 'Site Logistics - Telehandler'
 		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL CR' where teamtrade = 'Site Logistics - Crane Operator'
 		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL RI' where teamtrade = 'Site Logistics - Rigger'
 		--update stg.stg_prp_dept set teamcode = 'HPR CI BG SL TC' where teamtrade = 'Site Logistics - Traffic Management'
@@ -4176,291 +4185,291 @@ begin
 
 		-- DELETE BED DATA
 		truncate table dbo.PRP
-		
-		set @Del = @Del + @@rowcount		
-		
+
+		set @Del = @Del + @@rowcount
+
 		-- INSERT BED DATA
 		insert into dbo.PRP( hpr_dept_key, cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt )
-		select hpr_dept_key, cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt 
+		select hpr_dept_key, cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt
 		from (
-			select hpr_dept_key, cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_28', 3 ) +  ' 01 ' + '20' + right( 'mar_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
+			select hpr_dept_key, cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_28', 3 ) +  ' 01 ' + '20' + right( 'mar_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
 			select hpr_dept_key, cast( left( 'dec_28', 3 ) +  ' 01 ' + '20' + right( 'dec_28', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_28 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
-			select hpr_dept_key, cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'mar_29', 3 ) +  ' 01 ' + '20' + right( 'mar_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
+			select hpr_dept_key, cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'mar_29', 3 ) +  ' 01 ' + '20' + right( 'mar_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
 			select hpr_dept_key, cast( left( 'dec_29', 3 ) +  ' 01 ' + '20' + right( 'dec_29', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select dec_29 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
-			select hpr_dept_key, cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
+			select hpr_dept_key, cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
 			select hpr_dept_key, cast( left( 'mar_30', 3 ) +  ' 01 ' + '20' + right( 'mar_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select mar_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
-			select hpr_dept_key, cast( left( 'apr_30', 3 ) +  ' 01 ' + '20' + right( 'apr_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'may_30', 3 ) +  ' 01 ' + '20' + right( 'may_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
+			select hpr_dept_key, cast( left( 'apr_30', 3 ) +  ' 01 ' + '20' + right( 'apr_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select apr_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'may_30', 3 ) +  ' 01 ' + '20' + right( 'may_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select may_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
 			select hpr_dept_key, cast( left( 'jun_30', 3 ) +  ' 01 ' + '20' + right( 'jun_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
-			select hpr_dept_key, cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL 
-			select hpr_dept_key, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_v ) x			
+			select hpr_dept_key, cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_v ) x
 		) core
 
 		set @Ins = @Ins + @@rowcount
-		
+
 		-- DELETE BED SPACE DATA
 		truncate table dbo.PRP_Bed_Space
-		
-		set @Del = @Del + @@rowcount		
-		
+
+		set @Del = @Del + @@rowcount
+
 		-- INSERT BED SPACE DATA
-		insert into dbo.PRP_Bed_Space( cal_dt, rooming_category, rooming_detail, bed_cnt )		
+		insert into dbo.PRP_Bed_Space( cal_dt, rooming_category, rooming_detail, bed_cnt )
 		select cal_dt, rooming_category, rooming_detail, bed_cnt
 		from (
-			select cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
+			select cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'mar_28', 3 ) +  ' 01 ' + '20' + right( 'mar_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
-			select cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
+			select cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'dec_28', 3 ) +  ' 01 ' + '20' + right( 'dec_28', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_28 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
-			select cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
+			select cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'mar_29', 3 ) +  ' 01 ' + '20' + right( 'mar_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
-			select cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
+			select cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'dec_29', 3 ) +  ' 01 ' + '20' + right( 'dec_29', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select dec_29 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
-			select cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
+			select cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'mar_30', 3 ) +  ' 01 ' + '20' + right( 'mar_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select mar_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
-			select cast( left( 'apr_30', 3 ) +  ' 01 ' + '20' + right( 'apr_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'may_30', 3 ) +  ' 01 ' + '20' + right( 'may_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
+			select cast( left( 'apr_30', 3 ) +  ' 01 ' + '20' + right( 'apr_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select apr_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'may_30', 3 ) +  ' 01 ' + '20' + right( 'may_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select may_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'jun_30', 3 ) +  ' 01 ' + '20' + right( 'jun_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x	UNION ALL
-			select cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL 
-			select cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x			
+			select cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x
 		) core
-		
+
 		set @Ins = @Ins + @@rowcount
-		
+
 		update dbo.PRP_Bed_Space
 		set reporting_category =
-			case 
+			case
 				when rooming_category in ( 'Bed Space Required Total', 'Commuter Forecast' ) then rooming_category
 				when rooming_category = 'Branch' then 'Bed Capacity - Branch'
 				when rooming_category = 'BCL/BRS' then 'Bed Capacity - BCL/BRS'
@@ -4474,153 +4483,153 @@ begin
 
 		-- DELETE CPC LEVEL DATA
 		truncate table dbo.PRP_CPC
-		
-		set @Del = @Del + @@rowcount		
-		
+
+		set @Del = @Del + @@rowcount
+
 		-- INSERT CPC LEVEL DATA
 		insert into dbo.PRP_CPC( cpc_code, cal_dt, bed_cnt, pc_code )
 		select cpc_code, cal_dt, bed_cnt, pc_code
 		from (
-			select cpc_code, cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_28', 3 ) +  ' 01 ' + '20' + right( 'mar_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_20', 3 ) +  ' 01 ' + '20' + right( 'jan_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_20', 3 ) +  ' 01 ' + '20' + right( 'feb_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_20', 3 ) +  ' 01 ' + '20' + right( 'mar_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_20', 3 ) +  ' 01 ' + '20' + right( 'apr_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_20', 3 ) +  ' 01 ' + '20' + right( 'may_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_20', 3 ) +  ' 01 ' + '20' + right( 'jun_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_20', 3 ) +  ' 01 ' + '20' + right( 'jul_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_20', 3 ) +  ' 01 ' + '20' + right( 'aug_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_20', 3 ) +  ' 01 ' + '20' + right( 'sep_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_20', 3 ) +  ' 01 ' + '20' + right( 'oct_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_20', 3 ) +  ' 01 ' + '20' + right( 'nov_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_20', 3 ) +  ' 01 ' + '20' + right( 'dec_20', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_20 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_21', 3 ) +  ' 01 ' + '20' + right( 'jan_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_21', 3 ) +  ' 01 ' + '20' + right( 'feb_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_21', 3 ) +  ' 01 ' + '20' + right( 'mar_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_21', 3 ) +  ' 01 ' + '20' + right( 'apr_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_21', 3 ) +  ' 01 ' + '20' + right( 'may_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_21', 3 ) +  ' 01 ' + '20' + right( 'jun_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_21', 3 ) +  ' 01 ' + '20' + right( 'jul_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_21', 3 ) +  ' 01 ' + '20' + right( 'aug_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_21', 3 ) +  ' 01 ' + '20' + right( 'sep_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_21', 3 ) +  ' 01 ' + '20' + right( 'oct_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_21', 3 ) +  ' 01 ' + '20' + right( 'nov_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_21', 3 ) +  ' 01 ' + '20' + right( 'dec_21', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_21 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_22', 3 ) +  ' 01 ' + '20' + right( 'jan_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_22', 3 ) +  ' 01 ' + '20' + right( 'feb_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_22', 3 ) +  ' 01 ' + '20' + right( 'mar_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_22', 3 ) +  ' 01 ' + '20' + right( 'apr_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_22', 3 ) +  ' 01 ' + '20' + right( 'may_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_22', 3 ) +  ' 01 ' + '20' + right( 'jun_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_22', 3 ) +  ' 01 ' + '20' + right( 'jul_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_22', 3 ) +  ' 01 ' + '20' + right( 'aug_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_22', 3 ) +  ' 01 ' + '20' + right( 'sep_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_22', 3 ) +  ' 01 ' + '20' + right( 'oct_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_22', 3 ) +  ' 01 ' + '20' + right( 'nov_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_22', 3 ) +  ' 01 ' + '20' + right( 'dec_22', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_22 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_23', 3 ) +  ' 01 ' + '20' + right( 'jan_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_23', 3 ) +  ' 01 ' + '20' + right( 'feb_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_23', 3 ) +  ' 01 ' + '20' + right( 'mar_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_23', 3 ) +  ' 01 ' + '20' + right( 'apr_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_23', 3 ) +  ' 01 ' + '20' + right( 'may_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_23', 3 ) +  ' 01 ' + '20' + right( 'jun_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_23', 3 ) +  ' 01 ' + '20' + right( 'jul_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_23', 3 ) +  ' 01 ' + '20' + right( 'aug_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_23', 3 ) +  ' 01 ' + '20' + right( 'sep_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_23', 3 ) +  ' 01 ' + '20' + right( 'oct_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_23', 3 ) +  ' 01 ' + '20' + right( 'nov_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_23', 3 ) +  ' 01 ' + '20' + right( 'dec_23', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_23 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_24', 3 ) +  ' 01 ' + '20' + right( 'jan_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_24', 3 ) +  ' 01 ' + '20' + right( 'feb_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_24', 3 ) +  ' 01 ' + '20' + right( 'mar_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_24', 3 ) +  ' 01 ' + '20' + right( 'apr_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_24', 3 ) +  ' 01 ' + '20' + right( 'may_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_24', 3 ) +  ' 01 ' + '20' + right( 'jun_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_24', 3 ) +  ' 01 ' + '20' + right( 'jul_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_24', 3 ) +  ' 01 ' + '20' + right( 'aug_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_24', 3 ) +  ' 01 ' + '20' + right( 'sep_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_24', 3 ) +  ' 01 ' + '20' + right( 'oct_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_24', 3 ) +  ' 01 ' + '20' + right( 'nov_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_24', 3 ) +  ' 01 ' + '20' + right( 'dec_24', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_24 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_25', 3 ) +  ' 01 ' + '20' + right( 'jan_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_25', 3 ) +  ' 01 ' + '20' + right( 'feb_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_25', 3 ) +  ' 01 ' + '20' + right( 'mar_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_25', 3 ) +  ' 01 ' + '20' + right( 'apr_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_25', 3 ) +  ' 01 ' + '20' + right( 'may_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_25', 3 ) +  ' 01 ' + '20' + right( 'jun_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_25', 3 ) +  ' 01 ' + '20' + right( 'jul_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_25', 3 ) +  ' 01 ' + '20' + right( 'aug_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_25', 3 ) +  ' 01 ' + '20' + right( 'sep_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_25', 3 ) +  ' 01 ' + '20' + right( 'oct_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_25', 3 ) +  ' 01 ' + '20' + right( 'nov_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_25', 3 ) +  ' 01 ' + '20' + right( 'dec_25', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_25 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_26', 3 ) +  ' 01 ' + '20' + right( 'jan_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_26', 3 ) +  ' 01 ' + '20' + right( 'feb_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_26', 3 ) +  ' 01 ' + '20' + right( 'mar_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_26', 3 ) +  ' 01 ' + '20' + right( 'apr_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_26', 3 ) +  ' 01 ' + '20' + right( 'may_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_26', 3 ) +  ' 01 ' + '20' + right( 'jun_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_26', 3 ) +  ' 01 ' + '20' + right( 'jul_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_26', 3 ) +  ' 01 ' + '20' + right( 'aug_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_26', 3 ) +  ' 01 ' + '20' + right( 'sep_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_26', 3 ) +  ' 01 ' + '20' + right( 'oct_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_26', 3 ) +  ' 01 ' + '20' + right( 'nov_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_26', 3 ) +  ' 01 ' + '20' + right( 'dec_26', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_26 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_27', 3 ) +  ' 01 ' + '20' + right( 'jan_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_27', 3 ) +  ' 01 ' + '20' + right( 'feb_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_27', 3 ) +  ' 01 ' + '20' + right( 'mar_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_27', 3 ) +  ' 01 ' + '20' + right( 'apr_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_27', 3 ) +  ' 01 ' + '20' + right( 'may_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_27', 3 ) +  ' 01 ' + '20' + right( 'jun_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_27', 3 ) +  ' 01 ' + '20' + right( 'jul_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_27', 3 ) +  ' 01 ' + '20' + right( 'aug_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_27', 3 ) +  ' 01 ' + '20' + right( 'sep_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_27', 3 ) +  ' 01 ' + '20' + right( 'oct_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_27', 3 ) +  ' 01 ' + '20' + right( 'nov_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'dec_27', 3 ) +  ' 01 ' + '20' + right( 'dec_27', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_27 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jan_28', 3 ) +  ' 01 ' + '20' + right( 'jan_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_28', 3 ) +  ' 01 ' + '20' + right( 'feb_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_28', 3 ) +  ' 01 ' + '20' + right( 'mar_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_28', 3 ) +  ' 01 ' + '20' + right( 'apr_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_28', 3 ) +  ' 01 ' + '20' + right( 'may_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_28', 3 ) +  ' 01 ' + '20' + right( 'jun_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_28', 3 ) +  ' 01 ' + '20' + right( 'jul_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_28', 3 ) +  ' 01 ' + '20' + right( 'aug_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_28', 3 ) +  ' 01 ' + '20' + right( 'sep_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_28', 3 ) +  ' 01 ' + '20' + right( 'oct_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_28', 3 ) +  ' 01 ' + '20' + right( 'nov_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
 			select cpc_code, cast( left( 'dec_28', 3 ) +  ' 01 ' + '20' + right( 'dec_28', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_28 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
-			select cpc_code, cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'mar_29', 3 ) +  ' 01 ' + '20' + right( 'mar_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_29', 3 ) +  ' 01 ' + '20' + right( 'jan_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_29', 3 ) +  ' 01 ' + '20' + right( 'feb_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'mar_29', 3 ) +  ' 01 ' + '20' + right( 'mar_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'apr_29', 3 ) +  ' 01 ' + '20' + right( 'apr_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_29', 3 ) +  ' 01 ' + '20' + right( 'may_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jun_29', 3 ) +  ' 01 ' + '20' + right( 'jun_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'jul_29', 3 ) +  ' 01 ' + '20' + right( 'jul_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_29', 3 ) +  ' 01 ' + '20' + right( 'aug_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_29', 3 ) +  ' 01 ' + '20' + right( 'sep_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_29', 3 ) +  ' 01 ' + '20' + right( 'oct_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_29', 3 ) +  ' 01 ' + '20' + right( 'nov_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
 			select cpc_code, cast( left( 'dec_29', 3 ) +  ' 01 ' + '20' + right( 'dec_29', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select dec_29 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
-			select cpc_code, cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'jan_30', 3 ) +  ' 01 ' + '20' + right( 'jan_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jan_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'feb_30', 3 ) +  ' 01 ' + '20' + right( 'feb_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select feb_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
 			select cpc_code, cast( left( 'mar_30', 3 ) +  ' 01 ' + '20' + right( 'mar_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select mar_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
-			select cpc_code, cast( left( 'apr_30', 3 ) +  ' 01 ' + '20' + right( 'apr_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'may_30', 3 ) +  ' 01 ' + '20' + right( 'may_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
+			select cpc_code, cast( left( 'apr_30', 3 ) +  ' 01 ' + '20' + right( 'apr_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select apr_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'may_30', 3 ) +  ' 01 ' + '20' + right( 'may_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select may_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
 			select cpc_code, cast( left( 'jun_30', 3 ) +  ' 01 ' + '20' + right( 'jun_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
-			select cpc_code, cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL 
-			select cpc_code, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x			
+			select cpc_code, cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x
 		) core
 
 		set @Ins = @Ins + @@rowcount
-		
+
 		-- PRP ACTUALS
 		-- DELETE EXISTING DATA
 		truncate table dbo.PRP_Actuals_Level_04_snp
-		
-		set @Del = @Del + @@rowcount		
-		
-		-- INSERT PRP ACTUALS DATA		
+
+		set @Del = @Del + @@rowcount
+
+		-- INSERT PRP ACTUALS DATA
 		insert into dbo.PRP_Actuals_Level_04_snp(
 			cpc_code
            ,level_03
@@ -4729,7 +4738,7 @@ begin
            ,wk_26_budget
            ,wk_26_used
            ,wk_26_avail )
-		select 
+		select
 			cpc_code
            ,level_03
            ,level_04
@@ -4788,7 +4797,7 @@ begin
            ,wk_14_dt
            ,wk_14_budget
            ,wk_14_used
-           ,wk_14_avail           
+           ,wk_14_avail
            ,wk_15_dt
            ,wk_15_budget
            ,wk_15_used
@@ -4808,7 +4817,7 @@ begin
            ,wk_19_dt
            ,wk_19_budget
            ,wk_19_used
-           ,wk_19_avail           
+           ,wk_19_avail
            ,wk_20_dt
            ,wk_20_budget
            ,wk_20_used
@@ -4836,17 +4845,17 @@ begin
            ,wk_26_dt
            ,wk_26_budget
            ,wk_26_used
-           ,wk_26_avail           
+           ,wk_26_avail
 		from rpt.PRP_Actuals_Level_04_v
-		
-		set @Ins = @Ins + @@rowcount		
-				
+
+		set @Ins = @Ins + @@rowcount
+
 		-- DELETE EXISTING DATA
 		truncate table dbo.PRP_Actuals_Level_03_snp
-		
-		set @Del = @Del + @@rowcount		
-		
-		-- INSERT PRP ACTUALS DATA		
+
+		set @Del = @Del + @@rowcount
+
+		-- INSERT PRP ACTUALS DATA
 		insert into dbo.PRP_Actuals_Level_03_snp(
 			cpc_code
            ,level_03
@@ -4954,7 +4963,7 @@ begin
            ,wk_26_budget
            ,wk_26_used
            ,wk_26_avail )
-		select 
+		select
 			cpc_code
            ,level_03
            ,wk_01_dt
@@ -5012,7 +5021,7 @@ begin
            ,wk_14_dt
            ,wk_14_budget
            ,wk_14_used
-           ,wk_14_avail           
+           ,wk_14_avail
            ,wk_15_dt
            ,wk_15_budget
            ,wk_15_used
@@ -5032,7 +5041,7 @@ begin
            ,wk_19_dt
            ,wk_19_budget
            ,wk_19_used
-           ,wk_19_avail           
+           ,wk_19_avail
            ,wk_20_dt
            ,wk_20_budget
            ,wk_20_used
@@ -5060,17 +5069,17 @@ begin
            ,wk_26_dt
            ,wk_26_budget
            ,wk_26_used
-           ,wk_26_avail           
+           ,wk_26_avail
 		from rpt.PRP_Actuals_Level_03_v
-		
-		set @Ins = @Ins + @@rowcount		
+
+		set @Ins = @Ins + @@rowcount
 
 		-- DELETE EXISTING DATA
 		truncate table dbo.PRP_Actuals_Level_02_snp
-		
-		set @Del = @Del + @@rowcount		
-		
-		-- INSERT PRP ACTUALS DATA		
+
+		set @Del = @Del + @@rowcount
+
+		-- INSERT PRP ACTUALS DATA
 		insert into dbo.PRP_Actuals_Level_02_snp(
 			cpc_code
            ,wk_01_dt
@@ -5177,7 +5186,7 @@ begin
            ,wk_26_budget
            ,wk_26_used
            ,wk_26_avail )
-		select 
+		select
 			cpc_code
            ,wk_01_dt
            ,wk_01_budget
@@ -5234,7 +5243,7 @@ begin
            ,wk_14_dt
            ,wk_14_budget
            ,wk_14_used
-           ,wk_14_avail           
+           ,wk_14_avail
            ,wk_15_dt
            ,wk_15_budget
            ,wk_15_used
@@ -5254,7 +5263,7 @@ begin
            ,wk_19_dt
            ,wk_19_budget
            ,wk_19_used
-           ,wk_19_avail           
+           ,wk_19_avail
            ,wk_20_dt
            ,wk_20_budget
            ,wk_20_used
@@ -5282,11 +5291,11 @@ begin
            ,wk_26_dt
            ,wk_26_budget
            ,wk_26_used
-           ,wk_26_avail           
+           ,wk_26_avail
 		from rpt.PRP_Actuals_Level_02_v
-		
-		set @Ins = @Ins + @@rowcount		
-		
+
+		set @Ins = @Ins + @@rowcount
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -5297,7 +5306,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -5307,7 +5316,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -5323,16 +5332,16 @@ alter procedure dbo.ETL_App_Attributes_Cleanup_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'App_Attribute_Hist', 
+
+	declare
+		@Table nvarchar(150) = 'App_Attribute_Hist',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
-	begin try		
+
+	begin try
 		-- SET TO COMPLETE WHERE PURSUED MATCHES HUB
 		update data_xchg.App_Attribute_Hist
 		set status = 'Complete'
@@ -5342,16 +5351,16 @@ begin
 				inner join ( select a.applicant_id, ph.attribute_value, a.attrib_pursued_by_val, a.attrib_contacted_val, a.active_flag from dbo.Volunteer_Pursuit_Hist_Curr_v ph
 					inner join dbo.volunteer_app_v a on ph.volunteer_key = a.volunteer_key ) x on p.applicant_Id = x.applicant_id
 				where app_status_code not in ('PNDC','PNDE') and x.attribute_value = x.attrib_pursued_by_val )
-		
+
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- MULTIPLE ACTIVE PURSUIT HISTORY FOR A VOLUNTEER
 		delete
 		from dbo.volunteer_pursuit_hist
 		where volunteer_pursuit_hist_key in ( select min( volunteer_pursuit_hist_key ) as min_key from dbo.Volunteer_Pursuit_Hist where active_flag = 'Y' group by volunteer_key having count(*) > 1 )
 
 		set @Del = @Del + @@rowcount
-		
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -5362,7 +5371,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -5372,7 +5381,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -5388,26 +5397,26 @@ alter procedure dbo.ETL_Bad_Data_Cleanup_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Bad Data Cleanup', 
+
+	declare
+		@Table nvarchar(150) = 'Bad Data Cleanup',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
-	begin try		
+
+	begin try
 		-- ORPHANED WORK ASSIGNMENTS
 		update volunteer_dept set end_date = getdate(), active_flag = 'N' where volunteer_dept_key in ( select volunteer_dept_key from dbo.Volunteer_Dept_Orphaned_Records_v )
-		
+
 		set @Upd = @Upd + @@rowcount
-		
+
 		-- ORPHANED ENROLLMENTS
 		delete from volunteer_enrollment where volunteer_enrollment_key in ( select volunteer_enrollment_key from dbo.Volunteer_enrollment_Orphaned_Records_v )
-		
+
 		set @Del = @Del + @@rowcount
-		
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -5418,7 +5427,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -5428,7 +5437,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -5444,23 +5453,23 @@ alter procedure dbo.ETL_Reporting_Snapshots_proc
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Volunteer V Snapshot', 
+
+	declare
+		@Table nvarchar(150) = 'Volunteer V Snapshot',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-	
-	begin try		
-	
+
+	begin try
+
 		-- DELETE EXISTING DATA
 		truncate table dbo.Volunteer_v_snp
-		
-		set @Del = @Del + @@rowcount	
-		
-		-- INSERT NEW DATA		
+
+		set @Del = @Del + @@rowcount
+
+		-- INSERT NEW DATA
 		insert into dbo.Volunteer_v_snp(
 			 volunteer_key
 			,hub_volunteer_num
@@ -5491,7 +5500,7 @@ begin
 			,spouse_hub_person_id
 			,spouse_hub_volunteer_num
 			,spouse_bethel_email
-			,spouse_jwpub_email		
+			,spouse_jwpub_email
 			,enrollment_1_code
 			,enrollment_1_site_code
 			,enrollment_1_start_date
@@ -5552,7 +5561,7 @@ begin
 			,room_bldg_desc
 			,room
 			,staffing_number_exception_flag
-			,record_type )		
+			,record_type )
 		select
 			 volunteer_key
 			,hub_volunteer_num
@@ -5583,7 +5592,7 @@ begin
 			,spouse_hub_person_id
 			,spouse_hub_volunteer_num
 			,spouse_bethel_email
-			,spouse_jwpub_email		
+			,spouse_jwpub_email
 			,enrollment_1_code
 			,enrollment_1_site_code
 			,enrollment_1_start_date
@@ -5644,11 +5653,11 @@ begin
 			,room_bldg_desc
 			,room
 			,staffing_number_exception_flag
-			,record_type	
+			,record_type
 		from rpt.Volunteer_v
 
-		set @Ins = @Ins+ @@rowcount	
-		
+		set @Ins = @Ins+ @@rowcount
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
@@ -5659,7 +5668,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -5669,7 +5678,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End,
 			@Status_Code = 'F'
-	end catch		
+	end catch
 end
 go
 
@@ -5686,27 +5695,27 @@ alter procedure dbo.ETL_Status_Update_Process_Roles
 as
 begin
 	set nocount on
-	
-	declare 
-		@Table nvarchar(150) = 'Dept Role and Dept Role Volunteer', 
+
+	declare
+		@Table nvarchar(150) = 'Dept Role and Dept Role Volunteer',
 		@Ins integer = 0,
 		@Upd integer = 0,
 		@Del integer = 0,
-		@Start datetime = getdate(), 
+		@Start datetime = getdate(),
 		@End datetime
-		
-	begin try		
+
+	begin try
 		--Backup Dept_Role table
 		INSERT INTO arch.Dept_Role
 		SELECT *, cast(getdate() as date) FROM dbo.Dept_Role
 
-		set @Ins = @Ins + @@rowcount	
+		set @Ins = @Ins + @@rowcount
 
 		--Backup Dept_Role_Volunteer table
 		INSERT INTO arch.Dept_Role_Volunteer
 		SELECT *, cast(getdate() as date) FROM dbo.Dept_Role_Volunteer
 
-		set @Ins = @Ins + @@rowcount	
+		set @Ins = @Ins + @@rowcount
 
 		--RG Note (9/29/25) - Commented out inserting new records into the Dept_Role and Dept_Role_Volunteer tables
 		----Step 1a - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role
@@ -5730,7 +5739,7 @@ begin
   --         ,active_flag
   --         ,load_date
   --         ,update_date)
-		--select 
+		--select
 		--	 coalesce( dept_1_hpr_dept_key, dept_2_hpr_dept_key )	as hpr_dept_key
 		--	,0														as hpr_crew_key -- Set to 'Unassigned'
 		--	,case coalesce( d.cpc_code, d2.cpc_code )
@@ -5741,16 +5750,16 @@ begin
 		--		when 'PS' then 54
 		--		else 95 -- VD
 		--	 end													as hpr_dept_role_key  -- Set to 'Volunteer' based on CPC_Code
-		--	,( select Enrollment_Key from dbo.Enrollment 
-		--	   where enrollment_code = vr.enrollment_1_code 
+		--	,( select Enrollment_Key from dbo.Enrollment
+		--	   where enrollment_code = vr.enrollment_1_code
 		--			and Active_Flag = 'Y' )							as enrollment_key
 		--	,7														as skill_level -- Set to 'Not Assessed'
 		--	,dept_1_start_date										as dept_start_date
 		--	,dept_1_end_date										as dept_end_date
-		--	,(select dept_asgn_status_key 
-		--		from dbo.dept_asgn_status 
+		--	,(select dept_asgn_status_key
+		--		from dbo.dept_asgn_status
 		--		where dept_asgn_status_code = 'ACTIVE'
-		--		and Dept_Asgn_Status_Type = 'DR')					as dept_asgn_status_key  
+		--		and Dept_Asgn_Status_Type = 'DR')					as dept_asgn_status_key
 		--	,3														as priority_key -- set to 'normal'
 		--	,'N'													as vtc_meeting_code
 		--	,'HuB'													as Update_Source -- Indicate record added from HuB
@@ -5758,28 +5767,28 @@ begin
 		--	,cast( getdate() as date )								as UpdateDate_Source  -- Indicate date record added from HuB
 		--	,'N'													as Update_ReviewedByUser
 		--	,vr.volunteer_key										as Update_AddLink1
-		--	,( select Enrollment_Key from dbo.Enrollment 
-		--	   where enrollment_code = vr.enrollment_1_code 
+		--	,( select Enrollment_Key from dbo.Enrollment
+		--	   where enrollment_code = vr.enrollment_1_code
 		--			and Active_Flag = 'Y' )							as Update_AddLink2
 		--	,'Y'													as active_flag
 		--	,cast( getdate() as date )								as load_date
 		--	,cast( getdate() as date )								as update_date
 		--FROM rpt.Volunteer_Rpt_v VR
-		--left outer join dbo.HPR_Dept D 
+		--left outer join dbo.HPR_Dept D
 		--	on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
-		--left outer join dbo.HPR_Dept D2 
+		--left outer join dbo.HPR_Dept D2
 		--	on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
-		--left outer join 
-		--	( select da.volunteer_key, da.Vol_Enrollment_Key 
-		--	  from dbo.Dept_Role_Volunteer da 
+		--left outer join
+		--	( select da.volunteer_key, da.Vol_Enrollment_Key
+		--	  from dbo.Dept_Role_Volunteer da
 		--	  where Active_Flag = 'Y' and isnull( volunteer_key, 99999999 ) <> 99999999 ) A
-		--	on a.Volunteer_Key = vr.volunteer_key 
+		--	on a.Volunteer_Key = vr.volunteer_key
 		--	and a.Vol_Enrollment_Key = ( select Enrollment_Key from dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y' )
 		--where isnull( a.volunteer_key, 999999999 ) = 999999999 -- DOES NOT EXIST IN DEPT ROLE VOLUNTEER
 		--	and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
 		--		  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
 
-		--set @Ins = @Ins + @@rowcount	
+		--set @Ins = @Ins + @@rowcount
 
 
 		----Step 1b - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role_Volunteer
@@ -5800,11 +5809,11 @@ begin
   --         ,update_reviewedbyuser
   --         ,extension_flag
   --         ,extension_flag_updatedate )
-		--select 
-		--	 (select dr.dept_role_key 
+		--select
+		--	 (select dr.dept_role_key
 		--		from dept_role dr inner join
 		--		dept_role_volunteer drv on
-		--		coalesce(vr.dept_1_hpr_dept_key, vr.dept_2_hpr_dept_key ) 
+		--		coalesce(vr.dept_1_hpr_dept_key, vr.dept_2_hpr_dept_key )
 		--			= dr.hpr_dept_key
 		--		and case coalesce( d.cpc_code, d2.cpc_code )
 		--			when 'CI' then 76
@@ -5815,28 +5824,28 @@ begin
 		--			else 95
 		--			end = dr.hpr_dept_role_key
 		--		and dr.update_addlink1 = vr.volunteer_key
-		--		and dr.update_addlink2 = 
-		--			(select Enrollment_Key from dbo.Enrollment 
-		--			where enrollment_code = vr.enrollment_1_code 
+		--		and dr.update_addlink2 =
+		--			(select Enrollment_Key from dbo.Enrollment
+		--			where enrollment_code = vr.enrollment_1_code
 		--			and Active_Flag = 'Y' ))						as dept_role_key
-		--	,(select dept_asgn_status_key 
-		--		from dbo.dept_asgn_status 
+		--	,(select dept_asgn_status_key
+		--		from dbo.dept_asgn_status
 		--		where dept_asgn_status_code = 'VOLUNTEER'
 		--		and Dept_Asgn_Status_Type = 'RV')					as volunteer_type
-		--	,( select Enrollment_Key from dbo.Enrollment 
-		--	   where enrollment_code = vr.enrollment_1_code 
+		--	,( select Enrollment_Key from dbo.Enrollment
+		--	   where enrollment_code = vr.enrollment_1_code
 		--			and Active_Flag = 'Y' )							as vol_enrollment_key
 		--	,dept_1_start_date										as vol_start_date
 		--	,dept_1_end_date										as vol_end_date
-		--	,case 
-		--		when dept_1_start_date > cast( getdate() as date )  
+		--	,case
+		--		when dept_1_start_date > cast( getdate() as date )
 		--			then ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' ) -- FUTURE START
 		--		when dept_1_start_date <= cast( getdate() as date ) and isnull( dept_1_end_date, '12/31/9999' ) >= cast( getdate() as date )
 		--			then ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' ) -- START IN PAST AND END IS NULL OR IN FUTURE
-		--		when dept_1_end_date < cast( getdate() as date ) 
+		--		when dept_1_end_date < cast( getdate() as date )
 		--			then (select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'DEPARTED' ) -- END IN PAST
 		--		else ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING' )
-		--	 end													as dept_asgn_status_key  
+		--	 end													as dept_asgn_status_key
 		--	,vr.volunteer_key
 		--	,'Y'													as active_flag
 		--	,cast( getdate() as date )								as load_date
@@ -5848,21 +5857,21 @@ begin
 		--	,'N'													as Extension_Flag
 		--	,cast( getdate() as date )								as Extension_Flag_UpdateDate
 		--FROM rpt.Volunteer_Rpt_v VR
-		--left outer join dbo.HPR_Dept D 
+		--left outer join dbo.HPR_Dept D
 		--	on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
-		--left outer join dbo.HPR_Dept D2 
+		--left outer join dbo.HPR_Dept D2
 		--	on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
-		--left outer join 
-		--	( select da.volunteer_key, da.vol_enrollment_key 
-		--	  from dbo.dept_role_volunteer da 
+		--left outer join
+		--	( select da.volunteer_key, da.vol_enrollment_key
+		--	  from dbo.dept_role_volunteer da
 		--	  where active_flag = 'Y' and isnull( volunteer_key, 99999999 ) <> 99999999 ) A
-		--	on a.volunteer_key = vr.volunteer_key 
+		--	on a.volunteer_key = vr.volunteer_key
 		--	and a.vol_enrollment_key = ( select enrollment_Key from dbo.enrollment where enrollment_code = VR.enrollment_1_code and active_flag = 'Y' )
 		--where isnull( a.volunteer_key, 999999999 ) = 999999999 -- DOES NOT EXIST IN DEPT ASGN
 		--	and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
 		--		  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
 
-		--set @Ins = @Ins + @@rowcount	
+		--set @Ins = @Ins + @@rowcount
 
 
 		----STEP 1c - Clear update_addlink1 and update_addlink2 in Dept_Role table, which are temporary values to hold IDs when adding Dept_Role_Volunteer records in step 1b
@@ -5874,8 +5883,8 @@ begin
 
 		----STEP 1 (AUDIT) - Add records to Audit table
 		--INSERT INTO [arch].[ETL_Status_Audit]
-		--SELECT drv.Volunteer_Key, v.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'New Record Added', 'Y', NULL, NULL, NULL, NULL, NULL, NULL, cast(GETDATE() as date) 
-		--FROM Dept_Role_Volunteer drv 
+		--SELECT drv.Volunteer_Key, v.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'New Record Added', 'Y', NULL, NULL, NULL, NULL, NULL, NULL, cast(GETDATE() as date)
+		--FROM Dept_Role_Volunteer drv
 		--	inner join Volunteer v on v.Volunteer_Key = drv.Volunteer_Key
 		--	inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
 		--WHERE drv.Update_Type = 'New Vol Record' and drv.update_date = cast(GETDATE() as date)
@@ -5883,35 +5892,35 @@ begin
 
 		--STEP 2 (AUDIT) - Add records to Audit table before update to original data occurs
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.volunteer_name, drv.Vol_Enrollment_Key, vr.enrollment_1_code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Date Change', NULL, NULL, drv.Vol_Start_Date, drv.Vol_End_Date, NULL, vr.dept_1_start_date, coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date ), cast(GETDATE() as date) 
+		SELECT drv.Volunteer_Key, vr.volunteer_name, drv.Vol_Enrollment_Key, vr.enrollment_1_code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Date Change', NULL, NULL, drv.Vol_Start_Date, drv.Vol_End_Date, NULL, vr.dept_1_start_date, coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date ), cast(GETDATE() as date)
 		FROM rpt.volunteer_rpt_v vr
-				inner join dbo.dept_role_volunteer drv 
-					on drv.volunteer_key = vr.volunteer_key 
+				inner join dbo.dept_role_volunteer drv
+					on drv.volunteer_key = vr.volunteer_key
 					and drv.vol_enrollment_key = ( select enrollment_Key from dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y' )
-				left outer join 		
+				left outer join
 					( select da.volunteer_key as VolKey_Dup, da.vol_enrollment_key as EnrKey_Dup
-					  from dbo.dept_role_volunteer da 
-					  where Volunteer_Key is not null 
-						and vol_enrollment_key is not null 
+					  from dbo.dept_role_volunteer da
+					  where Volunteer_Key is not null
+						and vol_enrollment_key is not null
 						and active_flag = 'Y'
-					  group by da.volunteer_key, da.vol_enrollment_key 
-					  having count(*)>1 ) Dup 
-					on drv.volunteer_key = dup.VolKey_Dup 
+					  group by da.volunteer_key, da.vol_enrollment_key
+					  having count(*)>1 ) Dup
+					on drv.volunteer_key = dup.VolKey_Dup
 					and drv.vol_enrollment_key = dup.EnrKey_Dup
 				where 1=1
 					and (
 						   ( coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '1/1/1901' ) > cast( getdate() as date ) -- FUTURE END
 						or ( coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '1/1/1901' ) = '1/1/1901' ) )  -- NO END DATE
 						or vr.dept_1_start_date >= cast( getdate() as date ) -- FUTURE START
-						) 
+						)
 					and drv.Active_Flag = 'Y'
-					and ( 
-						   drv.Vol_Start_Date <> VR.dept_1_start_date -- DIFFERENT START 
+					and (
+						   drv.Vol_Start_Date <> VR.dept_1_start_date -- DIFFERENT START
 						or coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '1/1/1901' ) <> isnull( drv.Vol_End_Date, '1/1/1901' ) -- DIFFERENT END
-						) 
+						)
 					and VolKey_Dup is null		-- NOT A DUP
 					and not (  -- NOT NULL END DATE AND START BEFORE END
-						(     ISNULL( drv.Vol_End_Date, '1/1/1901' ) <> '1/1/1901' 
+						(     ISNULL( drv.Vol_End_Date, '1/1/1901' ) <> '1/1/1901'
 						  and VR.dept_1_start_date > ISNULL( drv.Vol_End_Date, '1/1/1901' ) )
 						)
 					and coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '12/31/9999' ) > vr.dept_1_start_date -- END AFTER START
@@ -5920,42 +5929,42 @@ begin
 		--Step 2 - UPDATE DATES:  Sync Dept_Asgn Dept start/end date to Hub start/end dates where records are currently active or have a future date and extension_flag is 'N'
 		--			Note:  Duplicate records (active records with same volunteer and enrollment) are being excluded from this check
 		update dbo.dept_role_volunteer
-		set vol_start_date = vr.dept_1_start_date, 
+		set vol_start_date = vr.dept_1_start_date,
 			vol_end_date = coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date ),
 			update_source = 'HuB',
-			update_type = 'Date Change', 
-			updatedate_source = cast( getdate() as date ), 
-			update_reviewedbyuser = 'N', 
+			update_type = 'Date Change',
+			updatedate_source = cast( getdate() as date ),
+			update_reviewedbyuser = 'N',
 			update_date = cast( getdate() as date )
 		--select vr.volunteer_name, vr.volunteer_key, drv.Volunteer_Key, vr.dept_1_start_date, vr.dept_1_end_date, vr.enrollment_1_end_date, drv.Vol_Start_Date, drv.Vol_End_Date, vr.enrollment_1_code, drv.Vol_Enrollment_Key
 		from rpt.volunteer_rpt_v vr
-		inner join dbo.dept_role_volunteer drv 
-			on drv.volunteer_key = vr.volunteer_key 
+		inner join dbo.dept_role_volunteer drv
+			on drv.volunteer_key = vr.volunteer_key
 			and drv.vol_enrollment_key = ( select enrollment_Key from dbo.Enrollment where enrollment_code = VR.enrollment_1_code and Active_Flag = 'Y' )
-		left outer join 		
+		left outer join
 			( select da.volunteer_key as VolKey_Dup, da.vol_enrollment_key as EnrKey_Dup
-			  from dbo.dept_role_volunteer da 
-			  where Volunteer_Key is not null 
-				and vol_enrollment_key is not null 
+			  from dbo.dept_role_volunteer da
+			  where Volunteer_Key is not null
+				and vol_enrollment_key is not null
 				and active_flag = 'Y'
-			  group by da.volunteer_key, da.vol_enrollment_key 
-			  having count(*)>1 ) Dup 
-			on drv.volunteer_key = dup.VolKey_Dup 
+			  group by da.volunteer_key, da.vol_enrollment_key
+			  having count(*)>1 ) Dup
+			on drv.volunteer_key = dup.VolKey_Dup
 			and drv.vol_enrollment_key = dup.EnrKey_Dup
 		where 1=1
 			and (
 				   ( coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '1/1/1901' ) > cast( getdate() as date ) -- FUTURE END
 				or ( coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '1/1/1901' ) = '1/1/1901' ) )  -- NO END DATE
 				or vr.dept_1_start_date >= cast( getdate() as date ) -- FUTURE START
-				) 
+				)
 			and drv.Active_Flag = 'Y'
-			and ( 
-				   drv.Vol_Start_Date <> VR.dept_1_start_date -- DIFFERENT START 
+			and (
+				   drv.Vol_Start_Date <> VR.dept_1_start_date -- DIFFERENT START
 				or coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '1/1/1901' ) <> isnull( drv.Vol_End_Date, '1/1/1901' ) -- DIFFERENT END
-				) 
+				)
 			and VolKey_Dup is null		-- NOT A DUP
 			and not (  -- NOT NULL END DATE AND START BEFORE END
-				(     ISNULL( drv.Vol_End_Date, '1/1/1901' ) <> '1/1/1901' 
+				(     ISNULL( drv.Vol_End_Date, '1/1/1901' ) <> '1/1/1901'
 				  and VR.dept_1_start_date > ISNULL( drv.Vol_End_Date, '1/1/1901' ) )
 				)
 			and coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '12/31/9999' ) > vr.dept_1_start_date -- END AFTER START
@@ -5967,27 +5976,27 @@ begin
 		update dbo.dept_role_volunteer
 		set dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' ),
 			Update_Source = 'HuB',
-			Update_Type = 'Status to APPROVED', 
-			UpdateDate_Source = cast( getdate() as date ), 
-			Update_ReviewedByUser = 'N', 
+			Update_Type = 'Status to APPROVED',
+			UpdateDate_Source = cast( getdate() as date ),
+			Update_ReviewedByUser = 'N',
 			Update_Date = cast( getdate() as date )
 		--select *
-		from dbo.dept_role_volunteer da 
-		left outer join rpt.volunteer_rpt_v h 
-			on h.volunteer_key = da.volunteer_key 
+		from dbo.dept_role_volunteer da
+		left outer join rpt.volunteer_rpt_v h
+			on h.volunteer_key = da.volunteer_key
 			and ( select enrollment_key from dbo.enrollment where enrollment_code = h.enrollment_1_code and active_flag = 'Y' ) = da.vol_enrollment_key
 		where dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'SUBMITTED' ) -- SUBMITTED STATUS
 			and vol_start_date > cast( getdate() as date ) -- START IN FUTURE
 			and isnull( h.volunteer_key, 999999999 ) <> 999999999 -- VOLUNTEER IN HUB
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		--STEP 3 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.volunteer_name, drv.Vol_Enrollment_Key, vr.enrollment_1_code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'SUBMITTED', NULL, NULL, 'APPROVED', NULL, NULL, cast(GETDATE() as date) 
-		FROM dbo.dept_role_volunteer drv 
+		SELECT drv.Volunteer_Key, vr.volunteer_name, drv.Vol_Enrollment_Key, vr.enrollment_1_code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'SUBMITTED', NULL, NULL, 'APPROVED', NULL, NULL, cast(GETDATE() as date)
+		FROM dbo.dept_role_volunteer drv
 			left outer join rpt.volunteer_rpt_v vr
-				on vr.volunteer_key = drv.volunteer_key 
+				on vr.volunteer_key = drv.volunteer_key
 				and ( select enrollment_key from dbo.enrollment where enrollment_code = vr.enrollment_1_code and active_flag = 'Y' ) = drv.vol_enrollment_key
 		WHERE dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'SUBMITTED' ) -- SUBMITTED STATUS
 				and vol_start_date > cast( getdate() as date ) -- START IN FUTURE
@@ -6000,35 +6009,35 @@ begin
 			Update_Source = 'HuB',
 			Update_Type = 'Status to ARRIVED',
 			UpdateDate_Source = cast( getdate() as date ),
-			Update_ReviewedByUser = 'N', 
+			Update_ReviewedByUser = 'N',
 			Update_Date = cast( getdate() as date ),
-			Ext_Orig_PS_End_Date = null, 
-			Ext_Orig_Enrollment_Key = null, 
-			Ext_Orig_Dept_Asgn_Status_Key = null, 
+			Ext_Orig_PS_End_Date = null,
+			Ext_Orig_Enrollment_Key = null,
+			Ext_Orig_Dept_Asgn_Status_Key = null,
 			Extension_Flag_UpdateDate = cast( getdate() as date )
 		--select *
-		from dbo.dept_role_volunteer 
+		from dbo.dept_role_volunteer
 		where dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
-			and vol_start_date <= cast( getdate() as date ) 
+			and vol_start_date <= cast( getdate() as date )
 
 		set @Upd = @Upd + @@rowcount
 
 		--STEP 4 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'ARRIVED', NULL, NULL, cast(GETDATE() as date) 
+		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'ARRIVED', NULL, NULL, cast(GETDATE() as date)
 		FROM dbo.dept_role_volunteer drv
 			inner join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
 			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
 		WHERE dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
-			and vol_start_date <= cast( getdate() as date ) 
+			and vol_start_date <= cast( getdate() as date )
 
 		--Step 5 - STATUS UPATE (ARRIVED TO DEPARTED) - Update Dept_Asgn STATUS to DEPARTED where status is Arrived and end date has passed
 		update dbo.dept_role_volunteer
 		set dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'DEPARTED' ),
 			Update_Source = 'HuB',
 			Update_Type = 'Status to DEPARTED',
-			UpdateDate_Source = cast( getdate() as date ), 
-			Update_ReviewedByUser = 'N', 
+			UpdateDate_Source = cast( getdate() as date ),
+			Update_ReviewedByUser = 'N',
 			Update_Date = cast( getdate() as date )
 		--select volunteer_Key, dept_start_date, dept_end_date, enrollment_key
 		from dbo.dept_role_volunteer
@@ -6039,7 +6048,7 @@ begin
 
 		--STEP 5 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'ARRIVED', NULL, NULL, 'DEPARTED', NULL, NULL, cast(GETDATE() as date) 
+		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'ARRIVED', NULL, NULL, 'DEPARTED', NULL, NULL, cast(GETDATE() as date)
 		FROM dbo.dept_role_volunteer drv
 			inner join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
 			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
@@ -6051,52 +6060,52 @@ begin
 		update dbo.dept_role_volunteer
 		set dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING'),
 			Update_Source = 'HuB',
-			Update_Type = 'Status to NEEDS HANDLING - No future record', 
+			Update_Type = 'Status to NEEDS HANDLING - No future record',
 			UpdateDate_Source = cast( getdate() as date ),
-			Update_ReviewedByUser = 'N', 
+			Update_ReviewedByUser = 'N',
 			Update_Date = cast( getdate() as date )
 		--select da.Dept_Start_Date, da.dept_asgn_status_key, *
 		from dbo.dept_role_volunteer da
 		left outer join -- FUTURE DEPT START DATE
-			( select volunteer_key, enrollment_1_code 
+			( select volunteer_key, enrollment_1_code
 			  from rpt.volunteer_rpt_v
-			  where dept_1_start_date >= cast( getdate() as date ) ) a 
-			on a.volunteer_key = da.volunteer_key 
+			  where dept_1_start_date >= cast( getdate() as date ) ) a
+			on a.volunteer_key = da.volunteer_key
 			and da.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = a.enrollment_1_code and active_flag = 'Y' )
 		left outer join -- FUTURE ENROLLMENT 2 START DATE
-			( select volunteer_key, enrollment_2_code 
-			  from rpt.volunteer_rpt_v 
+			( select volunteer_key, enrollment_2_code
+			  from rpt.volunteer_rpt_v
 			  where enrollment_2_start_date >= cast( getdate() as date ) ) b
-			on b.volunteer_key = da.volunteer_key 
+			on b.volunteer_key = da.volunteer_key
 			and da.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = b.enrollment_2_code and active_flag = 'Y' )
 		where isnull( a.volunteer_key, 999999999 ) = 999999999		-- NO FUTURE DEPT START DATE
 			and isnull( b.volunteer_key, 999999999 ) = 999999999	-- NO FUTURE ENRL 2 START DATE
-			and da.active_flag = 'Y' 
+			and da.active_flag = 'Y'
 			and da.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
 
 		set @Upd = @Upd + @@rowcount
 
 		--STEP 6 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date) 
+		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date)
 		FROM dbo.dept_role_volunteer drv
 			inner join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
 			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
 			left outer join -- FUTURE DEPT START DATE
-				( select volunteer_key, enrollment_1_code 
+				( select volunteer_key, enrollment_1_code
 					from rpt.volunteer_rpt_v
-					where dept_1_start_date >= cast( getdate() as date ) ) a 
-				on a.volunteer_key = drv.volunteer_key 
+					where dept_1_start_date >= cast( getdate() as date ) ) a
+				on a.volunteer_key = drv.volunteer_key
 				and drv.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = a.enrollment_1_code and active_flag = 'Y' )
 			left outer join -- FUTURE ENROLLMENT 2 START DATE
-				( select volunteer_key, enrollment_2_code 
-					from rpt.volunteer_rpt_v 
+				( select volunteer_key, enrollment_2_code
+					from rpt.volunteer_rpt_v
 					where enrollment_2_start_date >= cast( getdate() as date ) ) b
-				on b.volunteer_key = drv.volunteer_key 
+				on b.volunteer_key = drv.volunteer_key
 				and drv.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = b.enrollment_2_code and active_flag = 'Y' )
 		WHERE isnull( a.volunteer_key, 999999999 ) = 999999999		-- NO FUTURE DEPT START DATE
 			and isnull( b.volunteer_key, 999999999 ) = 999999999	-- NO FUTURE ENRL 2 START DATE
-			and drv.active_flag = 'Y' 
+			and drv.active_flag = 'Y'
 			and drv.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
 
 
@@ -6105,29 +6114,29 @@ begin
 		set dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING' ),
 			Update_Source = 'HuB',
 			Update_Type = 'Status to NEEDS HANDLING - Arrived no volunteer',
-			UpdateDate_Source = cast( getdate() as date ), 
-			Update_ReviewedByUser = 'N', 
+			UpdateDate_Source = cast( getdate() as date ),
+			Update_ReviewedByUser = 'N',
 			Update_Date = cast( getdate() as date )
 		--select *
 		from dbo.dept_role_volunteer
 		where isnull( volunteer_key, 999999999 ) = 999999999 -- NO VOLUNTEER KEY
-			and active_flag = 'Y' 
+			and active_flag = 'Y'
 			and dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' )
 
 		set @Upd = @Upd + @@rowcount
-		
+
 		--STEP 7 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date) 
+		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date)
 		FROM dbo.dept_role_volunteer drv
 			inner join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
 			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
 		WHERE isnull( drv.volunteer_key, 999999999 ) = 999999999 -- NO VOLUNTEER KEY
-			and drv.active_flag = 'Y' 
+			and drv.active_flag = 'Y'
 			and drv.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' )
 
-		set @End = getdate()		
-	
+		set @End = getdate()
+
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
 			@Rows_Inserted = @Ins,
@@ -6136,7 +6145,7 @@ begin
 			@Start_Time = @Start,
 			@End_Time = @End
 	end try
-		
+
 	begin catch
 		execute dbo.ETL_Table_Run_proc
 			@Table_Name = @Table,
@@ -6173,7 +6182,7 @@ begin
 	exec dbo.ETL_Volunteer_Dept_proc
 	exec dbo.ETL_Volunteer_Dept_Rpt_Proc
 	exec dbo.ETL_Volunteer_Enrollment_proc
-	exec dbo.ETL_Volunteer_Enrollment_Rpt_proc	
+	exec dbo.ETL_Volunteer_Enrollment_Rpt_proc
 	exec dbo.ETL_Volunteer_FTS_proc
 	exec dbo.ETL_Volunteer_Role_proc
 	exec dbo.ETL_Volunteer_Rooming_Hist_proc
