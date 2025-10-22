@@ -2008,7 +2008,7 @@ begin
 			,sun_flag
 			,row_num
 		from
-			( -- TEMP ASSIGNMENTS
+			( -- CURRENT TEMP ASSIGNMENTS
 			  select
 			  	 volunteer_key
 				,full_name
@@ -2061,7 +2061,7 @@ begin
 					and d.Active_Flag = 'Y'
 					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				  where 1=1
-					and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
+					and vd.active_flag = 'Y'
 					--and vd.volunteer_dept_key not in ( 71744681, 76839101 ) -- JUSTIN POTTER RDC  KEVIN KUZMINSKI PCC
 					and vd.hub_dept_id != 10418  -- REMOVE UNASSIGNED RECORDS
 					and vd.temp_flag = 'Y' ) x
