@@ -113,9 +113,9 @@ select distinct
 		when charindex( ' - ', dept_2_dept_name ) = 0 then dept_2_dept_name
 		else right( dept_2_dept_name, charindex( ' - ', reverse( dept_2_dept_name ) ) - 1 )
 	 end as sub_dept_name
-	,enrollment_1_code as enrollment_code
-	,enrollment_1_start_date as enrollment_start_date
-	,enrollment_1_end_date as enrollment_end_date
+	,coalesce( enrollment_2_code, enrollment_1_code ) as enrollment_code
+	,coalesce( enrollment_2_start_date, dept_2_start_date ) as enrollment_start_date
+	,coalesce( enrollment_2_end_date, dept_2_end_date ) as enrollment_end_date
 	,spouse_hub_volunteer_num
 	,spouse_bethel_email
 	,spouse_jwpub_email
@@ -1918,8 +1918,9 @@ actuals as (
 		,v.Room
 		,v.record_type
 	from rpt.volunteer_rpt_v v
-	inner join cal c
-		on c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' )
+	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
+		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
+		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
 	left join bbo 
 		on v.volunteer_key = bbo.volunteer_key
 	left join dbo.Dept_Role_Volunteer_v drv  -- RG:  Believe this join of the Role_Volunteer data is needed to get the volunteer on a role that matches the HuB actual record by the volunteer key/enrollment code.  Will need to join in Role data to get the fields needed in this view.
@@ -1930,7 +1931,8 @@ actuals as (
 		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
 	left join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the two fields referenced in this view
 		on drv.Dept_Role_Key = dr.Dept_Role_Key
-	where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
+	where 1=1
+        and isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
 
 ),
 	
@@ -2045,8 +2047,9 @@ actuals as (
 		,v.Room
 		,v.record_type
 	from rpt.volunteer_rpt_v v
-	inner join cal c
-		on c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' )
+	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
+		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
+		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
 	left join bbo 
 		on v.volunteer_key = bbo.volunteer_key
 	left join dbo.Dept_Role_Volunteer_v drv
@@ -2062,7 +2065,7 @@ actuals as (
 projected as (
 	select 
 		 v.volunteer_key
-		,v.Dept_Role_Vol_Key
+		,v.Dept_Role_Key as dept_asgn_key
 		,v.volunteer_name
 		,v.volunteer_name_short
 		,v.enrollment_code

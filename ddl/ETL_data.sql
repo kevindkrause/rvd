@@ -1824,23 +1824,25 @@ begin
 
 		set @Ins = @@rowcount
 
-		-- UPDATE - FLAG INACTIVE
+		-- UPDATE - FLAG OFF
 		update dbo.volunteer_dept
 		set
 			active_flag = 'N',
 			update_date = getdate()
 		where active_flag = 'Y'
-			and getdate() > coalesce( end_date, '2999-12-31' )
+			and (  getdate() > end_date
+				or start_date > getdate() )
 
 		set @Upd = @Upd + @@rowcount
 
-		-- UPDATE - FLAG ACTIVE
+		-- UPDATE - FLAG ON
 		update dbo.volunteer_dept
 		set
 			active_flag = 'Y',
 			update_date = getdate()
 		where active_flag = 'N'
-			and ( end_date is null or end_date > getdate() )
+			and coalesce( end_date, getdate() +1 ) >= cast( getdate() as date )
+			and start_date <= cast( getdate() as date )
 
 		set @Upd = @Upd + @@rowcount
 
@@ -2067,7 +2069,7 @@ begin
 
 			  union all
 
-			  -- PRIMARY ASSIGNMENTS MOST RECENT START DATE
+			  -- CURRENT PRIMARY OLDEST START DATE
 			  select *
 			  from
 				( select
@@ -2099,14 +2101,15 @@ begin
 					and d.Active_Flag = 'Y'
 					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				  where 1=1
-					and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
+                    --and v.volunteer_key = 968295
+					and vd.active_flag = 'Y'
 					and vd.primary_flag = 'Y'
 					and vd.temp_flag = 'N' ) x
 			  where row_num = 1
 
 			  union all
 
-			  -- PRIMARY ASSIGNMENTS OLDEST START DATE
+			  -- CURRENT PRIMARY NEWEST START DATE
 			  select *
 			  from
 				( select
@@ -2138,37 +2141,73 @@ begin
 					and d.Active_Flag = 'Y'
 					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
 				  where 1=1
-					and ( vd.active_flag = 'Y' or vd.start_date > cast( getdate() as date ) )
+                    --and v.volunteer_key = 968295
+					and vd.active_flag = 'Y'
 					and vd.primary_flag = 'Y'
 					and vd.temp_flag = 'N' ) x
 			  where row_num = 2
 
-			  --union all
+			  union all
 
-			  ---- NON-US BRANCH VOLUNTEERS
-			  --select
-			--	 fb.volunteer_number * -1 as volunteer_key  -- ARTIFICIAL VOL KEY
-			--	,fb.last_name + ', ' + fb.first_name as full_name
-			--	,fb.hub_dept_id
-			--	,d.dept_name as parent_dept_name
-			--	,d.work_group_name as dept_name
-			--	,'N' as temp_flag
-			--	,'Y' as primary_flag
-			--	,fb.department_start_date as start_date
-			--	,null as end_date
-			--	,'Y' as hpr_flag
-			--	,'N' as mon_flag
-			--	,'N' as tue_flag
-			--	,'N' as wed_flag
-			--	,'N' as thu_flag
-			--	,'N' as fri_flag
-			--	,'N' as sat_flag
-			--	,'N' as sun_flag
-			--	,'Y' as hpr_volunteer_exception_flag
-			--	,0 as row_num
-			  --from stg.stg_foreign_branches fb
-			  --inner join dbo.HPR_Dept d
-			--	on fb.hub_dept_id = d.hub_dept_id
+			  -- FUTURE PRIMARY ASSIGNMENTS
+			  select 
+                 volunteer_key
+                ,full_name
+                ,hub_dept_id
+                ,parent_dept_name
+                ,dept_name
+                ,temp_flag
+                ,primary_flag
+                ,split_allocation_pct
+                ,start_date
+                ,end_date
+                ,hpr_flag
+                ,mon_flag
+                ,tue_flag
+                ,wed_flag
+                ,thu_flag
+                ,fri_flag
+                ,sat_flag
+                ,sun_flag
+                ,hpr_volunteer_exception_flag
+                ,row_num
+			  from
+				( select
+					 vd.volunteer_key
+					,v.full_name
+					,vd.hub_dept_id
+					,vd.parent_dept_name
+					,vd.dept_name
+					,vd.temp_flag
+					,vd.primary_flag
+					,vd.split_allocation_pct
+					,vd.start_date
+					,vd.end_date
+					,case when d.hub_dept_id is not null and d.level_01 = 'Headquarters Project Ramapo' then 'Y' else 'N' end as hpr_flag
+					,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
+					,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
+					,case when ( vd.wed_AM_Flag = 'Y' or vd.wed_PM_Flag = 'Y' ) then 'Y' else 'N' end as wed_flag
+					,case when ( vd.thu_AM_Flag = 'Y' or vd.thu_PM_Flag = 'Y' ) then 'Y' else 'N' end as thu_flag
+					,case when ( vd.fri_AM_Flag = 'Y' or vd.fri_PM_Flag = 'Y' ) then 'Y' else 'N' end as fri_flag
+					,case when ( vd.sat_AM_Flag = 'Y' or vd.sat_PM_Flag = 'Y' ) then 'Y' else 'N' end as sat_flag
+					,case when ( vd.sun_AM_Flag = 'Y' or vd.sun_PM_Flag = 'Y' ) then 'Y' else 'N' end as sun_flag
+					,v.hpr_volunteer_exception_flag
+					,2 as row_num
+					,row_number() over( partition by vd.volunteer_key order by vd.start_date desc ) as row_seq
+				  from dbo.Volunteer_Dept vd
+				  inner join dbo.volunteer v
+					on vd.volunteer_key = v.volunteer_key
+				  left join dbo.HPR_Dept d
+					on vd.hub_dept_id = d.hub_dept_id
+					and d.Active_Flag = 'Y'
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+				  where 1=1
+                    --and v.volunteer_key = 968295
+					and vd.start_date > cast( getdate() as date )
+					and vd.primary_flag = 'Y'
+					and vd.temp_flag = 'N' ) x
+			  where row_seq = 1
+
 			) vd
 
 		set @Ins = @@rowcount;
@@ -2358,7 +2397,7 @@ begin
 		delete top(1) from volunteer_dept_rpt
 		where 1=1
 			and row_num = 2
-			and volunteer_key in ( 247599 )
+			--and volunteer_key in ( 247599 )
 			and volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt
 								   where row_num = 2
 								   group by volunteer_key
