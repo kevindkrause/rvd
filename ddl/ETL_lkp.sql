@@ -603,36 +603,62 @@ begin
 		from dbo.hpr_dept tgt
 		inner join stg.stg_department_hierarchy src
 			on tgt.hub_dept_id = src.department_id
-		where coalesce( tgt.pc_code, '' ) <> coalesce( src.department_code, '' )
-		
-		-- UPDATE OVERSIGHT
-		update dbo.hpr_dept
-		set 
-			dept_ovsr_person_id = src.overseer_person_id,
-			dept_asst_ovsr_person_id = src.assistant_overseer_personid,
-			update_date = getdate()
-		from dbo.hpr_dept tgt
-		inner join stg.stg_department_hierarchy src
-			on tgt.hub_dept_id = src.department_id
-		where tgt.level_03 is null
-			and (    coalesce( tgt.dept_ovsr_person_id, -1 ) <> coalesce( src.overseer_person_id, -1 )
-				  or coalesce( tgt.dept_asst_ovsr_person_id, -1 ) <> coalesce( src.assistant_overseer_personid, -1 ) )
+		where coalesce( tgt.pc_code, '' ) <> coalesce( src.department_code, '' );
 
-		set @Upd = @@rowcount
+        -- UPDATE OVERSIGHT
+        -- SET DEPT OVSR/ASST TO THE CPC LEVEL OVSR/ASST
+        with cpc as (
+            select 
+                replace( department_code, 'HPR-', '' ) as cpc_code
+                ,Overseer_Person_ID
+                ,Assistant_Overseer_PersonID
+            from stg.stg_department_hierarchy 
+            where coalesce( parent_department_id, 9841 ) = 9841 )
 
-		update dbo.hpr_dept
-		set 
-			work_group_ovsr_person_id = src.overseer_person_id,
-			work_group_asst_ovsr_person_id = src.assistant_overseer_personid,
-			work_group_coor_person_id = src.work_group_coordinator_personid,
-			update_date = getdate()
-		from dbo.hpr_dept tgt
-		inner join stg.stg_department_hierarchy src
-			on tgt.hub_dept_id = src.department_id
-		where tgt.level_03 is not null
-			and (    coalesce( tgt.work_group_ovsr_person_id, -1 ) <> coalesce( src.overseer_person_id, -1 )
-				  or coalesce( tgt.work_group_asst_ovsr_person_id, -1 ) <> coalesce( src.assistant_overseer_personid, -1 )
-				  or coalesce( tgt.work_group_coor_person_id, -1 ) <> coalesce( src.work_group_coordinator_personid, -1 ) )
+        --select tgt.cpc_code, level_01, level_02, level_03, level_04, level_05
+        --	,dept_ovsr_person_id, cpc.Overseer_Person_ID
+        --	,dept_asst_ovsr_person_id, cpc.Assistant_Overseer_PersonID
+        --	,Work_Group_Ovsr_Person_ID, src.Overseer_Person_ID
+        --	,Work_Group_Asst_Ovsr_Person_ID, src.Assistant_Overseer_PersonID
+        update dbo.hpr_dept
+        set 
+            dept_ovsr_person_id = cpc.overseer_person_id,
+            dept_asst_ovsr_person_id = cpc.assistant_overseer_personid,
+            work_group_ovsr_person_id = src.overseer_person_id,
+            work_group_asst_ovsr_person_id = src.assistant_overseer_personid,
+            update_date = getdate()
+        from dbo.hpr_dept tgt
+        inner join cpc 
+            on tgt.CPC_Code = cpc.cpc_code
+        inner join stg.stg_department_hierarchy src
+            on tgt.hub_dept_id = src.department_id
+        where tgt.hub_flag = 'Y' 
+            and tgt.active_flag = 'Y'
+        --order by tgt.cpc_code, level_01, level_02, level_03, level_04, level_05
+
+		set @Upd = @@rowcount;
+        
+        -- IF NO WORK GRP OVSR EXISTS, INHERIT FROM PARENT VALUES
+        with to_upd as (
+            select 
+                d.HPR_Dept_Key
+                ,coalesce( pd.Work_Group_Ovsr_person_id, d.dept_ovsr_person_id ) as inherited_ovsr_id
+                ,coalesce( pd.Work_Group_Asst_Ovsr_person_id, d.dept_asst_ovsr_person_id ) as inherited_asst_id
+            from dbo.hpr_dept d
+            inner join dbo.hpr_dept pd
+                on d.Parent_HPR_Dept_Key = pd.HPR_Dept_Key
+            where d.active_flag = 'Y' 
+                and d.hub_flag = 'Y'
+                and d.work_group_ovsr_person_id is null )
+
+        update dbo.hpr_dept
+        set 
+            work_group_ovsr_person_id = src.inherited_ovsr_id,
+            work_group_asst_ovsr_person_id = src.inherited_asst_id,
+            update_date = getdate()
+        from dbo.hpr_dept tgt
+        inner join to_upd src
+            on tgt.HPR_Dept_Key = src.HPR_Dept_Key
 
 		set @Upd = @Upd + @@rowcount
 		
@@ -645,6 +671,8 @@ begin
 		from dbo.hpr_dept tgt
 		inner join dbo.volunteer src
 			on tgt.dept_ovsr_person_id = src.hub_person_id
+        where tgt.active_flag = 'Y' 
+            and tgt.hub_flag = 'Y'
 			
 		set @Upd = @Upd + @@rowcount
 
@@ -656,6 +684,8 @@ begin
 		from dbo.hpr_dept tgt
 		inner join dbo.volunteer src
 			on tgt.dept_asst_ovsr_person_id = src.hub_person_id
+        where tgt.active_flag = 'Y' 
+            and tgt.hub_flag = 'Y'        
 			
 		set @Upd = @Upd + @@rowcount
 
@@ -667,6 +697,8 @@ begin
 		from dbo.hpr_dept tgt
 		left join dbo.volunteer src
 			on tgt.work_group_ovsr_person_id = src.hub_person_id
+        where tgt.active_flag = 'Y' 
+            and tgt.hub_flag = 'Y'            
 			
 		set @Upd = @Upd + @@rowcount
 
@@ -678,6 +710,8 @@ begin
 		from dbo.hpr_dept tgt
 		left join dbo.volunteer src
 			on tgt.work_group_asst_ovsr_person_id = src.hub_person_id
+        where tgt.active_flag = 'Y' 
+            and tgt.hub_flag = 'Y'
 			
 		set @Upd = @Upd + @@rowcount
 
@@ -689,6 +723,8 @@ begin
 		from dbo.hpr_dept tgt
 		left join dbo.volunteer src
 			on tgt.work_group_coor_person_id = src.hub_person_id
+        where tgt.active_flag = 'Y' 
+            and tgt.hub_flag = 'Y'
 			
 		set @Upd = @Upd + @@rowcount
 
@@ -715,13 +751,6 @@ begin
 	end catch
 end
 go
-
-
-
-
-
-
-
 
 
 /***********************************************************
