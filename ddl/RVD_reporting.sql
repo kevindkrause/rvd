@@ -1889,6 +1889,8 @@ actuals as (
 		,dr.dept_role
 		,'ARRIVED' as dept_asgn_status_code		
 		,c.cal_dt
+        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date        
 		,case 
 			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
 			else 0 
@@ -1948,6 +1950,8 @@ projected as (
 		,v.dept_role
 		,v.dept_asgn_status_code
 		,v.cal_dt
+	    ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date        
 		,v.bed_cnt
 		,v.fte
 		,v.onsite_flag
@@ -2018,6 +2022,8 @@ actuals as (
 		,dr.dept_role
 		,'ARRIVED' as dept_asgn_status_code		
 		,c.cal_dt
+        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
 		,case 
 			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
 			else 0 
@@ -2074,6 +2080,8 @@ projected as (
 		,v.dept_role
 		,v.dept_asgn_status_code
 		,v.cal_dt
+	    ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
 		,v.bed_cnt
 		,v.fte
 		,v.onsite_flag
@@ -2095,8 +2103,8 @@ base as (
 
 select *
 from base
---where cal_dt = '2025-07-07'
-	--and volunteer_key in (641583)
+--where cal_dt = '2025-10-27'
+--	and volunteer_key in (641583)
 --order by 3
 go
 
@@ -2451,32 +2459,34 @@ with cal as (
 )
 
 select
-	 a.volunteer_key
-	,a.Dept_Role_Key
-	,a.full_name as volunteer_name
-	,a.volunteer_name_short
+	 drv.volunteer_key
+	,dr.Dept_Role_Key
+	,drv.full_name as volunteer_name
+	,coalesce( drv.volunteer_name_short, drv.ps_enrollment_code, dr.dept_enrollment_code ) as volunteer_name_short
 	,c.cal_dt
 	,dr.hpr_dept_key
-	,a.ps_enrollment_code as enrollment_code
+	,coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) as enrollment_code
 	,dr.crew_name
 	,dr.dept_role
-	,a.dept_asgn_status_code	
+	,drv.dept_asgn_status_code
+    ,dr.role_start_date_rpt as role_start_date
+    ,dr.role_end_date_rpt as role_end_date
 	,case 
-		when a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
+		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
 		else 0 
-		end as bed_cnt
+	 end as bed_cnt
 	,case 
-		when a.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-		when a.ps_enrollment_code in ( 'BBV', 'BCC' ) then 0.2
+		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBV', 'BCC' ) then 0.2
 		else 0
 		end as fte
 	,'N' as onsite_flag
 	,'PROJECTED' as record_type
 	-- ADDED FOR CI TOOL BEING BUILT BY OS
-	,a.HUB_Person_ID
-	,a.ps_enrollment_code as enrollment_1_code
-	,a.vol_start_date as enrollment_1_start_date
-	,a.vol_end_date as enrollment_1_end_date
+	,drv.HUB_Person_ID
+	,coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) as enrollment_1_code
+	,coalesce( drv.vol_start_date, dr.role_start_date_rpt ) as enrollment_1_start_date
+	,coalesce( drv.vol_end_date, dr.role_end_date_rpt ) as enrollment_1_end_date
 	,dr.hpr_dept_key as dept_1_hpr_dept_key
 	,d.HUB_Dept_ID as dept_1_hub_dept_id
 	,d.CPC_Code as dept_1_cpc_code
@@ -2495,28 +2505,27 @@ select
 		when d.level_02 is not null then d.level_02
 		else d.level_01
 	  end as dept_1_dept_name
-	 ,a.vol_start_date as dept_1_start_date
-	 ,a.vol_end_date as dept_1_end_date
-	 ,'Y' as dept_1_hpr_flag	
-from dbo.Dept_Role_Volunteer_v a
+	,coalesce( drv.vol_start_date, dr.role_start_date_rpt ) as dept_1_start_date
+	,coalesce( drv.vol_end_date, dr.role_end_date_rpt ) as dept_1_end_date
+	,'Y' as dept_1_hpr_flag
+from dbo.Dept_Role_v dr
 inner join cal c
-	on c.cal_dt between a.vol_start_date and coalesce( a.vol_end_date , '2030-12-31' )
-inner join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the three fields referenced in this view
-	on a.Dept_Role_Key = dr.Dept_Role_Key	
+	on c.cal_dt between dr.role_start_date_rpt and dr.role_end_date_rpt
 inner join dbo.hpr_dept d
 	on dr.hpr_dept_key = d.hpr_dept_key
 	and d.Active_Flag = 'Y'
-where a.active_flag = 'Y'
-	and a.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+left join dbo.Dept_Role_Volunteer_v drv
+	on dr.Dept_Role_Key = drv.Dept_Role_Key	
+	and drv.Volunteer_Type_Description = 'VOLUNTEER'
+where dr.active_flag = 'Y'
+	and dr.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+	--and dr.dept_role_key = 655
 	--and d.hpr_dept_key = 217
-	--and c.cal_dt = '2025-06-25'
+	--and c.cal_dt = '2025-11-03'
 	and not exists ( 
 		select 1 from rpt.volunteer_rpt_v act 
-		where coalesce( a.volunteer_key, -1 ) = act.volunteer_key 
-			and a.ps_enrollment_code = act.enrollment_1_code
-			/*and a.HPR_Dept_Key = act.HPR_Dept_Key*/ 
-			/*and a.Volunteer_Type_Description = 'VOLUNTEER'*/) -- RG:  Maybe not needed, need to double check
-			and a.Volunteer_Type_Description = 'VOLUNTEER'
+		where coalesce( drv.volunteer_key, -1 ) = act.volunteer_key 
+			and coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) = act.enrollment_1_code )
 go
 
 
