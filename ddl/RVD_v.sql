@@ -372,41 +372,134 @@ inner join dbo.[User] u
 go	
 
 
-CREATE VIEW [dbo].[Dept_Role_v]
-AS
-SELECT        da.Dept_Role_Key, da.Dept_Asgn_Key, d.CPC_Code, d.Dept_Name, d.Work_Group_Name, d.Level_02, d.Level_03, d.Level_04, 
-                         CASE WHEN d .work_group_name = '' THEN d .dept_name ELSE d .dept_name + ' - ' + d .work_group_name END AS full_dept_name, c.Crew_Name, dr.Dept_Role, da.Skill_Level, da.Role_Start_Date, da.Role_End_Date, 
-                         e.Enrollment_Code AS dept_enrollment_code, da.Notes, das.Dept_Asgn_Status, das.Dept_Asgn_Status_Code, da.Priority_Key, 
-                         CASE WHEN da.priority_key = 1 THEN '!!' WHEN da.priority_key = 2 THEN '!' WHEN da.priority_key = 3 THEN '-' WHEN da.priority_key = 4 THEN '_' ELSE '.' END AS priority, DATEDIFF(month, da.Role_Start_Date, 
-                         COALESCE (da.Role_End_Date, CONVERT(DATETIME, '2027-12-31 00:00:00', 102))) AS duration_in_months, da.PS_Notes, da.Job_Description, da.VTC_Meeting_Code, da.Active_Flag, da.Load_Date, da.Update_Date, 
-                         da.HPR_Dept_Key, da.HPR_Crew_Key, da.HPR_Dept_Role_Key, da.Enrollment_Key, da.Dept_Asgn_Status_Key, da.Until_Not_Needed, da.Short_Term_OK, da.Trade_To_Qualify, CASE WHEN isnull(das.sort_trade_request, 999) 
-                         = 999 THEN 999 ELSE das.sort_trade_request END AS Sort_Trade_Request, da.Possible_Sister, d.PC_Code, da.Dept_Volunteer_Name, da.Marital_Status_Key, da.Cong_Servant_Code, da.Current_Sync_Status, 
-                         da.Sync_Data_Flag
-FROM            dbo.Dept_Role AS da INNER JOIN
-                         dbo.HPR_Dept AS d ON da.HPR_Dept_Key = d.HPR_Dept_Key LEFT OUTER JOIN
-                         dbo.Dept_Asgn_Status AS das ON da.Dept_Asgn_Status_Key = das.Dept_Asgn_Status_Key AND das.Dept_Asgn_Status_Type = 'DA' LEFT OUTER JOIN
-                         dbo.HPR_Crew AS c ON da.HPR_Crew_Key = c.HPR_Crew_Key LEFT OUTER JOIN
-                         dbo.HPR_Dept_Role AS dr ON da.HPR_Dept_Role_Key = dr.HPR_Dept_Role_Key LEFT OUTER JOIN
-                         dbo.Enrollment AS e ON da.Enrollment_Key = e.Enrollment_Key AND e.Active_Flag = 'Y'
-GO
+if object_id('dbo.Dept_Role_v', 'V') is not null
+	drop view dbo.Dept_Role_v
+go 
+create view dbo.Dept_Role_v
+as
+select        
+	 da.dept_role_key
+	,da.dept_asgn_key
+	,d.cpc_code
+	,d.dept_name
+	,d.work_group_name
+	,d.level_02
+	,d.level_03
+	,d.level_04
+    ,case when d.work_group_name = '' then d .dept_name else d .dept_name + ' - ' + d .work_group_name end as full_dept_name
+	,c.crew_name
+	,dr.dept_role
+	,da.skill_level 
+	,da.role_start_date
+    ,coalesce( da.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date_rpt 
+	,da.role_end_date
+    ,coalesce( da.role_end_date, '2030-03-01' ) as role_end_date_rpt
+    ,e.enrollment_code as dept_enrollment_code 
+	,da.notes
+	,das.dept_asgn_status
+	,das.dept_asgn_status_code
+	,da.priority_key
+    ,case 
+		when da.priority_key = 1 then '!!' 
+		when da.priority_key = 2 then '!' 
+		when da.priority_key = 3 then '-' 
+		when da.priority_key = 4 then '_' 
+		else '.' 
+	 end as priority 
+	,datediff( month, da.role_start_date, coalesce ( da.role_end_date, convert( datetime, '2030-03-01 00:00:00', 102 ) ) ) as duration_in_months
+	,da.ps_notes
+	,da.job_description
+	,da.vtc_meeting_code
+	,da.active_flag
+	,da.load_date
+	,da.update_date
+    ,da.hpr_dept_key
+	,da.hpr_crew_key
+	,da.hpr_dept_role_key
+	,da.enrollment_key
+	,da.dept_asgn_status_key
+	,da.until_not_needed
+	,da.short_term_ok
+	,da.trade_to_qualify
+	,case when isnull( das.sort_trade_request, 999 ) = 999 then 999 else das.sort_trade_request end as sort_trade_request
+	,da.possible_sister
+	,d.pc_code
+	,da.dept_volunteer_name
+	,da.marital_status_key
+	,da.cong_servant_code
+	,da.current_sync_status
+    ,da.sync_data_flag
+from dbo.dept_role as da 
+inner join dbo.hpr_dept as d 
+	on da.hpr_dept_key = d.hpr_dept_key 
+left outer join dbo.dept_asgn_status as das 
+	on da.dept_asgn_status_key = das.dept_asgn_status_key 
+	and das.dept_asgn_status_type = 'DA' 
+left outer join dbo.hpr_crew as c 
+	on da.hpr_crew_key = c.hpr_crew_key 
+left outer join dbo.hpr_dept_role as dr 
+	on da.hpr_dept_role_key = dr.hpr_dept_role_key 
+left outer join dbo.enrollment as e 
+	on da.enrollment_key = e.enrollment_key 
+	and e.active_flag = 'Y'
+go
 
 
-CREATE VIEW [dbo].[Dept_Role_Volunteer_v]
-AS
-SELECT        drv.Dept_Role_Vol_Key, drv.Dept_Role_Key, drv.Volunteer_Type AS Volunteer_Type_ID, vt.Dept_Asgn_Status_Code AS Volunteer_Type_Description, drv.Bed_Type, drv.Vol_Start_Date, drv.Vol_End_Date, drv.Notes, 
-                         drv.Dept_Asgn_Status_Key, das.Dept_Asgn_Status_Code, das.Dept_Asgn_Status, drv.Volunteer_Key, v.Full_Name, v.Last_Name + N', ' + LEFT(v.First_Name, 1) + N'.' AS volunteer_name_short, ms.Marital_Status_Code, 
-                         v.Cong_Servant_Code, v.Room_Site_Code, v.Room_Bldg_Code, CASE WHEN isnull(das.sort_trade_request, 999) = 999 THEN 999 ELSE das.sort_trade_request END AS Sort_Trade_Request, v.HUB_Person_ID, 
-                         v.HUB_Volunteer_ID, e.Enrollment_Code AS hub_enrollment_code, CASE WHEN Vol_Start_Date <= GETDATE() AND (Vol_End_Date >= GETDATE() OR
-                         ISNULL(Vol_End_Date, '1/1/1901') = '1/1/1901') THEN 'Current' ELSE 'Not Current' END AS IsCurrentVolunteer, drv.HuBIncidentURL, drv.Candidate_Next_Step, drv.Invite_Chart_Comments, drv.PS_Notes, 
-                         ve.Enrollment_Code AS ps_enrollment_code, drv.Vol_Enrollment_Key, drv.Active_Flag
-FROM            dbo.Dept_Role_Volunteer AS drv LEFT OUTER JOIN
-                         dbo.Enrollment AS ve ON drv.Vol_Enrollment_Key = ve.Enrollment_Key LEFT OUTER JOIN
-                         dbo.Dept_Asgn_Status AS vt ON drv.Volunteer_Type = vt.Dept_Asgn_Status_Key LEFT OUTER JOIN
-                         dbo.Volunteer AS v ON drv.Volunteer_Key = v.Volunteer_Key LEFT OUTER JOIN
-                         dbo.Marital_Status AS ms ON v.Marital_Status_Key = ms.Marital_Status_Key LEFT OUTER JOIN
-                         dbo.Dept_Asgn_Status AS das ON drv.Dept_Asgn_Status_Key = das.Dept_Asgn_Status_Key LEFT OUTER JOIN
-                         dbo.Enrollment AS e ON v.Current_Enrollment_Key = e.Enrollment_Key AND e.Active_Flag = 'Y'
-GO
+if object_id('dbo.Dept_Role_Volunteer_v', 'V') is not null
+    drop view dbo.Dept_Role_Volunteer_v
+go
+create view dbo.Dept_Role_Volunteer_v
+as
+select
+	 drv.dept_role_vol_key
+	,drv.dept_role_key
+	,drv.volunteer_type as volunteer_type_id
+	,vt.dept_asgn_status_code as volunteer_type_description
+	,drv.bed_type
+	,drv.vol_start_date
+	,drv.vol_end_date
+	,drv.notes
+	,drv.dept_asgn_status_key
+	,das.dept_asgn_status_code
+	,das.dept_asgn_status
+	,drv.volunteer_key
+	,v.full_name
+	,v.last_name + N', ' + left( v.first_name, 1 ) + N'.' as volunteer_name_short
+	,ms.marital_status_code
+	,v.cong_servant_code
+	,v.room_site_code
+	,v.room_bldg_code
+	,case when isnull( das.sort_trade_request, 999 ) = 999 then 999 else das.sort_trade_request end as sort_trade_request 
+	,v.hub_person_id
+	,v.hub_volunteer_id
+	,e.enrollment_code as hub_enrollment_code
+	,case 
+		when vol_start_date <= getdate() and (vol_end_date >= getdate() 
+			or isnull( vol_end_date, '1/1/1901' ) = '1/1/1901' ) then 'Current' 
+		else 'Not Current' 
+	 end as iscurrentvolunteer
+	,drv.hubincidenturl
+	,drv.candidate_next_step
+	,drv.invite_chart_comments
+	,drv.ps_notes
+	,ve.enrollment_code as ps_enrollment_code
+	,drv.vol_enrollment_key
+	,drv.active_flag
+from dbo.dept_role_volunteer as drv 
+left outer join dbo.enrollment as ve 
+	on drv.vol_enrollment_key = ve.enrollment_key 
+left outer join dbo.dept_asgn_status as vt 
+	on drv.volunteer_type = vt.dept_asgn_status_key 
+left outer join dbo.volunteer as v 
+	on drv.volunteer_key = v.volunteer_key 
+left outer join dbo.marital_status as ms 
+	on v.marital_status_key = ms.marital_status_key 
+left outer join dbo.dept_asgn_status as das 
+	on drv.dept_asgn_status_key = das.dept_asgn_status_key 
+left outer join dbo.enrollment as e 
+	on v.current_enrollment_key = e.enrollment_key 
+	and e.active_flag = 'Y'
+go
 
 
 CREATE VIEW [dbo].[Dept_Role_List_v]
