@@ -1887,7 +1887,7 @@ actuals as (
 		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
 		,dr.crew_name
 		,dr.dept_role
-		,'ARRIVED' as dept_asgn_status_code		
+		,dr.dept_asgn_status_code	
 		,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
         ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date        
@@ -2020,7 +2020,7 @@ actuals as (
 		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
 		,dr.crew_name
 		,dr.dept_role
-		,'ARRIVED' as dept_asgn_status_code		
+		,dr.dept_asgn_status_code
 		,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
         ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
