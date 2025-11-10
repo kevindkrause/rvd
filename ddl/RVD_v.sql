@@ -7,10 +7,10 @@ go
 
 if object_id('dbo.App_Data_Validation_Curr_v', 'V') is not null
 	drop view dbo.App_Data_Validation_Curr_v
-go 
+go
 create view dbo.App_Data_Validation_Curr_v
 as
-select 
+select
 	  table_name
 	 ,test_name
 	 ,load_date
@@ -22,11 +22,11 @@ go
 
 if object_id('dbo.BA_Event_v', 'V') is not null
 	drop view dbo.BA_Event_v
-go 
+go
 create view dbo.BA_Event_v
 as
 select event_name
-from 
+from
 	( select event_name, min( start_date ) as min_dt, max( start_date ) as max_dt
 	  from dbo.BA_Event_Volunteer_Invite
 	  where active_flag = 'Y'
@@ -37,7 +37,7 @@ go
 
 if object_id('dbo.Cal_Dim_v', 'V') is not null
 	drop view dbo.Cal_Dim_v
-go 
+go
 create view dbo.Cal_Dim_v
 as
 select *
@@ -47,10 +47,10 @@ go
 
 if object_id('dbo.Cong_v', 'V') is not null
 	drop view dbo.Cong_v
-go 
+go
 create view dbo.Cong_v
 as
-select 
+select
 	 c.cong_key
 	,c.cong_number
 	,c.cong
@@ -60,7 +60,7 @@ select
 	,pc.postal_code
 	,cntry.country_code
 	,c.state_key
-	,c.Country_Key	
+	,c.Country_Key
 	,c.circuit
 	,c.language_code
 	,c.kh_address1
@@ -108,10 +108,10 @@ go
 
 if object_id('dbo.Dept_Asgn_v', 'V') is not null
 	drop view dbo.Dept_Asgn_v
-go 
+go
 create view dbo.Dept_Asgn_v
 as
-select 
+select
 	 da.dept_asgn_key
 	,d.cpc_code
 	,d.dept_name
@@ -134,7 +134,7 @@ select
 	,das.dept_asgn_status
 	,das.dept_asgn_status_code
 	,da.priority_key
-	,case 
+	,case
 		when da.priority_key = 1 then '!!'
 		when da.priority_key = 2 then '!'
 		when da.priority_key = 3 then '-'
@@ -170,7 +170,7 @@ select
 	,da.candidate_6_name
 	,da.candidate_6_profile
 	,da.candidate_6_next_step
-	,case when isnull(da.candidate_6_name, 'Null') <> 'Null' then left(da.candidate_6_name, charindex(',', da.candidate_6_name) + 2) end as candidate_6_name_abbr	
+	,case when isnull(da.candidate_6_name, 'Null') <> 'Null' then left(da.candidate_6_name, charindex(',', da.candidate_6_name) + 2) end as candidate_6_name_abbr
 	,da.candidate_7_vol_key
 	,da.candidate_7_name
 	,da.candidate_7_profile
@@ -180,7 +180,7 @@ select
 	,da.candidate_8_name
 	,da.candidate_8_profile
 	,da.candidate_8_next_step
-	,case when isnull(da.candidate_8_name, 'Null') <> 'Null' then left(da.candidate_8_name, charindex(',', da.candidate_8_name) + 2) end as candidate_8_name_abbr		
+	,case when isnull(da.candidate_8_name, 'Null') <> 'Null' then left(da.candidate_8_name, charindex(',', da.candidate_8_name) + 2) end as candidate_8_name_abbr
 	,v.Full_Name
 	,v.last_name + ', ' + left( v.first_name, 1 ) + '.' as volunteer_name_short
 	,e2.enrollment_code as ps_enrollment_code
@@ -204,7 +204,7 @@ select
 	,da.hpr_crew_key
 	,da.hpr_dept_role_key
 	,da.enrollment_key
-	,da.dept_asgn_status_key	
+	,da.dept_asgn_status_key
 	,da.volunteer_key
 	,da.Num_Weeks
 	,da.Num_Months
@@ -221,7 +221,7 @@ select
 	,case when isnull(das.sort_trade_request, 999) = 999 then 999 else das.sort_trade_request end as Sort_Trade_Request
 	,da.Possible_Sister
 	,da.HuBIncidentURL
-	,d.PC_Code	
+	,d.PC_Code
 	,v.HUB_Person_ID
 	,v.HUB_Volunteer_ID
 	,da.Update_Source
@@ -249,7 +249,7 @@ left join dbo.enrollment e
 	and e.active_flag = 'Y'
 left join dbo.volunteer v
 	on da.volunteer_key = v.volunteer_key
-left join dbo.marital_status ms 
+left join dbo.marital_status ms
 	on v.marital_status_key = ms.marital_status_key
 left join dbo.enrollment e2
 	on v.current_enrollment_key = e2.enrollment_key
@@ -260,20 +260,20 @@ go
 
 CREATE VIEW [dbo].[Dept_Asgn_LeadTime_v]
 AS
-SELECT        dbo.Dept_Asgn_LeadTime.Dept_Asgn_LeadTime_Key, dbo.Dept_Asgn_LeadTime.Enrollment_Key, dbo.Enrollment.Enrollment_Code, dbo.Dept_Asgn_LeadTime.New_No_Earlier, dbo.Dept_Asgn_LeadTime.New_No_Later, 
+SELECT        dbo.Dept_Asgn_LeadTime.Dept_Asgn_LeadTime_Key, dbo.Dept_Asgn_LeadTime.Enrollment_Key, dbo.Enrollment.Enrollment_Code, dbo.Dept_Asgn_LeadTime.New_No_Earlier, dbo.Dept_Asgn_LeadTime.New_No_Later,
                          dbo.Dept_Asgn_LeadTime.Transfer_No_Earlier, dbo.Dept_Asgn_LeadTime.Transfer_No_Later, dbo.Dept_Asgn_LeadTime.Active_Flag
 FROM            dbo.Dept_Asgn_LeadTime INNER JOIN
                          dbo.Enrollment ON dbo.Dept_Asgn_LeadTime.Enrollment_Key = dbo.Enrollment.Enrollment_Key
 WHERE        (dbo.Enrollment.Active_Flag = N'Y') AND (dbo.Dept_Asgn_LeadTime.Active_Flag = N'Y')
 GO
 
-	
+
 if object_id('dbo.Dept_Asgn_VTC_v', 'V') is not null
 	drop view dbo.Dept_Asgn_VTC_v
-go 
+go
 create view dbo.Dept_Asgn_VTC_v
 as
-select 
+select
 	 dr.dept_asgn_key
 	,dr.hpr_dept_key
 	,dr.cpc_code
@@ -281,7 +281,7 @@ select
 	,dr.work_group_name
 	,dr.level_02
 	,dr.level_03
-	,dr.level_04		
+	,dr.level_04
 	,dr.hpr_crew_key
 	,dr.hpr_dept_role_key
 	,dr.enrollment_key
@@ -293,7 +293,7 @@ select
 	,dr.dept_last_name
 	,dr.dept_asgn_status_key
 	,dr.priority_key
-	,dr.priority	
+	,dr.priority
 	,dr.candidate_1_vol_key
 	,dr.candidate_1_name
 	,dr.candidate_1_profile
@@ -323,7 +323,7 @@ select
 	,dr.candidate_6_name
 	,dr.candidate_6_profile
 	,dr.candidate_6_next_step
-	,dr.candidate_6_name_abbr	
+	,dr.candidate_6_name_abbr
 	,dr.candidate_7_vol_key
 	,dr.candidate_7_name
 	,dr.candidate_7_profile
@@ -346,8 +346,8 @@ select
 	,dr.load_date
 	,dr.update_date
 	,u.user_key
-	,u.vtc_level_02	
-	,u.VTC_Level_03	
+	,u.vtc_level_02
+	,u.VTC_Level_03
 	,dr.Full_Name
 	,dr.marital_status_code
 	,dr.cong_servant_code
@@ -368,16 +368,16 @@ from dbo.Dept_asgn_v dr
 inner join dbo.[User] u
 	on dr.cpc_code = u.VTC_CPC_Code
 	and coalesce( dr.Level_03, '' ) = case when u.VTC_Level_02 is not null then u.VTC_Level_02 else coalesce( dr.level_03, '' ) end
-	and coalesce( dr.Level_04, '' ) = case when u.VTC_Level_03 is not null then u.VTC_Level_03 else coalesce( dr.Level_04, '' ) end	
-go	
+	and coalesce( dr.Level_04, '' ) = case when u.VTC_Level_03 is not null then u.VTC_Level_03 else coalesce( dr.Level_04, '' ) end
+go
 
 
 if object_id('dbo.Dept_Role_v', 'V') is not null
 	drop view dbo.Dept_Role_v
-go 
+go
 create view dbo.Dept_Role_v
 as
-select        
+select
 	 da.dept_role_key
 	,da.dept_asgn_key
 	,d.cpc_code
@@ -389,23 +389,23 @@ select
     ,case when d.work_group_name = '' then d .dept_name else d .dept_name + ' - ' + d .work_group_name end as full_dept_name
 	,c.crew_name
 	,dr.dept_role
-	,da.skill_level 
+	,da.skill_level
 	,da.role_start_date
-    ,coalesce( da.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date_rpt 
+    ,coalesce( da.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date_rpt
 	,da.role_end_date
     ,coalesce( da.role_end_date, '2030-03-01' ) as role_end_date_rpt
-    ,e.enrollment_code as dept_enrollment_code 
+    ,e.enrollment_code as dept_enrollment_code
 	,da.notes
 	,das.dept_asgn_status
 	,das.dept_asgn_status_code
 	,da.priority_key
-    ,case 
-		when da.priority_key = 1 then '!!' 
-		when da.priority_key = 2 then '!' 
-		when da.priority_key = 3 then '-' 
-		when da.priority_key = 4 then '_' 
-		else '.' 
-	 end as priority 
+    ,case
+		when da.priority_key = 1 then '!!'
+		when da.priority_key = 2 then '!'
+		when da.priority_key = 3 then '-'
+		when da.priority_key = 4 then '_'
+		else '.'
+	 end as priority
 	,datediff( month, da.role_start_date, coalesce ( da.role_end_date, convert( datetime, '2030-03-01 00:00:00', 102 ) ) ) as duration_in_months
 	,da.ps_notes
 	,da.job_description
@@ -429,18 +429,18 @@ select
 	,da.cong_servant_code
 	,da.current_sync_status
     ,da.sync_data_flag
-from dbo.dept_role as da 
-inner join dbo.hpr_dept as d 
-	on da.hpr_dept_key = d.hpr_dept_key 
-left outer join dbo.dept_asgn_status as das 
-	on da.dept_asgn_status_key = das.dept_asgn_status_key 
-	and das.dept_asgn_status_type = 'DA' 
-left outer join dbo.hpr_crew as c 
-	on da.hpr_crew_key = c.hpr_crew_key 
-left outer join dbo.hpr_dept_role as dr 
-	on da.hpr_dept_role_key = dr.hpr_dept_role_key 
-left outer join dbo.enrollment as e 
-	on da.enrollment_key = e.enrollment_key 
+from dbo.dept_role as da
+inner join dbo.hpr_dept as d
+	on da.hpr_dept_key = d.hpr_dept_key
+left outer join dbo.dept_asgn_status as das
+	on da.dept_asgn_status_key = das.dept_asgn_status_key
+	and das.dept_asgn_status_type = 'DA'
+left outer join dbo.hpr_crew as c
+	on da.hpr_crew_key = c.hpr_crew_key
+left outer join dbo.hpr_dept_role as dr
+	on da.hpr_dept_role_key = dr.hpr_dept_role_key
+left outer join dbo.enrollment as e
+	on da.enrollment_key = e.enrollment_key
 	and e.active_flag = 'Y'
 go
 
@@ -469,14 +469,14 @@ select
 	,v.cong_servant_code
 	,v.room_site_code
 	,v.room_bldg_code
-	,case when isnull( das.sort_trade_request, 999 ) = 999 then 999 else das.sort_trade_request end as sort_trade_request 
+	,case when isnull( das.sort_trade_request, 999 ) = 999 then 999 else das.sort_trade_request end as sort_trade_request
 	,v.hub_person_id
 	,v.hub_volunteer_id
 	,e.enrollment_code as hub_enrollment_code
-	,case 
-		when vol_start_date <= getdate() and (vol_end_date >= getdate() 
-			or isnull( vol_end_date, '1/1/1901' ) = '1/1/1901' ) then 'Current' 
-		else 'Not Current' 
+	,case
+		when vol_start_date <= getdate() and (vol_end_date >= getdate()
+			or isnull( vol_end_date, '1/1/1901' ) = '1/1/1901' ) then 'Current'
+		else 'Not Current'
 	 end as iscurrentvolunteer
 	,drv.hubincidenturl
 	,drv.candidate_next_step
@@ -485,26 +485,27 @@ select
 	,ve.enrollment_code as ps_enrollment_code
 	,drv.vol_enrollment_key
 	,drv.active_flag
-from dbo.dept_role_volunteer as drv 
-left outer join dbo.enrollment as ve 
-	on drv.vol_enrollment_key = ve.enrollment_key 
-left outer join dbo.dept_asgn_status as vt 
-	on drv.volunteer_type = vt.dept_asgn_status_key 
-left outer join dbo.volunteer as v 
-	on drv.volunteer_key = v.volunteer_key 
-left outer join dbo.marital_status as ms 
-	on v.marital_status_key = ms.marital_status_key 
-left outer join dbo.dept_asgn_status as das 
-	on drv.dept_asgn_status_key = das.dept_asgn_status_key 
-left outer join dbo.enrollment as e 
-	on v.current_enrollment_key = e.enrollment_key 
+    ,v.Mate_HUB_Person_ID
+from dbo.dept_role_volunteer as drv
+left outer join dbo.enrollment as ve
+	on drv.vol_enrollment_key = ve.enrollment_key
+left outer join dbo.dept_asgn_status as vt
+	on drv.volunteer_type = vt.dept_asgn_status_key
+left outer join dbo.volunteer as v
+	on drv.volunteer_key = v.volunteer_key
+left outer join dbo.marital_status as ms
+	on v.marital_status_key = ms.marital_status_key
+left outer join dbo.dept_asgn_status as das
+	on drv.dept_asgn_status_key = das.dept_asgn_status_key
+left outer join dbo.enrollment as e
+	on v.current_enrollment_key = e.enrollment_key
 	and e.active_flag = 'Y'
 go
 
 
 CREATE VIEW [dbo].[Dept_Role_List_v]
 AS
-SELECT        TOP (100) PERCENT dbo.Dept_Role.Dept_Role_Key, dbo.HPR_Dept.CPC_Code, dbo.HPR_Dept.Work_Group_Name AS Dept, isnull(VN.Vol_Name, 'No Volunteer') AS Current_Volunteer, dbo.HPR_Dept_Role.Dept_Role AS Role, 
+SELECT        TOP (100) PERCENT dbo.Dept_Role.Dept_Role_Key, dbo.HPR_Dept.CPC_Code, dbo.HPR_Dept.Work_Group_Name AS Dept, isnull(VN.Vol_Name, 'No Volunteer') AS Current_Volunteer, dbo.HPR_Dept_Role.Dept_Role AS Role,
                          dbo.Enrollment.Enrollment_Code AS Enroll, dbo.Dept_Role.Role_Start_Date as Role_StartDt, dbo.Dept_Role.Role_End_Date as Role_EndDt, dbo.Dept_Role.Dept_Role_Key AS [Key], dbo.Dept_Role.Active_Flag
 FROM            dbo.Dept_Role LEFT OUTER JOIN
                          dbo.HPR_Dept ON dbo.Dept_Role.HPR_Dept_Key = dbo.HPR_Dept.HPR_Dept_Key LEFT OUTER JOIN
@@ -523,51 +524,92 @@ GO
 
 if object_id('dbo.Dept_Role_wVolNm_Cand_Cnt_v', 'V') is not null
 	drop view dbo.Dept_Role_wVolNm_Cand_Cnt_v
-go 
+go
 CREATE VIEW dbo.Dept_Role_wVolNm_Cand_Cnt_v
 AS
-SELECT DISTINCT 
-	DRv.Dept_Role_Key, DRv.CPC_Code, DRv.Dept_Name, DRv.Work_Group_Name, DRv.Level_02, DRv.Level_03, DRv.Level_04, DRv.full_dept_name, DRv.Crew_Name, DRv.Dept_Role, DRv.Skill_Level, DRv.Role_Start_Date, 
-	DRv.Role_End_Date, VNC.Num_Vols AS [Number Volunteers], VN.Vol_Name, VN.Vol_Start_Date, VN.Vol_End_Date, CC.CountOfVolunteer_Key AS [Number Candidates], DRv.dept_enrollment_code, DRv.Notes, 
-	DRv.Dept_Asgn_Status, DRv.Dept_Asgn_Status_Code, DRv.Priority_Key, DRv.priority, DRv.duration_in_months, DRv.PS_Notes, DRv.Job_Description, DRv.VTC_Meeting_Code, DRv.Active_Flag, DRv.HPR_Dept_Key, 
-	DRv.HPR_Crew_Key, DRv.HPR_Dept_Role_Key, DRv.Enrollment_Key, DRv.Dept_Asgn_Status_Key, DRv.Until_Not_Needed, DRv.Short_Term_OK, DRv.Trade_To_Qualify, DRv.Sort_Trade_Request, DRv.Possible_Sister, 
-	DRv.PC_Code, DRv.Dept_Asgn_Key, DRv.Dept_Volunteer_Name, DRv.Marital_Status_Key, DRv.Cong_Servant_Code, DRv.Current_Sync_Status
-FROM dbo.Dept_Role_v AS DRv 
+SELECT DISTINCT
+	 DRv.Dept_Role_Key
+    ,DRv.CPC_Code
+    ,DRv.Dept_Name
+    ,DRv.Work_Group_Name
+    ,DRv.Level_02
+    ,DRv.Level_03
+    ,DRv.Level_04
+    ,DRv.full_dept_name
+    ,DRv.Crew_Name
+    ,DRv.Dept_Role
+    ,DRv.Skill_Level
+    ,DRv.Role_Start_Date
+    ,DRv.Role_End_Date
+    ,VNC.Num_Vols AS [Number Volunteers]
+    ,VN.Vol_Name
+    ,VN.Vol_Start_Date
+    ,VN.Vol_End_Date
+    ,VN.Vol_Status
+    ,CC.CountOfVolunteer_Key AS [Number Candidates]
+    ,DRv.dept_enrollment_code
+    ,DRv.Notes
+    ,DRv.Dept_Asgn_Status
+    ,DRv.Dept_Asgn_Status_Code
+    ,DRv.Priority_Key
+    ,DRv.priority
+    ,DRv.duration_in_months
+    ,DRv.PS_Notes
+    ,DRv.Job_Description
+    ,DRv.VTC_Meeting_Code
+    ,DRv.Active_Flag
+    ,DRv.HPR_Dept_Key
+	,DRv.HPR_Crew_Key
+    ,DRv.HPR_Dept_Role_Key
+    ,DRv.Enrollment_Key
+    ,DRv.Dept_Asgn_Status_Key
+    ,DRv.Until_Not_Needed
+    ,DRv.Short_Term_OK
+    ,DRv.Trade_To_Qualify
+    ,DRv.Sort_Trade_Request
+    ,DRv.Possible_Sister
+    ,DRv.PC_Code
+    ,DRv.Dept_Asgn_Key
+    ,DRv.Dept_Volunteer_Name
+    ,DRv.Marital_Status_Key
+    ,DRv.Cong_Servant_Code
+    ,DRv.Current_Sync_Status
+FROM dbo.Dept_Role_v AS DRv
 LEFT OUTER JOIN
 	( SELECT Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date, COUNT(Volunteer_Key) AS CountOfVolunteer_Key
 	  FROM dbo.Dept_Role_Volunteer_v AS DRV_vC
 	  WHERE active_flag = 'Y'
 	  GROUP BY Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date
-	  HAVING Volunteer_Type_Description = N'Candidate' ) AS CC 
-	ON DRv.Dept_Role_Key = CC.Dept_Role_Key 
+	  HAVING Volunteer_Type_Description = N'Candidate' ) AS CC
+	ON DRv.Dept_Role_Key = CC.Dept_Role_Key
 LEFT OUTER JOIN
 	( SELECT Dept_Role_Key, Volunteer_Type_Description, COUNT(Volunteer_Key) AS Num_Vols
 	  FROM dbo.Dept_Role_Volunteer_v
 	  WHERE Vol_Start_Date is not null and active_flag = 'Y'
 	  GROUP BY Dept_Role_Key, Volunteer_Type_Description
-	  HAVING Volunteer_Type_Description = N'Volunteer' ) as VNC  
-	ON DRv.Dept_Role_Key = VNC.Dept_Role_Key 
+	  HAVING Volunteer_Type_Description = N'Volunteer' ) as VNC
+	ON DRv.Dept_Role_Key = VNC.Dept_Role_Key
 LEFT OUTER JOIN
 	( Select A.Dept_Role_Key, A.Vol_Start_Date, A.Vol_End_Date, A.Vol_Name
-	  from 
+	  from
 		( SELECT ROW_NUMBER() over (partition by Dept_Role_Key Order by vol_start_date asc ) as RowNum, Dept_Role_Key, Vol_Start_Date, Vol_End_Date, Full_Name AS Vol_Name, Volunteer_Key AS Vol_Num
 		  FROM dbo.Dept_Role_Volunteer_v
-		  WHERE Volunteer_Type_Description = 'Volunteer' 
+		  WHERE Volunteer_Type_Description = 'Volunteer'
 		    and active_flag = 'Y'
-			AND ( 
-				   CAST(GETDATE() AS DATE) BETWEEN Vol_Start_Date AND COALESCE(Vol_End_Date, '2030-01-01')  
+			AND (
+				   CAST(GETDATE() AS DATE) BETWEEN Vol_Start_Date AND COALESCE(Vol_End_Date, '2030-01-01')
 				OR CAST(GETDATE() AS DATE) < Vol_Start_Date ) ) as A
-	  Where A.RowNum = 1 ) as VN 
-	ON DRv.Dept_Role_Key = VN.Dept_Role_Key 
+	  Where A.RowNum = 1 ) as VN
+	ON DRv.Dept_Role_Key = VN.Dept_Role_Key
 GO
 
 
 CREATE VIEW [dbo].[Dept_Role_wVolNm_Cand_Cnt__VTC_v]
 AS
-SELECT        A.Dept_Role_Key, A.CPC_Code, A.Dept_Name, A.Work_Group_Name, A.Level_02, A.Level_03, A.Level_04, A.full_dept_name, A.Crew_Name, A.Dept_Role, A.Skill_Level, A.Role_Start_Date, A.Role_End_Date, 
-                         A.[Number Volunteers], A.Vol_Name, A.Vol_Start_Date, A.Vol_End_Date, A.[Number Candidates], A.dept_enrollment_code, A.Notes, A.Dept_Asgn_Status, A.Dept_Asgn_Status_Code, A.Priority_Key, A.priority, 
-                         A.duration_in_months, A.PS_Notes, A.Job_Description, A.VTC_Meeting_Code, A.Active_Flag, A.HPR_Dept_Key, A.HPR_Crew_Key, A.HPR_Dept_Role_Key, A.Enrollment_Key, A.Dept_Asgn_Status_Key, A.Until_Not_Needed, 
-                         A.Short_Term_OK, A.Trade_To_Qualify, A.Sort_Trade_Request, A.Possible_Sister, A.PC_Code, A.Dept_Asgn_Key, A.Dept_Volunteer_Name, A.Marital_Status_Key, A.Cong_Servant_Code, A.Current_Sync_Status, U.User_Key, 
+SELECT        A.Dept_Role_Key, A.CPC_Code, A.Dept_Name, A.Work_Group_Name, A.Level_02, A.Level_03, A.Level_04, A.full_dept_name, A.Crew_Name, A.Dept_Role, A.Skill_Level, A.Role_Start_Date, A.Role_End_Date,
+                         A.[Number Volunteers], A.Vol_Name, A.Vol_Start_Date, A.Vol_End_Date, A.[Number Candidates], A.dept_enrollment_code, A.Notes, A.Dept_Asgn_Status, A.Dept_Asgn_Status_Code, A.Priority_Key, A.priority,
+                         A.duration_in_months, A.PS_Notes, A.Job_Description, A.VTC_Meeting_Code, A.Active_Flag, A.HPR_Dept_Key, A.HPR_Crew_Key, A.HPR_Dept_Role_Key, A.Enrollment_Key, A.Dept_Asgn_Status_Key, A.Until_Not_Needed,
+                         A.Short_Term_OK, A.Trade_To_Qualify, A.Sort_Trade_Request, A.Possible_Sister, A.PC_Code, A.Dept_Asgn_Key, A.Dept_Volunteer_Name, A.Marital_Status_Key, A.Cong_Servant_Code, A.Current_Sync_Status, U.User_Key,
                          U.VTC_CPC_Code, U.VTC_Level_02, U.VTC_Level_03
 FROM            dbo.Dept_Role_wVolNm_Cand_Cnt_v AS A INNER JOIN
                          dbo.[User] AS U ON A.CPC_Code = U.VTC_CPC_Code
@@ -576,18 +618,18 @@ GO
 
 CREATE VIEW [dbo].[Dept_Role_w_Vols_Cand_ALL_v]
 AS
-SELECT        dbo.Dept_Role_v.Dept_Role_Key, dbo.Dept_Role_v.Dept_Asgn_Key, dbo.Dept_Role_v.CPC_Code, dbo.Dept_Role_v.Dept_Name, dbo.Dept_Role_v.Work_Group_Name, dbo.Dept_Role_v.Level_02, dbo.Dept_Role_v.Level_03, 
-                         dbo.Dept_Role_v.Level_04, dbo.Dept_Role_v.full_dept_name, dbo.Dept_Role_v.Crew_Name, dbo.Dept_Role_v.Dept_Role, dbo.Dept_Role_v.Skill_Level, dbo.Dept_Role_v.Role_Start_Date, dbo.Dept_Role_v.Role_End_Date, 
-                         dbo.Dept_Role_v.dept_enrollment_code, dbo.Dept_Role_v.Notes, dbo.Dept_Role_v.Dept_Asgn_Status, dbo.Dept_Role_v.Dept_Asgn_Status_Code, dbo.Dept_Role_v.Priority_Key, dbo.Dept_Role_v.priority, 
-                         dbo.Dept_Role_v.duration_in_months, dbo.Dept_Role_v.PS_Notes, dbo.Dept_Role_v.Job_Description, dbo.Dept_Role_v.VTC_Meeting_Code, dbo.Dept_Role_v.Active_Flag, dbo.Dept_Role_v.Load_Date, 
-                         dbo.Dept_Role_v.Update_Date, dbo.Dept_Role_v.HPR_Dept_Key, dbo.Dept_Role_v.HPR_Crew_Key, dbo.Dept_Role_v.HPR_Dept_Role_Key, dbo.Dept_Role_v.Enrollment_Key, dbo.Dept_Role_v.Dept_Asgn_Status_Key, 
-                         dbo.Dept_Role_v.Until_Not_Needed, dbo.Dept_Role_v.Short_Term_OK, dbo.Dept_Role_v.Trade_To_Qualify, dbo.Dept_Role_v.Sort_Trade_Request, dbo.Dept_Role_v.Possible_Sister, dbo.Dept_Role_v.Dept_Volunteer_Name, 
-                         dbo.Dept_Role_v.Marital_Status_Key, dbo.Dept_Role_v.Cong_Servant_Code, dbo.Dept_Role_v.Current_Sync_Status, dbo.Dept_Role_v.PC_Code, dbo.Dept_Role_Volunteer_v.Dept_Role_Vol_Key, 
-                         dbo.Dept_Role_Volunteer_v.Volunteer_Type_ID, dbo.Dept_Role_Volunteer_v.Volunteer_Type_Description, dbo.Dept_Role_Volunteer_v.Vol_Start_Date, dbo.Dept_Role_Volunteer_v.Vol_End_Date, 
-                         dbo.Dept_Role_Volunteer_v.Notes AS Expr1, dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status_Key AS Expr2, dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status_Code AS Expr3, 
-                         dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status AS Expr4, dbo.Dept_Role_Volunteer_v.Volunteer_Key, dbo.Dept_Role_Volunteer_v.Full_Name, dbo.Dept_Role_Volunteer_v.volunteer_name_short, 
-                         dbo.Dept_Role_Volunteer_v.Marital_Status_Code, dbo.Dept_Role_Volunteer_v.Cong_Servant_Code AS Expr5, dbo.Dept_Role_Volunteer_v.HUB_Person_ID, dbo.Dept_Role_Volunteer_v.HUB_Volunteer_ID, 
-                         dbo.Dept_Role_Volunteer_v.hub_enrollment_code, dbo.Dept_Role_Volunteer_v.IsCurrentVolunteer, dbo.Dept_Role_Volunteer_v.HuBIncidentURL, dbo.Dept_Role_Volunteer_v.Candidate_Next_Step, 
+SELECT        dbo.Dept_Role_v.Dept_Role_Key, dbo.Dept_Role_v.Dept_Asgn_Key, dbo.Dept_Role_v.CPC_Code, dbo.Dept_Role_v.Dept_Name, dbo.Dept_Role_v.Work_Group_Name, dbo.Dept_Role_v.Level_02, dbo.Dept_Role_v.Level_03,
+                         dbo.Dept_Role_v.Level_04, dbo.Dept_Role_v.full_dept_name, dbo.Dept_Role_v.Crew_Name, dbo.Dept_Role_v.Dept_Role, dbo.Dept_Role_v.Skill_Level, dbo.Dept_Role_v.Role_Start_Date, dbo.Dept_Role_v.Role_End_Date,
+                         dbo.Dept_Role_v.dept_enrollment_code, dbo.Dept_Role_v.Notes, dbo.Dept_Role_v.Dept_Asgn_Status, dbo.Dept_Role_v.Dept_Asgn_Status_Code, dbo.Dept_Role_v.Priority_Key, dbo.Dept_Role_v.priority,
+                         dbo.Dept_Role_v.duration_in_months, dbo.Dept_Role_v.PS_Notes, dbo.Dept_Role_v.Job_Description, dbo.Dept_Role_v.VTC_Meeting_Code, dbo.Dept_Role_v.Active_Flag, dbo.Dept_Role_v.Load_Date,
+                         dbo.Dept_Role_v.Update_Date, dbo.Dept_Role_v.HPR_Dept_Key, dbo.Dept_Role_v.HPR_Crew_Key, dbo.Dept_Role_v.HPR_Dept_Role_Key, dbo.Dept_Role_v.Enrollment_Key, dbo.Dept_Role_v.Dept_Asgn_Status_Key,
+                         dbo.Dept_Role_v.Until_Not_Needed, dbo.Dept_Role_v.Short_Term_OK, dbo.Dept_Role_v.Trade_To_Qualify, dbo.Dept_Role_v.Sort_Trade_Request, dbo.Dept_Role_v.Possible_Sister, dbo.Dept_Role_v.Dept_Volunteer_Name,
+                         dbo.Dept_Role_v.Marital_Status_Key, dbo.Dept_Role_v.Cong_Servant_Code, dbo.Dept_Role_v.Current_Sync_Status, dbo.Dept_Role_v.PC_Code, dbo.Dept_Role_Volunteer_v.Dept_Role_Vol_Key,
+                         dbo.Dept_Role_Volunteer_v.Volunteer_Type_ID, dbo.Dept_Role_Volunteer_v.Volunteer_Type_Description, dbo.Dept_Role_Volunteer_v.Vol_Start_Date, dbo.Dept_Role_Volunteer_v.Vol_End_Date,
+                         dbo.Dept_Role_Volunteer_v.Notes AS Expr1, dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status_Key AS Expr2, dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status_Code AS Expr3,
+                         dbo.Dept_Role_Volunteer_v.Dept_Asgn_Status AS Expr4, dbo.Dept_Role_Volunteer_v.Volunteer_Key, dbo.Dept_Role_Volunteer_v.Full_Name, dbo.Dept_Role_Volunteer_v.volunteer_name_short,
+                         dbo.Dept_Role_Volunteer_v.Marital_Status_Code, dbo.Dept_Role_Volunteer_v.Cong_Servant_Code AS Expr5, dbo.Dept_Role_Volunteer_v.HUB_Person_ID, dbo.Dept_Role_Volunteer_v.HUB_Volunteer_ID,
+                         dbo.Dept_Role_Volunteer_v.hub_enrollment_code, dbo.Dept_Role_Volunteer_v.IsCurrentVolunteer, dbo.Dept_Role_Volunteer_v.HuBIncidentURL, dbo.Dept_Role_Volunteer_v.Candidate_Next_Step,
                          dbo.Dept_Role_Volunteer_v.PS_Notes AS Expr6, dbo.Dept_Role_Volunteer_v.Vol_Enrollment_Key, dbo.Dept_Role_Volunteer_v.Active_Flag AS Expr7
 FROM            dbo.Dept_Role_v LEFT OUTER JOIN
                          dbo.Dept_Role_Volunteer_v ON dbo.Dept_Role_v.Dept_Role_Key = dbo.Dept_Role_Volunteer_v.Dept_Role_Key
@@ -596,11 +638,11 @@ GO
 
 CREATE VIEW [dbo].[Dept_Role_wVolNm_Cand_Cnt_v_BU]
 AS
-SELECT DISTINCT 
-                         DRv.Dept_Role_Key, DRv.CPC_Code, DRv.Dept_Name, DRv.Work_Group_Name, DRv.Level_02, DRv.Level_03, DRv.Level_04, DRv.full_dept_name, DRv.Crew_Name, DRv.Dept_Role, DRv.Skill_Level, DRv.Role_Start_Date, 
-                         DRv.Role_End_Date, VN.Num_Vols AS [Number Volunteers], VN.Vol_Name, VN.Vol_Start_Date, VN.Vol_End_Date, CC.CountOfVolunteer_Key AS [Number Candidates], DRv.dept_enrollment_code, DRv.Notes, 
-                         DRv.Dept_Asgn_Status, DRv.Dept_Asgn_Status_Code, DRv.Priority_Key, DRv.priority, DRv.duration_in_months, DRv.PS_Notes, DRv.Job_Description, DRv.VTC_Meeting_Code, DRv.Active_Flag, DRv.HPR_Dept_Key, 
-                         DRv.HPR_Crew_Key, DRv.HPR_Dept_Role_Key, DRv.Enrollment_Key, DRv.Dept_Asgn_Status_Key, DRv.Until_Not_Needed, DRv.Short_Term_OK, DRv.Trade_To_Qualify, DRv.Sort_Trade_Request, DRv.Possible_Sister, 
+SELECT DISTINCT
+                         DRv.Dept_Role_Key, DRv.CPC_Code, DRv.Dept_Name, DRv.Work_Group_Name, DRv.Level_02, DRv.Level_03, DRv.Level_04, DRv.full_dept_name, DRv.Crew_Name, DRv.Dept_Role, DRv.Skill_Level, DRv.Role_Start_Date,
+                         DRv.Role_End_Date, VN.Num_Vols AS [Number Volunteers], VN.Vol_Name, VN.Vol_Start_Date, VN.Vol_End_Date, CC.CountOfVolunteer_Key AS [Number Candidates], DRv.dept_enrollment_code, DRv.Notes,
+                         DRv.Dept_Asgn_Status, DRv.Dept_Asgn_Status_Code, DRv.Priority_Key, DRv.priority, DRv.duration_in_months, DRv.PS_Notes, DRv.Job_Description, DRv.VTC_Meeting_Code, DRv.Active_Flag, DRv.HPR_Dept_Key,
+                         DRv.HPR_Crew_Key, DRv.HPR_Dept_Role_Key, DRv.Enrollment_Key, DRv.Dept_Asgn_Status_Key, DRv.Until_Not_Needed, DRv.Short_Term_OK, DRv.Trade_To_Qualify, DRv.Sort_Trade_Request, DRv.Possible_Sister,
                          DRv.PC_Code, DRv.Dept_Asgn_Key, DRv.Dept_Volunteer_Name, DRv.Marital_Status_Key, DRv.Cong_Servant_Code, DRv.Current_Sync_Status
 FROM            dbo.Dept_Role_v AS DRv LEFT OUTER JOIN
                              (SELECT        Dept_Role_Key, Volunteer_Type_Description, Vol_Start_Date, COUNT(Volunteer_Key) AS CountOfVolunteer_Key
@@ -617,10 +659,10 @@ GO
 
 if object_id('dbo.ETL_Table_Run_v', 'V') is not null
 	drop view dbo.ETL_Table_Run_v
-go 
+go
 create view dbo.ETL_Table_Run_v
 as
-select 
+select
 	 etl_table
 	,rows_inserted
 	,rows_updated
@@ -636,10 +678,10 @@ go
 
 if object_id('dbo.ETL_Table_Run_Curr_v', 'V') is not null
 	drop view dbo.ETL_Table_Run_Curr_v
-go 
+go
 create view dbo.ETL_Table_Run_Curr_v
 as
-select 
+select
 	 etl_table
 	,rows_inserted
 	,rows_updated
@@ -656,10 +698,10 @@ go
 
 if object_id('dbo.HPR_Volunteer_Invites_Base_v', 'V') is not null
 	drop view dbo.HPR_Volunteer_Invites_Base_v
-go 
+go
 create view dbo.HPR_Volunteer_Invites_Base_v
 as
-select 
+select
 	 v.volunteer_key
 	,v.full_name
 	,v.ba_volunteer_num
@@ -674,17 +716,17 @@ select
 from dbo.volunteer_enrollment ve
 inner join dbo.volunteer v
 	on ve.volunteer_key = v.volunteer_key
-where ve.end_date > getdate() 
+where ve.end_date > getdate()
 	and ve.enrollment_key = 76  -- BCV, was BRD invites
 go
 
 
 if object_id('dbo.HPR_Volunteer_Invites_v', 'V') is not null
 	drop view dbo.HPR_Volunteer_Invites_v
-go 
+go
 create view dbo.HPR_Volunteer_Invites_v
 as
-select 
+select
 	 i.volunteer_key
 	,i.full_name
 	,i.ba_volunteer_num
@@ -707,7 +749,7 @@ go
 
 if object_id('dbo.MW_Attendant_v', 'V') is not null
 	drop view dbo.MW_Attendant_v
-go 
+go
 create view dbo.MW_Attendant_v
 as
 select pcc.volunteer_name, pcc.hub_volunteer_num, v.cong_servant_code, pcc.enrollment_1_code as enrollment_code
@@ -724,10 +766,10 @@ go
 
 if object_id('dbo.Skills_v', 'V') is not null
 	drop view dbo.Skills_v
-go 
+go
 create view dbo.Skills_v
 as
-select 
+select
 	 s.skill
 	,ss.skill_subskill
 	,ss.skill_speciality
@@ -743,10 +785,10 @@ go
 
 if object_id('dbo.User_Activity_Summary_v', 'V') is not null
 	drop view dbo.User_Activity_Summary_v
-go 
+go
 create view dbo.User_Activity_Summary_v
 as
-select top 1000 last_name + ', ' + first_name as full_name, format( login_datetime, 'yyyy-MM-01' ) as mth, count(*) as cnt 
+select top 1000 last_name + ', ' + first_name as full_name, format( login_datetime, 'yyyy-MM-01' ) as mth, count(*) as cnt
 from dbo.User_Activity_v
 where last_name not in ( 'Bargeron', 'Krause', 'Cassell' )
 group by last_name + ', ' + first_name, format( login_datetime, 'yyyy-MM-01' )
@@ -756,10 +798,10 @@ go
 
 if object_id('dbo.User_Activity_v', 'V') is not null
 	drop view dbo.User_Activity_v
-go 
+go
 create view dbo.User_Activity_v
 as
-select 
+select
 	 ua.user_key
 	,u.last_name
 	,u.first_name
@@ -776,16 +818,16 @@ go
 
 if object_id('dbo.User_List_v', 'V') is not null
 	drop view dbo.User_List_v
-go 
+go
 create view dbo.User_List_v
 as
-select 
+select
 	 u.user_key
 	,u.first_name
 	,u.last_name
 	,u.email
 	,u.ad_user_name
-	,u.vtc_flag	
+	,u.vtc_flag
 	,ul.user_list_key
 	,ul.user_list
 	,ul.user_list_description
@@ -802,33 +844,33 @@ select
 	,d.vtc_8_user_key
 	,ul.active_flag
 from dbo.user_list ul
-inner join dbo.[user] u 
+inner join dbo.[user] u
 	on ul.user_key = u.user_key
 left join dbo.hpr_dept d
-	on ul.hpr_dept_key = d.hpr_dept_key	
+	on ul.hpr_dept_key = d.hpr_dept_key
 where ul.active_flag = 'Y'
 go
 
 
 if object_id('dbo.User_List_Volunteer_v', 'V') is not null
 	drop view dbo.User_List_Volunteer_v
-go 
+go
 create view dbo.User_List_Volunteer_v
 as
-select 
-	 u.user_list_volunteer_key 		
-	,u.user_list_key 					
-	,u.volunteer_key 					
-	,u.sort_order 						
-	,u.user_list_volunteer_status_key	
-	,u.status_date 					
-	,u.notes 							
-	,u.last_changed_user_key 			
-	,u.start_date	 					
-	,u.end_date 						
-	,u.active_flag 					
-	,u.load_date 						
-	,u.update_date 
+select
+	 u.user_list_volunteer_key
+	,u.user_list_key
+	,u.volunteer_key
+	,u.sort_order
+	,u.user_list_volunteer_status_key
+	,u.status_date
+	,u.notes
+	,u.last_changed_user_key
+	,u.start_date
+	,u.end_date
+	,u.active_flag
+	,u.load_date
+	,u.update_date
 from dbo.user_list ul
 inner join dbo.user_list_volunteer u
 	on ul.user_list_key = u.user_list_key
@@ -839,7 +881,7 @@ go
 
 if object_id('dbo.User_Task_v', 'V') is not null
 	drop view dbo.User_Task_v
-go 
+go
 create view dbo.User_Task_v
 as
 select ut.user_task_key
@@ -874,10 +916,10 @@ go
 
 if object_id('dbo.Volunteer_App_v', 'V') is not null
 	drop view dbo.Volunteer_App_v
-go 
+go
 create view dbo.Volunteer_App_v
 as
-select 
+select
 	 v.full_name
 	,va.volunteer_app_key
 	,va.volunteer_key
@@ -933,10 +975,10 @@ go
 
 if object_id('dbo.Volunteer_Approval_Level_v', 'V') is not null
 	drop view dbo.Volunteer_Approval_Level_v
-go 
+go
 create view dbo.Volunteer_Approval_Level_v
 as
-select 
+select
 	 volunteer_key
 	,case
 		when seq_num = 1 then 'OK - All'
@@ -952,14 +994,14 @@ select
 	 end as approval_level
 	,seq_num
 from (
-	select 
+	select
 		 va.volunteer_Key
-		,min( case 
+		,min( case
 			when typ.App_Type_Code = 'A-8' and va.Attrib_Approval_Level_Val = 'OK - All' then 1
-			when typ.App_Type_Code = 'A-8' and sts.app_status_code = 'APP' and coalesce( va.attrib_approval_level_val, '' ) = '' and 
+			when typ.App_Type_Code = 'A-8' and sts.app_status_code = 'APP' and coalesce( va.attrib_approval_level_val, '' ) = '' and
 				cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) < 36 then 1
 			when typ.App_Type_Code = 'A-8' and va.Attrib_Approval_Level_Val = 'OK - BCS' then 2
-			when typ.App_Type_Code = 'A-8' and sts.app_status_code = 'APP' and coalesce( va.attrib_approval_level_val, '' ) = '' and 
+			when typ.App_Type_Code = 'A-8' and sts.app_status_code = 'APP' and coalesce( va.attrib_approval_level_val, '' ) = '' and
 				cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) > 36 then 2
 			when typ.App_Type_Code = 'A-8' and va.Attrib_Approval_Level_Val = 'OK - Exception' then 3
 			when typ.App_Type_Code = 'A-19' and va.Attrib_Approval_Level_Val = 'OK - All' then 4
@@ -982,49 +1024,49 @@ from (
 		and sts.active_flag = 'Y'
 	where va.active_flag = 'Y'
 	group by va.volunteer_key ) core
-go	
+go
 
 
 if object_id('dbo.Volunteer_Availability_v', 'V') is not null
 	drop view dbo.Volunteer_Availability_v
-go 
+go
 create view dbo.Volunteer_Availability_v
 as
-select 
+select
 	 volunteer_availability_key
 	,volunteer_key
-	,avail_as_consultant_flag			
-	,avail_as_commuter_flag 				
-	,avail_as_commuter_as_needed_flag	
-	,avail_as_commuter_closest_site 	
-	,avail_as_commuter_days_per_wk 	
-	,avail_as_commuter_weekly_flag	
-	,avail_as_commuter_notes 		
-	,avail_as_commuter_mon_am_flag	
-	,avail_as_commuter_mon_pm_flag	
-	,avail_as_commuter_tue_am_flag	
-	,avail_as_commuter_tue_pm_flag	
-	,avail_as_commuter_wed_am_flag	
-	,avail_as_commuter_wed_pm_flag	
-	,avail_as_commuter_thu_am_flag	
-	,avail_as_commuter_thu_pm_flag	
-	,avail_as_commuter_fri_am_flag	
-	,avail_as_commuter_fri_pm_flag	
-	,avail_as_commuter_sat_am_flag	
-	,avail_as_commuter_sat_pm_flag	
-	,avail_as_commuter_sun_am_flag	
-	,avail_as_commuter_sun_pm_flag	
-	,avail_as_remote_vol_flag		
-	,avail_as_remote_vol_days_per_wk 	
-	,avail_as_remote_vol_notes 		
-	,avail_as_vol_flag 				
-	,avail_as_vol_anytime_flag		
-	,avail_as_vol_start_date 		
-	,avail_as_vol_end_date 			
-	,avail_as_vol_date_notes 		
-	,avail_as_vol_date_short_term_days 	
-	,avail_as_vol_long_term_flag 	
-	,avail_as_vol_notes				
+	,avail_as_consultant_flag
+	,avail_as_commuter_flag
+	,avail_as_commuter_as_needed_flag
+	,avail_as_commuter_closest_site
+	,avail_as_commuter_days_per_wk
+	,avail_as_commuter_weekly_flag
+	,avail_as_commuter_notes
+	,avail_as_commuter_mon_am_flag
+	,avail_as_commuter_mon_pm_flag
+	,avail_as_commuter_tue_am_flag
+	,avail_as_commuter_tue_pm_flag
+	,avail_as_commuter_wed_am_flag
+	,avail_as_commuter_wed_pm_flag
+	,avail_as_commuter_thu_am_flag
+	,avail_as_commuter_thu_pm_flag
+	,avail_as_commuter_fri_am_flag
+	,avail_as_commuter_fri_pm_flag
+	,avail_as_commuter_sat_am_flag
+	,avail_as_commuter_sat_pm_flag
+	,avail_as_commuter_sun_am_flag
+	,avail_as_commuter_sun_pm_flag
+	,avail_as_remote_vol_flag
+	,avail_as_remote_vol_days_per_wk
+	,avail_as_remote_vol_notes
+	,avail_as_vol_flag
+	,avail_as_vol_anytime_flag
+	,avail_as_vol_start_date
+	,avail_as_vol_end_date
+	,avail_as_vol_date_notes
+	,avail_as_vol_date_short_term_days
+	,avail_as_vol_long_term_flag
+	,avail_as_vol_notes
 	,active_flag
 	,load_date
 	,update_date
@@ -1036,23 +1078,23 @@ go
 
 if object_id('dbo.Volunteer_Contact_Hist_Curr_v', 'V') is not null
 	drop view dbo.Volunteer_Contact_Hist_Curr_v
-go 
+go
 create view dbo.Volunteer_Contact_Hist_Curr_v
 as
 select
-	 volunteer_contact_hist_key 	
-	,volunteer_key 				
-	,vtc_name					
-	,contact_date				
-	,contact_type				
-	,contact_purpose				
-	,contact_pending				
-	,contact_notes				
-	,contact_url					
-	,attribute_value				
-	,active_flag 				
-	,load_date 					
-	,update_date 	
+	 volunteer_contact_hist_key
+	,volunteer_key
+	,vtc_name
+	,contact_date
+	,contact_type
+	,contact_purpose
+	,contact_pending
+	,contact_notes
+	,contact_url
+	,attribute_value
+	,active_flag
+	,load_date
+	,update_date
 from dbo.volunteer_contact_hist
 where active_flag = 'Y'
 go
@@ -1060,7 +1102,7 @@ go
 
 if object_id('dbo.Volunteer_DC50_v', 'V') is not null
 	drop view dbo.Volunteer_DC50_v
-go 
+go
 create view dbo.Volunteer_DC50_v
 as
 select
@@ -1076,8 +1118,8 @@ select
 	,va.app_date
 from dbo.volunteer_app va
 inner join dbo.app_type at
-	on va.app_type_key = at.app_type_key 
-inner join dbo.app_status sts 
+	on va.app_type_key = at.app_type_key
+inner join dbo.app_status sts
 	on va.app_status_key = sts.app_status_key
 where at.app_type_key = 7
 	and va.app_date in ( select max( app_date ) from dbo.volunteer_app va2 where va2.volunteer_key = va.volunteer_key and va2.app_type_key = 7 )
@@ -1086,15 +1128,15 @@ go
 
 if object_id('dbo.Volunteer_Dept_v', 'V') is not null
 	drop view dbo.Volunteer_Dept_v
-go 
+go
 create view dbo.Volunteer_Dept_v
 as
-select 
+select
 	 vd.volunteer_dept_key
     ,vd.volunteer_key
     ,vd.person_id
     ,v.full_name
-	,case 
+	,case
 		when vd.enrollment_code in ( 'BAS', 'BCS', 'BCV', 'BSS' ) and site_code is null then 'Field'
 		else vd.site_code
 	 end as site_code
@@ -1137,7 +1179,7 @@ go
 
 if object_id('dbo.Volunteer_Dept_Orphaned_Records_v', 'V') is not null
 	drop view dbo.Volunteer_Dept_Orphaned_Records_v
-go 
+go
 create view dbo.Volunteer_Dept_Orphaned_Records_v
 as
 with rvd as (
@@ -1150,9 +1192,9 @@ hub as (
 	from stg.stg_Person_Dept_History
 	where end_date is null or cast( end_date as date ) >= cast( getdate() as date ) )
 
-select rvd.full_name, rvd.dept_name, rvd.start_date, rvd.person_id, notes, temp_flag, primary_flag, volunteer_dept_key 
+select rvd.full_name, rvd.dept_name, rvd.start_date, rvd.person_id, notes, temp_flag, primary_flag, volunteer_dept_key
 from rvd
-left join hub 
+left join hub
 	on rvd.person_id = hub.person_id
 	and rvd.Dept_Name = hub.Department_Name
 	and rvd.Start_Date = hub.Start_Date
@@ -1162,7 +1204,7 @@ go
 
 if object_id('dbo.Volunteer_Enrollment_v', 'V') is not null
 	drop view dbo.Volunteer_Enrollment_v
-go 
+go
 create view dbo.Volunteer_Enrollment_v
 as
 select
@@ -1171,11 +1213,11 @@ select
 	,e.enrollment_key
 	,e.enrollment_code
 	,e.rank_num
-	,case 
+	,case
 		when e.enrollment_code in ( 'BAS', 'BCS', 'BCV', 'BSS' ) and site_code is null then 'Field'
 		else ve.site_code
 	 end as site_code
-	,ve.site_code as site_code_orig	 
+	,ve.site_code as site_code_orig
 	,ve.notes
 	,ve.applicant_id
 	,v.hub_person_id
@@ -1183,17 +1225,17 @@ select
 	,ve.end_date
 	,ve.active_flag
 	,ve.volunteer_enrollment_key
-from dbo.volunteer v 
+from dbo.volunteer v
 inner join dbo.volunteer_enrollment ve
-	on v.volunteer_key = ve.volunteer_key 
-inner join dbo.enrollment e 
+	on v.volunteer_key = ve.volunteer_key
+inner join dbo.enrollment e
 	on ve.enrollment_key = e.enrollment_key
 go
 
 
 if object_id('dbo.Volunteer_Enrollment_Orphaned_Records_v', 'V') is not null
 	drop view dbo.Volunteer_Enrollment_Orphaned_Records_v
-go 
+go
 create view dbo.Volunteer_Enrollment_Orphaned_Records_v
 as
 with rvd as (
@@ -1206,51 +1248,51 @@ hub as (
 	from stg.stg_Person_enrollment
 	where end_date is null or cast( end_date as date ) >= cast( getdate() as date ) )
 
-select rvd.full_name, rvd.enrollment_code, rvd.start_date, rvd.person_id, volunteer_enrollment_key 
+select rvd.full_name, rvd.enrollment_code, rvd.start_date, rvd.person_id, volunteer_enrollment_key
 from rvd
-left join hub 
+left join hub
 	on rvd.person_id = hub.person_id
 	and rvd.enrollment_code = hub.enrollment_code
 	and rvd.Start_Date = cast( hub.Start_Date as date )
 where hub.person_id is null
 	and rvd.enrollment_code not in ( 'HPR', 'BA' )
 go
-	
+
 
 if object_id('dbo.Volunteer_Enrollment_Schools_v', 'V') is not null
 	drop view dbo.Volunteer_Enrollment_Schools_v
-go 
+go
 create view dbo.Volunteer_Enrollment_Schools_v
 as
-select distinct 
+select distinct
 	 v.volunteer_key
 	,v.full_name
 	,e.enrollment_code
 	,ve.start_date
 	,ve.end_date
-from dbo.volunteer v 
+from dbo.volunteer v
 inner join dbo.volunteer_enrollment ve
-	on v.volunteer_key = ve.volunteer_key 
-inner join dbo.enrollment e 
+	on v.volunteer_key = ve.volunteer_key
+inner join dbo.enrollment e
 	on ve.enrollment_key = e.enrollment_key
 where e.enrollment_code in ( 'SKE', 'FGC', 'FGM' )
-	and ve.start_date in ( select max( ve2.start_date ) 
-						   from dbo.volunteer_enrollment ve2 
-						   inner join dbo.enrollment e2 
-							   on ve2.enrollment_key = e2.enrollment_key 
+	and ve.start_date in ( select max( ve2.start_date )
+						   from dbo.volunteer_enrollment ve2
+						   inner join dbo.enrollment e2
+							   on ve2.enrollment_key = e2.enrollment_key
 						   where ve2.volunteer_key = v.volunteer_key and e2.enrollment_code in ( 'SKE', 'FGC', 'FGM' ) )
 go
 
 
 if object_id('dbo.Volunteer_Event_Data_v', 'V') is not null
 	drop view dbo.Volunteer_Event_Data_v
-go 
+go
 create view dbo.Volunteer_Event_Data_v
 as
-select 
+select
 	 ve.volunteer_key
 	,ve.event_key
-	,case 
+	,case
 		when ea.event_attribute_group = 'Personal' then ' Personal'
 		when ea.event_attribute_group = 'Secular' then ' Secular'
 		else ea.event_attribute_group
@@ -1261,13 +1303,13 @@ select
 	,ea.event_attribute_key
 	,e.event_system_key
 	,ea.to_profile_active_flag
-from dbo.volunteer_event ve 
-inner join dbo.event e 
+from dbo.volunteer_event ve
+inner join dbo.event e
 	on ve.event_key = e.event_key
 inner join dbo.event_attribute ea
-	on e.event_key = ea.event_key 
+	on e.event_key = ea.event_key
 inner join dbo.volunteer_event_data ved
-	on ve.volunteer_event_key = ved.volunteer_event_key	
+	on ve.volunteer_event_key = ved.volunteer_event_key
 	and ea.event_attribute_key = ved.event_attribute_key
 where e.event_system_key = 1
 	and ea.active_flag = 'Y'
@@ -1276,10 +1318,10 @@ go
 
 if object_id('dbo.Volunteer_Export_v', 'V') is not null
 	drop view dbo.Volunteer_Export_v
-go 
+go
 create view dbo.Volunteer_Export_v
 as
-select 
+select
 	 v.volunteer_key
 	,v.full_name
 	,v.last_name
@@ -1304,21 +1346,21 @@ select
 	,ms.marital_status_code
 	,v.pioneer_flag
 	,v.cong_servant_code
-	,v.vol_desk_user_key	
-	,v.current_enrollment_key	
+	,v.vol_desk_user_key
+	,v.current_enrollment_key
 	,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-	,cast( round( ( datediff( day, v.baptism_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as yrs_bap	
+	,cast( round( ( datediff( day, v.baptism_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as yrs_bap
 	,v.trade_contact_group_key
-	,case 
-		when coalesce( v.vol_desk_user_key, 1 ) = 1 then 'Not Assigned' 
-		else u.last_Name + ', ' + u.first_name 
+	,case
+		when coalesce( v.vol_desk_user_key, 1 ) = 1 then 'Not Assigned'
+		else u.last_Name + ', ' + u.first_name
 	 end as assigned_to
 	,case
 		when len( cast( v.ba_volunteer_num as varchar(10) ) ) = 7
 			then '0' + cast( v.ba_volunteer_num as varchar(10) )
 		else cast( v.ba_volunteer_num as varchar(10) )
 	 end as ba_vol_num
-	,v.hub_volunteer_num	 
+	,v.hub_volunteer_num
 	,cast( v.hub_person_id as varchar(9) ) as hub_person_id
 	,v.jw_username
 	,ts.tracking_status
@@ -1337,7 +1379,7 @@ select
 	,a8.app_status_code as a8_app_status
 	,v.a19_approved_flag
 	,a19.app_status_code as a19_app_status
-	,e.enrollment_code as current_enrollment_code	
+	,e.enrollment_code as current_enrollment_code
 from dbo.volunteer v
 inner join dbo.[user] u
 	on v.vol_desk_user_key = u.user_key
@@ -1349,7 +1391,7 @@ inner join dbo.country c
 	on v.country_key = c.country_key
 inner join dbo.tracking_status ts
 	on v.tracking_status_key = ts.tracking_status_key
-inner join dbo.cong 
+inner join dbo.cong
 	on v.cong_key = cong.cong_key
 left join dbo.volunteer mate
 	on v.mate_hub_person_id = mate.hub_person_id
@@ -1358,22 +1400,22 @@ left join dbo.app_status a8
 left join dbo.app_status a19
 	on v.a19_app_status_key = a19.app_status_key
 left join dbo.enrollment e
-	on v.current_enrollment_key = e.enrollment_key	
+	on v.current_enrollment_key = e.enrollment_key
 go
 
 
 if object_id('dbo.Volunteer_FTS_v', 'V') is not null
 	drop view dbo.Volunteer_FTS_v
-go 
+go
 create view dbo.Volunteer_FTS_v
 as
-select 
+select
 	 volunteer_key
 	,round( sum( fts_days ) / 365.25, 1 ) as fts
 	,round( sum( sfts_days ) / 365.25, 1 ) as sfts
 	,cast( round( sum( fts_days ) / 365.25, 0 ) as integer ) as rounded_fts
 	,cast( round( sum( sfts_days ) / 365.25, 0 ) as integer ) as rounded_sfts
-from 
+from
 	( select
 		 volunteer_key
 		,enrollment_code
@@ -1382,8 +1424,8 @@ from
 		,datediff( day, start_date, end_date ) as enrl_days
 		,case when fts_flag = 'Y' then datediff( day, start_date, end_date ) else 0 end as fts_days
 		,case when sfts_flag = 'Y' then datediff( day, start_date, end_date ) else 0 end as sfts_days
-	  from 
-		( select 
+	  from
+		( select
 			 ve.volunteer_key
 			,e.enrollment_code
 			,ve.start_date
@@ -1401,64 +1443,85 @@ go
 
 if object_id('dbo.Volunteer_Pursuit_Hist_v', 'V') is not null
 	drop view dbo.Volunteer_Pursuit_Hist_v
-go 
+go
 create view dbo.Volunteer_Pursuit_Hist_v
 as
-select 
-	ph.volunteer_pursuit_hist_key, 	
-	ph.volunteer_key,
-	ph.vtc_name,	
-	v.Full_Name,
-	ph.hpr_dept_key,
-	ph.start_date,	
-	ph.target_date,
-	ph.role_name,	
-	ph.role_desc,	
-	ph.attribute_value,
-	ph.requested_flag,
-	ph.volunteer_pursuit_cancel_reason_key,
-	ph.request_cancel_reason,
-	ph.active_flag, 
-	ph.load_date, 	
-	ph.update_date
+select
+	 ph.volunteer_pursuit_hist_key
+	,ph.volunteer_key
+	,ph.vtc_name
+	,v.Full_Name
+	,ph.hpr_dept_key
+	,d.CPC_Code
+	,d.level_02
+	,d.Level_03
+	,d.level_04
+	,d.level_05
+	,d.level_06
+	,case
+		when d.NYC_Flag = 'Y' then 'NYC Dept'
+		when d.Active_Flag = 'Y' and d.hub_flag = 'N' then 'Future Dept not yet in HuB'
+		when d.active_flag = 'N' and d.hub_flag = 'N' then 'Legacy Dept'
+	end as Dept_Note
+	,ph.start_date
+	,ph.target_date
+	,ph.role_name
+	,ph.role_desc
+	,ph.attribute_value
+	,ph.requested_flag
+	,ph.volunteer_pursuit_cancel_reason_key
+	,ph.request_cancel_reason
+	,ph.active_flag
+	,ph.load_date
+	,ph.update_date
 from dbo.Volunteer_Pursuit_Hist ph
 inner join dbo.volunteer v
 	on ph.volunteer_key = v.volunteer_key
+inner join dbo.HPR_Dept d
+	on ph.HPR_Dept_Key = d.HPR_Dept_Key
 go
 
 
 if object_id('dbo.Volunteer_Pursuit_Hist_Curr_v', 'V') is not null
 	drop view dbo.Volunteer_Pursuit_Hist_Curr_v
-go 
+go
 create view dbo.Volunteer_Pursuit_Hist_Curr_v
 as
-select 
-	volunteer_pursuit_hist_key, 	
-	volunteer_key,
-	vtc_name,	
-	hpr_dept_key,
-	start_date,	
-	target_date,
-	role_name,	
-	role_desc,	
-	attribute_value,
-	requested_flag,
-	volunteer_pursuit_cancel_reason_key,
-	request_cancel_reason,
-	active_flag, 
-	load_date, 	
-	update_date
-from dbo.Volunteer_Pursuit_Hist
+select
+	 vtc_name
+	,Full_Name
+	,CPC_Code
+	,level_02
+	,Level_03
+	,level_04
+	,level_05
+	,level_06
+	,Dept_Note
+	,role_name
+	,role_desc
+	,start_date
+	,target_date
+	,attribute_value
+	,requested_flag
+	,volunteer_pursuit_cancel_reason_key
+	,request_cancel_reason
+	,active_flag
+	,load_date
+	,update_date
+    ,volunteer_pursuit_hist_key
+	,volunteer_key
+    ,hpr_dept_key
+from dbo.Volunteer_Pursuit_Hist_v
 where active_flag = 'Y'
 go
 
 
 if object_id('dbo.Volunteer_Search_Skills_v', 'V') is not null
 	drop view dbo.Volunteer_Search_Skills_v
-go 
+go
 create view dbo.Volunteer_Search_Skills_v
 as
-select 
+select
 	 vs.volunteer_key
 	,s.skill_key
 	,vs.skill_speciality_key
@@ -1469,17 +1532,17 @@ inner join dbo.skill_speciality ss
 	on s.skill_key = ss.skill_key
 inner join dbo.volunteer_skill vs
 	on ss.skill_speciality_key = vs.skill_speciality_key
-inner join dbo.skill_level sl 
+inner join dbo.skill_level sl
 	on vs.skill_level_key = sl.skill_level_key
 go
 
 
 if object_id('dbo.Volunteer_Search_v', 'V') is not null
 	drop view dbo.Volunteer_Search_v
-go 
+go
 create view dbo.Volunteer_Search_v
 as
-select 
+select
 	 v.volunteer_key
 	,v.full_name
 	,v.first_name
@@ -1508,9 +1571,9 @@ select
 	,v.cong_servant_code
 	,v.cong_relocation_date
 	,v.vol_desk_user_key
-	,case 
-		when coalesce( v.vol_desk_user_key, 1 ) = 1 then 'Not Assigned' 
-		else u.last_Name + ', ' + u.first_name 
+	,case
+		when coalesce( v.vol_desk_user_key, 1 ) = 1 then 'Not Assigned'
+		else u.last_Name + ', ' + u.first_name
 	 end as vol_desk_user
 	,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
 	,v.avail_short_notice_flag
@@ -1525,12 +1588,12 @@ select
 	,v.tcg_contact_date
 	,v.email
 	,v.hub_tracking_flag
-	,case 
+	,case
 		when v.ba_safety_orientation_date is not null and tmp.last_temp_asgn_date is null then dateadd( year, 1, v.ba_safety_orientation_date )
 		when v.ba_safety_orientation_date is null and tmp.last_temp_asgn_date is not null then dateadd( year, 1, tmp.last_temp_asgn_date )
 		when v.ba_safety_orientation_date > tmp.last_temp_asgn_date then dateadd( year, 1, v.ba_safety_orientation_date )
 		else dateadd( year, 1, tmp.last_temp_asgn_date )
-	 end as safety_orientation_exp_date		
+	 end as safety_orientation_exp_date
 from dbo.volunteer v
 inner join dbo.marital_status ms
 	on v.marital_status_key = ms.marital_status_key
@@ -1552,16 +1615,16 @@ left outer join
 	( select v.volunteer_key, max( v.end_date ) as last_temp_asgn_date
 	  from dbo.volunteer_enrollment v inner join dbo.enrollment e on v.Enrollment_Key = e.Enrollment_Key
 	  where e.Enrollment_Code in ( 'BBC', 'BCV', 'BCS' ) and v.site_code is not null group by v.volunteer_key ) tmp
-	on v.volunteer_key = tmp.volunteer_key		
+	on v.volunteer_key = tmp.volunteer_key
 go
 
 
 if object_id('dbo.Volunteer_Skills_v', 'V') is not null
 	drop view dbo.Volunteer_Skills_v
-go 
+go
 create view dbo.Volunteer_Skills_v
 as
-select 
+select
 	 vs.volunteer_key
 	,v.full_name as volunteer_name
 	,s.skill_key
@@ -1571,7 +1634,7 @@ select
 	,ss.skill_speciality
 	,vs.skill_description
 	,vs.yrs_exp
-	,case 
+	,case
 		when coalesce( abs( vs.yrs_exp ), 0 ) between 0 and 1 then '0-1'
 		when vs.yrs_exp >1 and vs.yrs_exp <=5 then '1-5'
 		when vs.yrs_exp >5 and vs.yrs_exp <=10 then '5-10'
@@ -1592,51 +1655,51 @@ select
 	,vs.office_notes
 	,vs.ovsr_assessment_name
 	,vs.ovsr_assessment_notes
-	,vs.ovsr_assessment_date	
-	,case 
+	,vs.ovsr_assessment_date
+	,case
 		when src.source_system_code = 'BRCH' then sl.skill_level_key
 		when bsl.skill_level_key <> 7 then bsl.skill_level_key
 		else sl.skill_level_key
 	 end as master_skill_level_key
-	,case 
+	,case
 		when src.source_system_code = 'BRCH' then sl.skill_level_code
 		when bsl.skill_level_key <> 7 then bsl.skill_level_code
 		else sl.skill_level_code
 	 end as master_skill_level_code
-	,case 
+	,case
 		when src.source_system_code = 'BRCH' then sl.skill_level
 		when bsl.skill_level_key <> 7 then bsl.skill_level
 		else sl.skill_level
 	 end as master_skill_level
-	,case 
+	,case
 		when src.source_system_code = 'BRCH' then src.source_system_key
 		when bsl.skill_level_key <> 7 then 4
 		else src.source_system_key
 	 end as master_source_system_key
-	,case 
+	,case
 		when src.source_system_code = 'BRCH' then src.source_system_code
 		when bsl.skill_level_key <> 7 then 'BA'
 		else src.source_system_code
 	 end as master_source_system_code
-	,case 
+	,case
 		when src.source_system_code = 'BRCH' then src.source_system
 		when bsl.skill_level_key <> 7 then 'BA'
 		else src.source_system
 	 end as master_source_system
-	,vs.skill_update_date	 
+	,vs.skill_update_date
 from dbo.skill s
 inner join dbo.skill_speciality ss
 	on s.skill_key = ss.skill_key
 inner join dbo.volunteer_skill vs
 	on ss.skill_speciality_key = vs.skill_speciality_key
-inner join dbo.skill_level sl 
+inner join dbo.skill_level sl
 	on vs.skill_level_key = sl.skill_level_key
-inner join dbo.skill_level bsl 
-	on coalesce( vs.ovsr_assessment_skill_level_key, 7 ) = bsl.skill_level_key	
+inner join dbo.skill_level bsl
+	on coalesce( vs.ovsr_assessment_skill_level_key, 7 ) = bsl.skill_level_key
 inner join dbo.source_system src
 	on vs.source_system_key = src.source_system_key
 inner join dbo.volunteer v
-	on vs.Volunteer_Key = v.Volunteer_Key	
+	on vs.Volunteer_Key = v.Volunteer_Key
 where ss.active_flag = 'Y'
 	and s.active_flag = 'Y'
 	--and sl.active_flag = 'Y'
@@ -1646,10 +1709,10 @@ go
 
 if object_id('dbo.Volunteer_v', 'V') is not null
 	drop view dbo.Volunteer_v
-go 
+go
 create view dbo.Volunteer_v
 as
-select 
+select
 	 v.volunteer_key
 	,v.full_name
 	,v.last_name
@@ -1687,23 +1750,23 @@ select
 		else '-'
 	 end as cong_servant
 	,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-	,cast( round( ( datediff( day, v.baptism_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as yrs_bap	
-	,case 
-		when coalesce( v.vol_desk_user_key, 1 ) = 1 then 'Not Assigned' 
-		else u.last_Name + ', ' + u.first_name 
+	,cast( round( ( datediff( day, v.baptism_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as yrs_bap
+	,case
+		when coalesce( v.vol_desk_user_key, 1 ) = 1 then 'Not Assigned'
+		else u.last_Name + ', ' + u.first_name
 	 end as assigned_to
 	,cast( v.ba_volunteer_num as varchar(10) ) as ba_volunteer_num
 	,v.ba_volunteer_id
 	,v.ba_safety_orientation_date
 	,tmp.last_temp_asgn_date
-	,case 
+	,case
 		when v.ba_safety_orientation_date is not null and tmp.last_temp_asgn_date is null then dateadd( year, 1, v.ba_safety_orientation_date )
 		when v.ba_safety_orientation_date is null and tmp.last_temp_asgn_date is not null then dateadd( year, 1, tmp.last_temp_asgn_date )
 		when v.ba_safety_orientation_date > tmp.last_temp_asgn_date then dateadd( year, 1, v.ba_safety_orientation_date )
 		else dateadd( year, 1, tmp.last_temp_asgn_date )
-	 end as safety_orientation_exp_date	
+	 end as safety_orientation_exp_date
 	,v.hub_person_id
-	,v.hub_volunteer_num	
+	,v.hub_volunteer_num
 	,v.hub_volunteer_id
 	,v.hub_tracking_flag
 	,v.jw_username
@@ -1728,9 +1791,9 @@ select
 	,v.a19_app_status_key
 	,v.app_request_collection_flag
 	,v.hpr_volunteer_exception_flag
-	,v.staffing_number_exception_flag	
+	,v.staffing_number_exception_flag
 	,v.person_key_roles_flag
-	,v.App_Pursued_By_Value	
+	,v.App_Pursued_By_Value
  	,dc50.App_Status_Code AS DC_50_App_Status
  	,al.approval_level
 	,v.current_enrollment_key
@@ -1741,7 +1804,7 @@ select
 	,ve.Enrollment_Code AS school_enrollment
 	,mate.full_name as spouse_name
 	,mate.HUB_Volunteer_Num AS spouse_hub_vol_num
- 	,mate.HUB_Person_ID AS spouse_hub_person_id	
+ 	,mate.HUB_Person_ID AS spouse_hub_person_id
 	,v.load_date
 	,v.update_date
 from dbo.volunteer v
@@ -1749,27 +1812,27 @@ inner join dbo.state s
 	on v.state_key = s.state_key
 inner join dbo.postal_code pc
 	on v.postal_code_key = pc.postal_code_key
-inner join dbo.[user] u 
+inner join dbo.[user] u
 	on v.vol_desk_user_key = u.user_key
-inner join dbo.marital_status ms 
+inner join dbo.marital_status ms
 	on v.marital_status_key = ms.marital_status_key
 inner join dbo.cong
 	on v.cong_key = cong.cong_key
 left join dbo.Enrollment e
-	on v.current_enrollment_key = e.Enrollment_Key	
+	on v.current_enrollment_key = e.Enrollment_Key
 inner join dbo.tracking_status ts
 	on v.tracking_status_key = ts.tracking_status_key
 inner join dbo.country c
 	on v.country_key = c.country_key
-left outer join dbo.Volunteer_Enrollment_Schools_v ve 
-	on v.volunteer_key = ve.volunteer_key 	
+left outer join dbo.Volunteer_Enrollment_Schools_v ve
+	on v.volunteer_key = ve.volunteer_key
 left outer join
 	( select v.volunteer_key, max( v.end_date ) as last_temp_asgn_date
 	  from dbo.volunteer_enrollment v inner join dbo.enrollment e on v.Enrollment_Key = e.Enrollment_Key
 	  where e.Enrollment_Code in ( 'BBC', 'BCV', 'BCS' ) and v.site_code is not null group by v.volunteer_key ) tmp
-	on v.volunteer_key = tmp.volunteer_key	
-left outer join dbo.volunteer_dc50_v dc50 
-	on v.volunteer_key = dc50.volunteer_key	
+	on v.volunteer_key = tmp.volunteer_key
+left outer join dbo.volunteer_dc50_v dc50
+	on v.volunteer_key = dc50.volunteer_key
 left join dbo.volunteer mate
 	on v.mate_hub_person_id = mate.hub_person_id
 left join dbo.volunteer_approval_level_v al
@@ -1780,73 +1843,73 @@ go
 
 
 /*  DYNAMIC VIEWS  */
-select 'D. Soto' as ovsr, 165914 as person_id, 'DSoto@bethel.jw.org' as email 
+select 'D. Soto' as ovsr, 165914 as person_id, 'DSoto@bethel.jw.org' as email
 	union all
-	select 'G. Stradowski' as ovsr, 58599 as person_id, 'GSTRADOW@bethel.jw.org' as email 
+	select 'G. Stradowski' as ovsr, 58599 as person_id, 'GSTRADOW@bethel.jw.org' as email
 	union all
-	select 'K. Cady' as ovsr, 49403 as person_id, 'KCADY@bethel.jw.org' as email 
+	select 'K. Cady' as ovsr, 49403 as person_id, 'KCADY@bethel.jw.org' as email
 	union all
-	select 'M. Mordecki' as ovsr, 398886 as person_id, 'MJMORDEC@bethel.jw.org' as email 
+	select 'M. Mordecki' as ovsr, 398886 as person_id, 'MJMORDEC@bethel.jw.org' as email
 	union all
-	select 'R. McRedmond' as ovsr, 617508 as person_id, 'rmcredmond@bethel.jw.org' as email 	
+	select 'R. McRedmond' as ovsr, 617508 as person_id, 'rmcredmond@bethel.jw.org' as email
 	union all
-	select 'B. O''Bleness' as ovsr, 40217 as person_id, 'BKOBlene@bethel.jw.org' as email 	
+	select 'B. O''Bleness' as ovsr, 40217 as person_id, 'BKOBlene@bethel.jw.org' as email
 	union all
-	select 'C. Haynes' as ovsr, 90427 as person_id, 'CHAYNES@bethel.jw.org' as email 	
+	select 'C. Haynes' as ovsr, 90427 as person_id, 'CHAYNES@bethel.jw.org' as email
 	union all
-	select 'D. Dietrich' as ovsr, 526053 as person_id, 'DLDIETRI@bethel.jw.org' as email 	
+	select 'D. Dietrich' as ovsr, 526053 as person_id, 'DLDIETRI@bethel.jw.org' as email
 	union all
-	select 'D. Snyder' as ovsr, 30632 as person_id, 'DSNYDER@bethel.jw.org' as email 	
+	select 'D. Snyder' as ovsr, 30632 as person_id, 'DSNYDER@bethel.jw.org' as email
 	union all
-	select 'D. Willis' as ovsr, 876578 as person_id, 'DWILLIS@bethel.jw.org' as email 	
+	select 'D. Willis' as ovsr, 876578 as person_id, 'DWILLIS@bethel.jw.org' as email
 	union all
-	select 'E. Hedefine' as ovsr, 49887 as person_id, 'EHEDEFIN@bethel.jw.org' as email 	
+	select 'E. Hedefine' as ovsr, 49887 as person_id, 'EHEDEFIN@bethel.jw.org' as email
 	union all
-	select 'E. Weber' as ovsr, 41854 as person_id, 'ERWEBER@bethel.jw.org' as email 	
+	select 'E. Weber' as ovsr, 41854 as person_id, 'ERWEBER@bethel.jw.org' as email
 	union all
-	select 'J. Estes' as ovsr, 444364 as person_id, 'JESTES@bethel.jw.org' as email 	
+	select 'J. Estes' as ovsr, 444364 as person_id, 'JESTES@bethel.jw.org' as email
 	union all
-	select 'J. Jacks' as ovsr, 44402 as person_id, 'JJacks@bethel.jw.org' as email 	
+	select 'J. Jacks' as ovsr, 44402 as person_id, 'JJacks@bethel.jw.org' as email
 	union all
-	select 'J. Levan' as ovsr, 155837 as person_id, 'JLEVAN@bethel.jw.org' as email 	
+	select 'J. Levan' as ovsr, 155837 as person_id, 'JLEVAN@bethel.jw.org' as email
 	union all
-	select 'J. Nichols' as ovsr, 456193 as person_id, 'JNICHOLS@bethel.jw.org' as email 	
+	select 'J. Nichols' as ovsr, 456193 as person_id, 'JNICHOLS@bethel.jw.org' as email
 	union all
-	select 'J. Niemann' as ovsr, 28863 as person_id, 'JNiemann@bethel.jw.org' as email 	
+	select 'J. Niemann' as ovsr, 28863 as person_id, 'JNiemann@bethel.jw.org' as email
 	union all
-	select 'J. White' as ovsr, 339343 as person_id, 'JWHITE@bethel.jw.org' as email 	
+	select 'J. White' as ovsr, 339343 as person_id, 'JWHITE@bethel.jw.org' as email
 	union all
-	select 'K. Mueller' as ovsr, 380131 as person_id, 'KMUELLER@bethel.jw.org' as email 	
+	select 'K. Mueller' as ovsr, 380131 as person_id, 'KMUELLER@bethel.jw.org' as email
 	union all
-	select 'M. Calloway' as ovsr, 348730 as person_id, 'MCALLOWAY@bethel.jw.org' as email 	
+	select 'M. Calloway' as ovsr, 348730 as person_id, 'MCALLOWAY@bethel.jw.org' as email
 	union all
-	select 'M. Hainstock' as ovsr, 785819 as person_id, 'MHainstock@bethel.jw.org' as email 	
+	select 'M. Hainstock' as ovsr, 785819 as person_id, 'MHainstock@bethel.jw.org' as email
 	union all
-	select 'M. Tidei' as ovsr, 808950 as person_id, 'MTIDEI@bethel.jw.org' as email 	
+	select 'M. Tidei' as ovsr, 808950 as person_id, 'MTIDEI@bethel.jw.org' as email
 	union all
-	select 'M. Wilcox' as ovsr, 28334 as person_id, 'MWILCOX@bethel.jw.org' as email 	
+	select 'M. Wilcox' as ovsr, 28334 as person_id, 'MWILCOX@bethel.jw.org' as email
 	union all
-	select 'N. Tartaglia' as ovsr, 46429 as person_id, 'NWTartag@bethel.jw.org' as email 	
+	select 'N. Tartaglia' as ovsr, 46429 as person_id, 'NWTartag@bethel.jw.org' as email
 	union all
-	select 'N. Thomas' as ovsr, 36184 as person_id, 'NAWTHOMAS@bethel.jw.org' as email 	
+	select 'N. Thomas' as ovsr, 36184 as person_id, 'NAWTHOMAS@bethel.jw.org' as email
 	union all
-	select 'P. Cain' as ovsr, 185459 as person_id, 'PACAIN@bethel.jw.org' as email 	
+	select 'P. Cain' as ovsr, 185459 as person_id, 'PACAIN@bethel.jw.org' as email
 	union all
-	select 'R. Harbo' as ovsr, 109345 as person_id, 'RRHARBO@bethel.jw.org' as email 	
+	select 'R. Harbo' as ovsr, 109345 as person_id, 'RRHARBO@bethel.jw.org' as email
 	union all
-	select 'R. Leithiser' as ovsr, 408350 as person_id, 'RTLEITHI@bethel.jw.org' as email 	
+	select 'R. Leithiser' as ovsr, 408350 as person_id, 'RTLEITHI@bethel.jw.org' as email
 	union all
-	select 'R. Seydlitz' as ovsr, 29612 as person_id, 'rseydlit@bethel.jw.org' as email 	
+	select 'R. Seydlitz' as ovsr, 29612 as person_id, 'rseydlit@bethel.jw.org' as email
 	union all
-	select 'S. Burckholter' as ovsr, 39753 as person_id, 'SBURCKHOLTER@bethel.jw.org' as email 	
+	select 'S. Burckholter' as ovsr, 39753 as person_id, 'SBURCKHOLTER@bethel.jw.org' as email
 	union all
-	select 'T. Coriell' as ovsr, 52181 as person_id, 'TCORIELL@bethel.jw.org' as email 	
+	select 'T. Coriell' as ovsr, 52181 as person_id, 'TCORIELL@bethel.jw.org' as email
 	union all
-	select 'T. Stockwell' as ovsr, 43248 as person_id, 'TSTOCKWELL@bethel.jw.org' as email 	
+	select 'T. Stockwell' as ovsr, 43248 as person_id, 'TSTOCKWELL@bethel.jw.org' as email
 	union all
-	select 'W. Merchant' as ovsr, 48028 as person_id, 'WMERCHANT@bethel.jw.org' as email 	
+	select 'W. Merchant' as ovsr, 48028 as person_id, 'WMERCHANT@bethel.jw.org' as email
 	union all
-	select 'D. Glover' as ovsr, 781119 as person_id, 'DGLOVER@bethel.jw.org' as email 
+	select 'D. Glover' as ovsr, 781119 as person_id, 'DGLOVER@bethel.jw.org' as email
 	union all
 	select 'K. Page' as ovsr, 59612 as person_id, 'KPAGE@bethel.jw.org' as email
 	union all
@@ -1868,11 +1931,11 @@ select 'D. Soto' as ovsr, 165914 as person_id, 'DSoto@bethel.jw.org' as email
 	select 'J. Barker' as ovsr, 741671 as person_id, 'JONBARKER@bethel.jw.org' as email
 	union all
 	select 'K. Flores' as ovsr, 347395 as person_id, 'KFLORES@bethel.jw.org' as email
-	
-	
-	
-	
+
+
+
+
 insert into dbo.hpr_Crew (hpr_dept_key, crew_name, crew_ovsr, crew_ovsr_person_id, crew_ovsr_email )
-values( 131, 'Volunteer Resourcing', 'R. Horne', 102057, 'AHORNE@bethel.jw.org' ), 
+values( 131, 'Volunteer Resourcing', 'R. Horne', 102057, 'AHORNE@bethel.jw.org' ),
 	( 131, 'Approval Processing', 'J. Barker', 741671, 'JONBARKER@bethel.jw.org' ),
-	( 131, 'Special Handling', 'K. Flores', 347395, 'KFLORES@bethel.jw.org' );	
+	( 131, 'Special Handling', 'K. Flores', 347395, 'KFLORES@bethel.jw.org' );
