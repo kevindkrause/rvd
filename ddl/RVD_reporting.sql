@@ -6,7 +6,7 @@ go
 
 if object_id('rpt.Arrival_Departure_v', 'V') is not null
 	drop view rpt.Arrival_Departure_v
-go 
+go
 create view rpt.Arrival_Departure_v
 as
 select distinct
@@ -27,7 +27,7 @@ select distinct
 	,dept_1_cpc_code as cpc_code
 	,dept_1_parent_dept_name as parent_dept_name
 	,dept_1_dept_name as dept_name
-	,case 
+	,case
 		when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
 		else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
 	 end as sub_dept_name
@@ -38,7 +38,7 @@ select distinct
 	,spouse_bethel_email
 	,spouse_jwpub_email
 	,volunteer_key
-	,case 
+	,case
 		when enrollment_1_start_date > cast( getdate() as date ) then 'Invited'
 		when enrollment_1_end_date < cast( getdate() as date ) then 'Departed'
 		else 'Arrived'
@@ -68,10 +68,10 @@ select distinct
 	,parent_dept_code as cpc_code
 	,parent_dept_name
 	,dept_name
-	,case 
+	,case
 		when charindex( ' - ', dept_name ) = 0 then dept_name
 		else right( dept_name, charindex( ' - ', reverse( dept_name ) ) - 1 )
-	 end as sub_dept_name	
+	 end as sub_dept_name
 	,enrollment_code
 	,enrollment_start_date
 	,enrollment_end_date
@@ -79,7 +79,7 @@ select distinct
 	,spouse_bethel_email
 	,spouse_jwpub_email
 	,volunteer_key
-	,case 
+	,case
 		when enrollment_start_date > cast( getdate() as date ) then 'Invited'
 		when enrollment_end_date < cast( getdate() as date ) then 'Departed'
 		else 'Arrived'
@@ -109,7 +109,7 @@ select distinct
 	,dept_2_cpc_code as cpc_code
 	,dept_2_parent_dept_name as parent_dept_name
 	,dept_2_dept_name as dept_name
-	,case 
+	,case
 		when charindex( ' - ', dept_2_dept_name ) = 0 then dept_2_dept_name
 		else right( dept_2_dept_name, charindex( ' - ', reverse( dept_2_dept_name ) ) - 1 )
 	 end as sub_dept_name
@@ -134,10 +134,10 @@ go
 
 if object_id('rpt.BA_Elevated_Permissions_v', 'V') is not null
 	drop view rpt.BA_Elevated_Permissions_v
-go 
+go
 create view rpt.BA_Elevated_Permissions_v
 as
-select 
+select
 	 volunteer_name
 	,cast( ba_volunteer_num as varchar(10) ) as ba_volunteer_num
 	,case when b.DomainPerm = 1 then 'Y' else 'N' end as domain_perm_flag
@@ -145,7 +145,7 @@ select
 	,parent_dept_name
 	,dept_name
 	,enrollment_code
-	,enrollment_start_date	
+	,enrollment_start_date
 	,volunteer_key
 	,b.load_date
 from rpt.volunteer_v v
@@ -157,10 +157,10 @@ go
 
 if object_id('rpt.BA_Event_v', 'V') is not null
 	drop view rpt.BA_Event_v
-go 
+go
 create view rpt.BA_Event_v
 as
-select 
+select
 	 volunteer_name
 	,ba_volunteer_num
 	,event_name
@@ -169,7 +169,7 @@ select
 	,start_dow
 	,num_days
 	,dateadd( day, num_days - 1, start_date ) as end_date
-	,case 
+	,case
 		when start_dow = 'Mon' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_3 = 'C' then 'Y'
@@ -177,9 +177,9 @@ select
 		when start_dow = 'Thu' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as mon
-	,case 
+	,case
 		when start_dow = 'Tue' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_3 = 'C' then 'Y'
@@ -187,9 +187,9 @@ select
 		when start_dow = 'Fri' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as tue
-	,case 
+	,case
 		when start_dow = 'Wed' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_3 = 'C' then 'Y'
@@ -197,9 +197,9 @@ select
 		when start_dow = 'Sat' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as wed
-	,case 
+	,case
 		when start_dow = 'Thu' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_3 = 'C' then 'Y'
@@ -207,9 +207,9 @@ select
 		when start_dow = 'Sun' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as thu
-	,case 
+	,case
 		when start_dow = 'Fri' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_3 = 'C' then 'Y'
@@ -217,9 +217,9 @@ select
 		when start_dow = 'Mon' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as fri
-	,case 
+	,case
 		when start_dow = 'Sat' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_3 = 'C' then 'Y'
@@ -227,9 +227,9 @@ select
 		when start_dow = 'Tue' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as sat
-	,case 
+	,case
 		when start_dow = 'Sun' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_3 = 'C' then 'Y'
@@ -237,12 +237,12 @@ select
 		when start_dow = 'Wed' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as sun
 	--,status_day_1,status_day_2, status_day_3, status_day_4,status_day_5, status_day_6, status_day_7
 	,comments
-from 
-	( select 
+from
+	( select
 		 v.full_Name as volunteer_name
 		,v.ba_volunteer_num
 		,ba.event_name
@@ -268,17 +268,17 @@ from
 	  inner join dbo.volunteer v
 		on ba.person_guid = v.hub_person_guid
 	  where 1=1
-		and start_date >= 1 + dateadd( week, datediff( week, 0, getdate() ), -42 )	  
+		and start_date >= 1 + dateadd( week, datediff( week, 0, getdate() ), -42 )
 		--and (    start_date = 1 + dateadd( week, datediff( week, 0, getdate() ), -1 ) -- CURRENT WK
 		--	  or start_date = 1 + dateadd( week, datediff( week, 0, getdate() ), -8 ) -- PRIOR WK
-		--	  or start_date >= dateadd( week, datediff( week, 0, getdate() ), 7 ) 	  -- NEXT WK		  
+		--	  or start_date >= dateadd( week, datediff( week, 0, getdate() ), 7 ) 	  -- NEXT WK
 		--	)
 		and (
 				 event_name like 'HPR - %'
-			  or event_name like 'HPR – %' -- long dash				 
-			  or event_name like 'HPR-%'			 
+			  or event_name like 'HPR – %' -- long dash
+			  or event_name like 'HPR-%'
 			  or event_name like 'Tuxedo %'
-			  or event_name like 'Ramapo %'		  
+			  or event_name like 'Ramapo %'
 			)
 		--and active_flag = 'Y'
 		and (
@@ -289,17 +289,17 @@ from
 			  or ba.status_day_5 = 'C'
 			  or ba.status_day_6 = 'C'
 			  or ba.status_day_7 = 'C'
-			)	
+			)
 	) x
 go
 
 
 if object_id('rpt.BA_Event_Invite_v', 'V') is not null
 	drop view rpt.BA_Event_Invite_v
-go 
+go
 create view rpt.BA_Event_Invite_v
 as
-select 
+select
 	 volunteer_name
 	,ba_volunteer_num
 	,event_name
@@ -308,7 +308,7 @@ select
 	,start_dow
 	,num_days
 	,dateadd( day, num_days - 1, start_date ) as end_date
-	,case 
+	,case
 		when start_dow = 'Mon' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_3 = 'C' then 'Y'
@@ -316,9 +316,9 @@ select
 		when start_dow = 'Thu' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as mon
-	,case 
+	,case
 		when start_dow = 'Tue' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_3 = 'C' then 'Y'
@@ -326,9 +326,9 @@ select
 		when start_dow = 'Fri' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as tue
-	,case 
+	,case
 		when start_dow = 'Wed' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_3 = 'C' then 'Y'
@@ -336,9 +336,9 @@ select
 		when start_dow = 'Sat' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as wed
-	,case 
+	,case
 		when start_dow = 'Thu' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_3 = 'C' then 'Y'
@@ -346,9 +346,9 @@ select
 		when start_dow = 'Sun' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as thu
-	,case 
+	,case
 		when start_dow = 'Fri' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Wed' and status_day_3 = 'C' then 'Y'
@@ -356,9 +356,9 @@ select
 		when start_dow = 'Mon' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as fri
-	,case 
+	,case
 		when start_dow = 'Sat' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Thu' and status_day_3 = 'C' then 'Y'
@@ -366,9 +366,9 @@ select
 		when start_dow = 'Tue' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Sun' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as sat
-	,case 
+	,case
 		when start_dow = 'Sun' and status_day_1 = 'C' then 'Y'
 		when start_dow = 'Sat' and status_day_2 = 'C' then 'Y'
 		when start_dow = 'Fri' and status_day_3 = 'C' then 'Y'
@@ -376,7 +376,7 @@ select
 		when start_dow = 'Wed' and status_day_5 = 'C' then 'Y'
 		when start_dow = 'Tue' and status_day_6 = 'C' then 'Y'
 		when start_dow = 'Mon' and status_day_7 = 'C' then 'Y'
-		else '' 
+		else ''
 	 end as sun
 	,comments
 	,case
@@ -386,11 +386,11 @@ select
 			or status_day_4 = 'C'
 			or status_day_5 = 'C'
 			or status_day_6 = 'C'
-			or status_day_7 = 'C' then 'Y' 
-		else 'N' 
+			or status_day_7 = 'C' then 'Y'
+		else 'N'
 	 end as confirmed_flag
-from 
-	( select 
+from
+	( select
 		 v.full_Name as volunteer_name
 		,v.ba_volunteer_num
 		,ba.event_name
@@ -416,29 +416,29 @@ from
 	  inner join dbo.volunteer v
 		on ba.person_guid = v.hub_person_guid
 	  where 1=1
-		and start_date >= 1 + dateadd( week, datediff( week, 0, getdate() ), -42 )	  
+		and start_date >= 1 + dateadd( week, datediff( week, 0, getdate() ), -42 )
 		--and (    start_date = 1 + dateadd( week, datediff( week, 0, getdate() ), -1 ) -- CURRENT WK
 		--	  or start_date = 1 + dateadd( week, datediff( week, 0, getdate() ), -8 ) -- PRIOR WK
-		--	  or start_date >= dateadd( week, datediff( week, 0, getdate() ), 7 ) 	  -- NEXT WK		  
+		--	  or start_date >= dateadd( week, datediff( week, 0, getdate() ), 7 ) 	  -- NEXT WK
 		--	)
 		and (
 				 event_name like 'HPR - %'
-			  or event_name like 'HPR – %' -- long dash				 
-			  or event_name like 'HPR-%'			 
+			  or event_name like 'HPR – %' -- long dash
+			  or event_name like 'HPR-%'
 			  or event_name like 'Tuxedo %'
-			  or event_name like 'Ramapo %'		  
+			  or event_name like 'Ramapo %'
 			)
-	
+
 	) x
 go
 
 
 if object_id('rpt.Cong_v', 'V') is not null
 	drop view rpt.Cong_v
-go 
+go
 create view rpt.Cong_v
 as
-select 
+select
 	 c.cong_key
 	,c.cong_number
 	,c.cong
@@ -495,19 +495,19 @@ go
 
 if object_id('rpt.CVC_v', 'V') is not null
 	drop view rpt.CVC_v
-go 
+go
 create view rpt.CVC_v
 as
 with dates as (
 	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
-	from dbo.cal_dim 
+	from dbo.cal_dim
 	where 1=1
 		and day_of_wk = 2
-		and cal_dt between cast(getdate()-6 as date) and getdate() + 200 
+		and cal_dt between cast(getdate()-6 as date) and getdate() + 200
 ),
 
 vol as (
-	select 
+	select
 		 d.cpc_code
 		,d.level_02
 		,d.level_03
@@ -528,7 +528,7 @@ vol as (
 		,v.hpr_dept_key
 		,v.volunteer_key
 		,c.wk_num
-	from dates c 
+	from dates c
 	left join rpt.Resource_Plan_vol_v v
 		on c.cal_dt = v.cal_dt
 	inner join dbo.hpr_dept d
@@ -582,7 +582,7 @@ where 1=1
 	--and level_04 = 'Siteworks'
 	--and used_bed_cnt = 1
 	--and volunteer_key = 242862
-group by 
+group by
 	 cpc_code
 	,level_03
 	,level_04
@@ -600,7 +600,7 @@ go
 
 if object_id('rpt.Dept_Crew_v', 'V') is not null
 	drop view rpt.Dept_Crew_v
-go 
+go
 create view rpt.Dept_Crew_v
 as
 select
@@ -647,17 +647,17 @@ left join dbo.hpr_crew c
 	on d.hpr_dept_key = c.hpr_dept_key
 	and c.active_flag = 'Y'
 where 1=1
-	and d.active_flag = 'Y' 
+	and d.active_flag = 'Y'
 	and d.nyc_flag = 'N'
 go
 
 
 if object_id('rpt.Dept_v', 'V') is not null
 	drop view rpt.Dept_v
-go 
+go
 create view rpt.Dept_v
 as
-select 
+select
 	 hpr_dept_key
 	,hub_dept_id
 	,cpc_code
@@ -679,7 +679,7 @@ select
 	,work_group_asst_ovsr_email
 	,work_group_coor
 	,work_group_coor_person_id
-	,work_group_coor_email	
+	,work_group_coor_email
 	,vtc_contact
 	,level_01
 	,level_02
@@ -690,11 +690,11 @@ select
 	,level_07
 	,level_08
 	,level_09
-	,level_10	
+	,level_10
 	,active_flag
 	,hub_flag
 	,nyc_flag
-	,case 
+	,case
 		when cpc_code = 'CO' then 1
 		when cpc_code = 'DD' then 2
 		when cpc_code = 'PCC' then 3
@@ -704,18 +704,71 @@ select
 	 end as sort_order
 from dbo.hpr_dept
 where 1=1
-	and active_flag = 'Y' 
+	and active_flag = 'Y'
 	and nyc_flag = 'N'
-	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI', 'VD' ) 
+	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI', 'VD' )
+go
+
+
+if object_id('rpt.Dept_Role_Volunteer_Exception_v', 'V') is not null
+	drop view rpt.Dept_Role_Volunteer_Exception_v
+go
+create view rpt.Dept_Role_Volunteer_Exception_v
+as
+with vol as (
+	select
+         dr.dept_role_key
+        ,dr.cpc_code
+        ,dr.work_group_name
+        ,dr.dept_role
+        ,dr.role_start_date
+        ,dr.role_end_date
+        ,drv.full_name
+        ,drv.vol_start_date
+        ,drv.vol_end_date
+        ,drv.dept_asgn_status_code
+		,drv.hub_enrollment_code as curr_enrollment_code
+        ,drv.ps_enrollment_code as target_enrollment_code
+        ,drv.volunteer_key
+		,case when drv.hub_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 else 0 end as curr_bed_cnt
+		,case when drv.ps_enrollment_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 else 0 end as target_bed_cnt
+	from dept_role_v dr
+	inner join Dept_Role_Volunteer_v drv
+		on dr.dept_role_key = drv.dept_role_key
+	where 1=1
+		and dr.active_flag = 'Y'
+		and drv.active_flag = 'Y'
+		and drv.volunteer_type_description = 'VOLUNTEER'
+		and coalesce( drv.vol_end_date, '9999-12-31' ) > cast( getdate() as date )
+	),
+
+dups as ( select volunteer_key, sum(target_bed_cnt - curr_bed_cnt) as bed_cnt from vol group by volunteer_key having sum(target_bed_cnt - curr_bed_cnt) > 1 )
+
+select
+     v.full_name
+    ,v.cpc_code
+    ,v.work_group_name
+    ,v.dept_role
+    ,v.curr_enrollment_code
+    ,v.target_enrollment_code
+    ,v.dept_role_key
+    ,v.role_start_date
+    ,v.vol_start_date
+    ,v.role_end_date
+    ,v.vol_end_date
+    ,v.volunteer_key
+from vol v
+inner join dups d
+	on v.volunteer_key = d.volunteer_key
 go
 
 
 if object_id('rpt.DC_52_v', 'V') is not null
 	drop view rpt.DC_52_v
-go 
+go
 create view rpt.DC_52_v
 as
-select 
+select
 	 volunteer_name
     ,hub_volunteer_num
     ,hub_person_id
@@ -738,8 +791,8 @@ select
 	 end as ovsr_email
 	,asst_name
 	,asst_email
-from 
-	( select 
+from
+	( select
 		 volunteer_name
 		,hub_volunteer_num
 		,hub_person_id
@@ -756,17 +809,17 @@ from
 		,d.work_group_asst_ovsr
 		,d.work_group_asst_ovsr_email
 		-- FIND THE LOWEST LEVEL OVERSIGHT
-		,case 
-			when /* crew_ovsr */ case when volunteer_key = 238580 then 'T. Bargeron' else null end is not null then /* crew_ovsr */ case when volunteer_key = 238580 then 'T. Bargeron' else null end 
+		,case
+			when /* crew_ovsr */ case when volunteer_key = 238580 then 'T. Bargeron' else null end is not null then /* crew_ovsr */ case when volunteer_key = 238580 then 'T. Bargeron' else null end
 			when work_group_asst_ovsr is not null then work_group_asst_ovsr
 			when work_group_ovsr is not null then work_group_ovsr
-			else 'x' 
+			else 'x'
 		 end as asst_name
-		,case 
-			when /* crew_ovsr */ case when volunteer_key = 238580 then 'TBARGERON@bethel.jw.org' else null end is not null then /* crew_ovsr */ case when volunteer_key = 238580 then 'TBARGERON@bethel.jw.org' else null end 
+		,case
+			when /* crew_ovsr */ case when volunteer_key = 238580 then 'TBARGERON@bethel.jw.org' else null end is not null then /* crew_ovsr */ case when volunteer_key = 238580 then 'TBARGERON@bethel.jw.org' else null end
 			when work_group_asst_ovsr is not null then work_group_asst_ovsr_email
 			when work_group_ovsr is not null then work_group_ovsr_email
-			else 'x' 
+			else 'x'
 		 end as asst_email
 	  from rpt.volunteer_v v
 	  inner join rpt.dept_v d
@@ -778,10 +831,10 @@ go
 
 if object_id('rpt.Enrollment_v', 'V') is not null
 	drop view rpt.Enrollment_v
-go 
+go
 create view rpt.Enrollment_v
 as
-select 
+select
 	 enrollment_key
 	,enrollment_code
 	,enrollment
@@ -797,12 +850,12 @@ select
 from dbo.enrollment
 where 1=1
 	and active_flag = 'Y'
-go	
+go
 
 
 if object_id('rpt.Onsite_Report_v', 'V') is not null
 	drop view rpt.Onsite_Report_v
-go 
+go
 create view rpt.Onsite_Report_v
 as
 with dt as (
@@ -811,7 +864,7 @@ with dt as (
 	where cal_dt between dateadd( week, datediff( week, 0, getdate() ), 0 ) and
 		dateadd( week, datediff( week, 0, getdate() ), 0 ) + 27 )
 
-select 
+select
 	 dt.cal_dt
 	,dt.day_nm
 	,case when d.cpc_code = 'CI' then 'On-site' else 'Tuxedo' end as location
@@ -819,10 +872,10 @@ select
 from rpt.Resource_Plan_Vol_Daily_v v
 inner join dbo.hpr_dept d
 	on v.hpr_dept_key = d.hpr_dept_key
-inner join dt 
+inner join dt
 	on dt.cal_dt = v.cal_dt
 where v.record_type <> 'PROJECTED'
-group by 
+group by
 	 dt.cal_dt
 	,dt.day_nm
 	,case when d.cpc_code = 'CI' then 'On-site' else 'Tuxedo' end
@@ -831,10 +884,10 @@ go
 
 if object_id('rpt.PCC_Project_Volunteer_v', 'V') is not null
 	drop view rpt.PCC_Project_Volunteer_v
-go 
+go
 create view rpt.PCC_Project_Volunteer_v
 as
-select 
+select
 	 volunteer_name
 	,hub_volunteer_num
 	,bethel_email
@@ -877,7 +930,7 @@ go
 
 if object_id('rpt.PC_Volunteer_Actuals_v', 'V') is not null
 	drop view rpt.PC_Volunteer_Actuals_v
-go 
+go
 create view rpt.PC_Volunteer_Actuals_v
 as
 select
@@ -888,7 +941,7 @@ select
 	,d.level_03
 	,d.level_04
 	,d.level_05
-	,d.level_06 
+	,d.level_06
 	,v.cal_dt
 	,v.enrollment_code
 	,v.room_site_code as site_code
@@ -901,15 +954,15 @@ from rpt.Resource_Plan_Vol_v v
 inner join dbo.hpr_dept d
 	on v.hpr_dept_key = d.HPR_Dept_Key
 inner join dbo.cal_dim c
-	on v.cal_dt = c.cal_dt 
-	and c.day_of_mth = 1	
+	on v.cal_dt = c.cal_dt
+	and c.day_of_mth = 1
 where 1=1
 	and v.record_type <> 'PROJECTED'
 	--and v.cal_dt between '2025-07-01' and '2025-07-07'
 	--and d.level_03 = 'Trade Group'
 	--and d.level_04 = 'Siteworks'
 	--and PC_Category = 'Tools'
-group by 
+group by
 	 d.pc_code
 	,d.pc_category
 	,d.cpc_code
@@ -917,19 +970,19 @@ group by
 	,d.level_03
 	,d.level_04
 	,d.level_05
-	,d.level_06 
+	,d.level_06
 	,v.cal_dt
 	,v.enrollment_code
 	,v.room_site_code
 	,v.room_bldg
-	,v.room_bldg_code 
+	,v.room_bldg_code
 --order by 1, 2, 3, 4, 5, 6, 7, 8, 9
 go
 
 
 if object_id('rpt.PC_Volunteer_Actuals_Daily_v', 'V') is not null
 	drop view rpt.PC_Volunteer_Actuals_Daily_v
-go 
+go
 create view rpt.PC_Volunteer_Actuals_Daily_v
 as
 select
@@ -940,7 +993,7 @@ select
 	,d.level_03
 	,d.level_04
 	,d.level_05
-	,d.level_06 
+	,d.level_06
 	,v.cal_dt
 	,v.enrollment_code
 	,v.room_site_code 												as site_code
@@ -956,8 +1009,8 @@ from rpt.Resource_Plan_Vol_Daily_v v
 inner join dbo.hpr_dept d
 	on v.hpr_dept_key = d.HPR_Dept_Key
 inner join dbo.cal_dim c
-	on v.cal_dt = c.cal_dt 
-	--and c.day_of_mth = 1	
+	on v.cal_dt = c.cal_dt
+	--and c.day_of_mth = 1
 where 1=1
 	--and v.record_type <> 'PROJECTED'
 	--and v.cal_dt between '2025-07-01' and '2025-07-07'
@@ -965,7 +1018,7 @@ where 1=1
 	--and d.level_04 = 'Siteworks'
 	--and PC_Category = 'Tools'
 	--and enrollment_code = 'BRS'
-group by 
+group by
 	 d.pc_code
 	,d.pc_category
 	,d.cpc_code
@@ -973,22 +1026,22 @@ group by
 	,d.level_03
 	,d.level_04
 	,d.level_05
-	,d.level_06 
+	,d.level_06
 	,v.cal_dt
 	,v.enrollment_code
 	,v.room_site_code
 	,v.room_bldg
-	,v.room_bldg_code 
+	,v.room_bldg_code
 	,case when v.record_type = 'PROJECTED' then 'Y' else 'N' end
 go
 
 
 if object_id('rpt.PRP_Actuals_Level_02_v', 'V') is not null
 	drop view rpt.PRP_Actuals_Level_02_v
-go 
+go
 create view rpt.PRP_Actuals_Level_02_v
 as
-select 
+select
 	 cpc_code
 	,max( wk_01_dt ) as wk_01_dt
 	,sum( wk_01_budget ) as wk_01_budget
@@ -1097,14 +1150,14 @@ select
 from rpt.PRP_Actuals_Level_04_v
 group by cpc_code
 go
-	
+
 
 if object_id('rpt.PRP_Actuals_Level_03_v', 'V') is not null
 	drop view rpt.PRP_Actuals_Level_03_v
-go 
+go
 create view rpt.PRP_Actuals_Level_03_v
 as
-select 
+select
 	 cpc_code
 	,level_03
 	,max( wk_01_dt ) as wk_01_dt
@@ -1220,19 +1273,19 @@ go
 
 if object_id('rpt.PRP_Actuals_Level_04_v', 'V') is not null
 	drop view rpt.PRP_Actuals_Level_04_v
-go 
+go
 create view rpt.PRP_Actuals_Level_04_v
 as
 -- ALL DEPT ASGN BY DAY
 with dates as (
 	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
-	from dbo.cal_dim 
+	from dbo.cal_dim
 	where 1=1
 		and day_of_wk = 2
 		and cal_dt between cast( getdate() - 6 as date) and getdate() + 200 ),
 
 dept_prp as (
-	select 
+	select
 		 r.cpc_code
 		,r.level_03
 		,r.level_04
@@ -1342,7 +1395,7 @@ dept_prp as (
 		,max( case when c.wk_num = 26 and r.prp_subtype = 'Available' then r.bed_cnt else 0 end ) as wk_26_budget
 		,max( case when c.wk_num = 26 and r.prp_subtype = 'Requested' then r.bed_cnt else 0 end ) as wk_26_requested
 		,max( case when c.wk_num = 26 and r.prp_subtype = 'Used' then r.bed_cnt else 0 end ) as wk_26_used
-	from dates c 
+	from dates c
 	left join rpt.Resource_Plan_Dept_v r
 		on c.cal_dt = r.cal_dt
 		and r.prp_type = 'Dept Beds'
@@ -1356,7 +1409,7 @@ dept_prp as (
 		,r.dept_level ),
 
 dept_num as (
-	select 
+	select
 		 cpc_code
 		,level_03
 		,level_04
@@ -1441,11 +1494,11 @@ dept_num as (
 		,wk_26_budget
 		,case when wk_26_requested > wk_26_used then wk_26_requested else wk_26_used end as wk_26_used
 	from dept_prp
-	--where dept_level > 3 
+	--where dept_level > 3
 	),
 
 lvl_04 as (
-	select 
+	select
 		 cpc_code
 		,level_03
 		,level_04
@@ -1554,12 +1607,12 @@ lvl_04 as (
 		,sum( wk_26_used ) as wk_26_used
 		,sum( wk_26_budget ) - sum( wk_26_used ) as wk_26_avail
 	from dept_num
-	group by 
+	group by
 		 cpc_code
 		,level_03
 		,level_04 )
 
-select 
+select
 	 cpc_code
 	,level_03
 	,level_04
@@ -1673,10 +1726,10 @@ go
 
 if object_id('rpt.PRP_v', 'V') is not null
 	drop view rpt.PRP_v
-go 
+go
 create view rpt.PRP_v
 as
-select 
+select
 	 row_number() over ( order by c.cal_dt ) as prp_key
 	,p.hpr_dept_key
 	,c.cal_dt
@@ -1698,10 +1751,10 @@ go
 
 if object_id('rpt.PRP_Bed_Space_v', 'V') is not null
 	drop view rpt.PRP_Bed_Space_v
-go 
+go
 create view rpt.PRP_Bed_Space_v
 as
-select 
+select
 	 row_number() over ( order by c.cal_dt ) as prp_bed_space_key
 	,c.cal_dt
 	,p.rooming_category
@@ -1714,29 +1767,29 @@ inner join dbo.cal_dim c
 	on p.cal_dt = c.mth_start_dt
 	and c.cal_dt = c.wk_start_dt
 go
-	
-	
+
+
 if object_id('rpt.PRP_CPC_v', 'V') is not null
 	drop view rpt.PRP_CPC_v
-go 
+go
 create view rpt.PRP_CPC_v
 as
-select 
+select
 	 cpc_code
 	,cal_dt as start_dt
 	,eomonth( cal_dt ) as end_dt
 	,bed_cnt
 from dbo.prp_cpc
-go	
+go
 
 
 if object_id('rpt.Resource_Plan_Dept_v', 'V') is not null
 	drop view rpt.Resource_Plan_Dept_v
-go 
+go
 create view rpt.Resource_Plan_Dept_v
 as
 with project_beds as (
-	select 
+	select
 		'Project Beds' as prp_type
 		,c.cal_dt
 		,sum( case when reporting_category like 'Bed Capacity%' then bed_cnt else 0 end ) as project_available_bed_cnt
@@ -1756,7 +1809,7 @@ cpc_beds as (
 		and day_of_wk = 2 ),
 
 dept_beds as (
-	select 'Dept Beds' as prp_type, p.hpr_dept_key, c.cal_dt, p.cpc_code, p.bed_cnt as dept_avail_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+	select 'Dept Beds' as prp_type, p.hpr_dept_key, c.cal_dt, p.cpc_code, p.bed_cnt as dept_avail_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,
 		case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
 	from rpt.PRP_v p
 	inner join dbo.cal_dim c
@@ -1775,7 +1828,7 @@ dept_req_base as (
 	group by v.hpr_dept_key, v.cal_dt ),
 
 dept_req as (
-	select 'Dept Beds' as prp_type, a.hpr_dept_key, a.cal_dt, d.cpc_code, a.requested_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+	select 'Dept Beds' as prp_type, a.hpr_dept_key, a.cal_dt, d.cpc_code, a.requested_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,
 		case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
 	from dept_req_base a
 	inner join dbo.hpr_dept d
@@ -1792,7 +1845,7 @@ dept_used_base as (
 	group by v.hpr_dept_key, v.cal_dt ),
 
 dept_used as (
-	select 'Dept Beds' as prp_type, u.hpr_dept_key, u.cal_dt, d.cpc_code, u.used_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+	select 'Dept Beds' as prp_type, u.hpr_dept_key, u.cal_dt, d.cpc_code, u.used_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,
 		case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
 	from dept_used_base u
 	inner join dbo.hpr_dept d
@@ -1800,7 +1853,7 @@ dept_used as (
 		and d.active_flag = 'Y' ),
 
 dept_avail as (
-	select 'Dept Beds' as prp_type, p.hpr_dept_key, c.cal_dt, p.cpc_code, p.bed_cnt as dept_avail_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,  
+	select 'Dept Beds' as prp_type, p.hpr_dept_key, c.cal_dt, p.cpc_code, p.bed_cnt as dept_avail_bed_cnt, coalesce( nullif( d.work_group_name, '' ), d.dept_name ) as dept_name,
 			case when d.level_02 is null then 1 when d.level_03 is null then 2 when level_04 is null then 3 when level_05 is null then 4 when level_06 is null then 5 end as dept_level
 		from rpt.PRP_v p
 		inner join dbo.cal_dim c
@@ -1819,14 +1872,14 @@ final as (
 	union all
 	select prp_type, 'Approved' as prp_subtype, cal_dt, cpc_code, null as hpr_dept_key, null as dept_name, null as dept_level, cpc_bed_cnt as bed_cnt from cpc_beds
 	union all
-	select prp_type, 'Available' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, dept_avail_bed_cnt as bed_cnt from dept_beds 
+	select prp_type, 'Available' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, dept_avail_bed_cnt as bed_cnt from dept_beds
 	union all
 	select prp_type, 'Requested' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, requested_bed_cnt as bed_cnt from dept_req
 	union all
-	select prp_type, 'Used' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, used_bed_cnt as bed_cnt from dept_used 
+	select prp_type, 'Used' as prp_subtype, cal_dt, cpc_code, hpr_dept_key, dept_name, dept_level, used_bed_cnt as bed_cnt from dept_used
 	)
 
-select 
+select
 	 f.prp_type
 	,f.prp_subtype
 	,f.cal_dt
@@ -1847,151 +1900,18 @@ go
 
 if object_id('rpt.Resource_Plan_Vol_v', 'V') is not null
 	drop view rpt.Resource_Plan_Vol_v
-go 
+go
 create view rpt.Resource_Plan_Vol_v
 as
 with cal as (
-	select cal_dt, day_of_wk, day_nm, day_of_mth 
-	from dbo.cal_dim 
+	select cal_dt, day_of_wk, day_nm, day_of_mth
+	from dbo.cal_dim
 	where cal_dt between '2020-01-01' and '2030-03-01'
 		and day_of_wk = 2
 ),
 
 bbo as (
-	select 
-		 volunteer_key
-		,max( ba.mon ) as mon_flag
-		,max( ba.tue ) as tue_flag
-		,max( ba.wed ) as wed_flag
-		,max( ba.thu ) as thu_flag
-		,max( ba.fri ) as fri_flag
-		,max( ba.sat ) as sat_flag
-		,max( ba.sun ) as sun_flag
-	from rpt.Volunteer_Rpt_v v
-	inner join cal dt
-		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
-	inner join dbo.ba_event_snp ba
-		on v.ba_volunteer_num = ba.ba_volunteer_num
-		and dt.cal_dt between ba.start_date and ba.end_date
-	where enrollment_1_code in ( 'BBO' )
-	group by volunteer_key
-),
-
-actuals as (
-	select distinct
-		 v.volunteer_key
-		,dr.Dept_Role_Key as dept_asgn_key
-		,v.volunteer_name
-		,v.volunteer_name_short
-		,v.Enrollment_1_code as enrollment_code
-		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
-		,dr.crew_name
-		,dr.dept_role
-		,dr.dept_asgn_status_code	
-		,c.cal_dt
-        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date        
-		,case 
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
-			else 0 
-		 end as bed_cnt
-		,case 
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
-			else 0
-		 end as fte
-		,case 
-			when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 4 and v.dept_1_wed_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 5 and v.dept_1_thu_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 6 and v.dept_1_fri_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 2 and bbo.mon_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 3 and bbo.tue_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
-			else 'N' 
-		 end as onsite_flag
-		,v.Room_Site_Code
-		,v.Room_Bldg
-		,v.Room_Bldg_Code
-		,v.Room
-		,v.record_type
-	from rpt.volunteer_rpt_v v
-	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
-		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
-		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
-	left join bbo 
-		on v.volunteer_key = bbo.volunteer_key
-	left join dbo.Dept_Role_Volunteer_v drv  -- RG:  Believe this join of the Role_Volunteer data is needed to get the volunteer on a role that matches the HuB actual record by the volunteer key/enrollment code.  Will need to join in Role data to get the fields needed in this view.
-		on v.volunteer_key = drv.volunteer_key
-		and v.enrollment_1_code = drv.ps_enrollment_code
-		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )  -- RG:  Is this just double checking to make sure the RVD record start/end date lines up with HuB?  Don't think this needs to be the role start/end date, right?
-		and drv.active_flag = 'Y'
-		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
-	left join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the two fields referenced in this view
-		on drv.Dept_Role_Key = dr.Dept_Role_Key
-	where 1=1
-        and isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
-
-),
-	
-projected as (
-	select 
-		 v.volunteer_key
-		,v.Dept_Role_Key as dept_asgn_key
-		,v.volunteer_name
-		,v.volunteer_name_short
-		,v.enrollment_code
-		,v.hpr_dept_key
-		,v.crew_name
-		,v.dept_role
-		,v.dept_asgn_status_code
-		,v.cal_dt
-	    ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date        
-		,v.bed_cnt
-		,v.fte
-		,v.onsite_flag
-		,null as Room_Site_Code
-		,null as Room_Bldg
-		,null as Room_Bldg_Code
-		,null as Room		
-		,v.record_type
-	from rpt.Volunteer_Projected_v v
-	inner join cal c
-		on c.cal_dt = v.cal_dt
-),
-
-base as (
-	select * from actuals 
-	union all
-	select * from projected 
-)
-
-select *
-from base
---where cal_dt = '2025-07-07'
-	--and volunteer_key in (641583)
---order by 3
-go
-
-
-if object_id('rpt.Resource_Plan_Vol_Daily_v', 'V') is not null
-	drop view rpt.Resource_Plan_Vol_Daily_v
-go 
-create view rpt.Resource_Plan_Vol_Daily_v
-as
-with cal as (
-	select cal_dt, day_of_wk, day_nm, day_of_mth 
-	from dbo.cal_dim 
-	where cal_dt between '2020-01-01' and '2030-03-01'
-),
-
-bbo as (
-	select 
+	select
 		 volunteer_key
 		,max( ba.mon ) as mon_flag
 		,max( ba.tue ) as tue_flag
@@ -2024,16 +1944,16 @@ actuals as (
 		,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
         ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
-		,case 
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
-			else 0 
+		,case
+			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+			else 0
 		 end as bed_cnt
-		,case 
+		,case
 			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
 			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
 			else 0
 		 end as fte
-		,case 
+		,case
 			when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
 			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
 			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
@@ -2045,7 +1965,7 @@ actuals as (
 			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
 			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
 			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
-			else 'N' 
+			else 'N'
 		 end as onsite_flag
 		,v.Room_Site_Code
 		,v.Room_Bldg
@@ -2056,20 +1976,23 @@ actuals as (
 	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
 		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
 		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
-	left join bbo 
+	left join bbo
 		on v.volunteer_key = bbo.volunteer_key
-	left join dbo.Dept_Role_Volunteer_v drv
+	left join dbo.Dept_Role_Volunteer_v drv  -- RG:  Believe this join of the Role_Volunteer data is needed to get the volunteer on a role that matches the HuB actual record by the volunteer key/enrollment code.  Will need to join in Role data to get the fields needed in this view.
 		on v.volunteer_key = drv.volunteer_key
 		and v.enrollment_1_code = drv.ps_enrollment_code
-		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )
+		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )  -- RG:  Is this just double checking to make sure the RVD record start/end date lines up with HuB?  Don't think this needs to be the role start/end date, right?
 		and drv.active_flag = 'Y'
 		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
-	left join dbo.Dept_Role_v dr
+	left join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the two fields referenced in this view
 		on drv.Dept_Role_Key = dr.Dept_Role_Key
-	where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' ),
-	
+	where 1=1
+        and isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
+
+),
+
 projected as (
-	select 
+	select
 		 v.volunteer_key
 		,v.Dept_Role_Key as dept_asgn_key
 		,v.volunteer_name
@@ -2088,7 +2011,7 @@ projected as (
 		,null as Room_Site_Code
 		,null as Room_Bldg
 		,null as Room_Bldg_Code
-		,null as Room		
+		,null as Room
 		,v.record_type
 	from rpt.Volunteer_Projected_v v
 	inner join cal c
@@ -2096,9 +2019,139 @@ projected as (
 ),
 
 base as (
-	select * from actuals 
+	select * from actuals
 	union all
-	select * from projected 
+	select * from projected
+)
+
+select *
+from base
+--where cal_dt = '2025-07-07'
+	--and volunteer_key in (641583)
+--order by 3
+go
+
+
+if object_id('rpt.Resource_Plan_Vol_Daily_v', 'V') is not null
+	drop view rpt.Resource_Plan_Vol_Daily_v
+go
+create view rpt.Resource_Plan_Vol_Daily_v
+as
+with cal as (
+	select cal_dt, day_of_wk, day_nm, day_of_mth
+	from dbo.cal_dim
+	where cal_dt between '2020-01-01' and '2030-03-01'
+),
+
+bbo as (
+	select
+		 volunteer_key
+		,max( ba.mon ) as mon_flag
+		,max( ba.tue ) as tue_flag
+		,max( ba.wed ) as wed_flag
+		,max( ba.thu ) as thu_flag
+		,max( ba.fri ) as fri_flag
+		,max( ba.sat ) as sat_flag
+		,max( ba.sun ) as sun_flag
+	from rpt.Volunteer_Rpt_v v
+	inner join cal dt
+		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
+	inner join dbo.ba_event_snp ba
+		on v.ba_volunteer_num = ba.ba_volunteer_num
+		and dt.cal_dt between ba.start_date and ba.end_date
+	where enrollment_1_code in ( 'BBO' )
+	group by volunteer_key
+),
+
+actuals as (
+	select distinct
+		 v.volunteer_key
+		,dr.Dept_Role_Key as dept_asgn_key
+		,v.volunteer_name
+		,v.volunteer_name_short
+		,v.Enrollment_1_code as enrollment_code
+		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
+		,dr.crew_name
+		,dr.dept_role
+		,dr.dept_asgn_status_code
+		,c.cal_dt
+        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
+		,case
+			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+			else 0
+		 end as bed_cnt
+		,case
+			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
+			else 0
+		 end as fte
+		,case
+			when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
+			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 4 and v.dept_1_wed_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 5 and v.dept_1_thu_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 6 and v.dept_1_fri_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 2 and bbo.mon_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 3 and bbo.tue_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
+			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
+			else 'N'
+		 end as onsite_flag
+		,v.Room_Site_Code
+		,v.Room_Bldg
+		,v.Room_Bldg_Code
+		,v.Room
+		,v.record_type
+	from rpt.volunteer_rpt_v v
+	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
+		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
+		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
+	left join bbo
+		on v.volunteer_key = bbo.volunteer_key
+	left join dbo.Dept_Role_Volunteer_v drv
+		on v.volunteer_key = drv.volunteer_key
+		and v.enrollment_1_code = drv.ps_enrollment_code
+		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )
+		and drv.active_flag = 'Y'
+		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+	left join dbo.Dept_Role_v dr
+		on drv.Dept_Role_Key = dr.Dept_Role_Key
+	where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' ),
+
+projected as (
+	select
+		 v.volunteer_key
+		,v.Dept_Role_Key as dept_asgn_key
+		,v.volunteer_name
+		,v.volunteer_name_short
+		,v.enrollment_code
+		,v.hpr_dept_key
+		,v.crew_name
+		,v.dept_role
+		,v.dept_asgn_status_code
+		,v.cal_dt
+	    ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
+		,v.bed_cnt
+		,v.fte
+		,v.onsite_flag
+		,null as Room_Site_Code
+		,null as Room_Bldg
+		,null as Room_Bldg_Code
+		,null as Room
+		,v.record_type
+	from rpt.Volunteer_Projected_v v
+	inner join cal c
+		on c.cal_dt = v.cal_dt
+),
+
+base as (
+	select * from actuals
+	union all
+	select * from projected
 )
 
 select *
@@ -2111,7 +2164,7 @@ go
 
 if object_id('rpt.Staffing_Tool_v', 'V') is not null
 	drop view rpt.Staffing_Tool_v
-go 
+go
 create view rpt.Staffing_Tool_v
 as
 select
@@ -2211,11 +2264,11 @@ select
 	,rownum
 	,helmet_id
 	,enrollment_status
-from rpt.Volunteer_All_v 
+from rpt.Volunteer_All_v
 
 union all
 
-select 
+select
 	 p.volunteer_key
 	,null as HUB_Volunteer_Num
 	,null as hub_person_id
@@ -2427,10 +2480,10 @@ go
 
 if object_id('rpt.User_Permissions_v', 'V') is not null
 	drop view rpt.User_Permissions_v
-go 
+go
 create view rpt.User_Permissions_v
-as	
-select 
+as
+select
 	 last_name
 	,first_name
 	,ad_user_name
@@ -2449,13 +2502,13 @@ go
 
 if object_id('rpt.Volunteer_Projected_v', 'V') is not null
 	drop view rpt.Volunteer_Projected_v
-go 
+go
 create view rpt.Volunteer_Projected_v
 as
 with cal as (
-	select cal_dt, day_of_wk, day_nm, day_of_mth 
-	from dbo.cal_dim 
-	where cal_dt between '2020-01-01' and '2030-03-01' 
+	select cal_dt, day_of_wk, day_nm, day_of_mth
+	from dbo.cal_dim
+	where cal_dt between '2020-01-01' and '2030-03-01'
 )
 
 select
@@ -2471,11 +2524,11 @@ select
 	,drv.dept_asgn_status_code
     ,dr.role_start_date_rpt as role_start_date
     ,dr.role_end_date_rpt as role_end_date
-	,case 
-		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1 
-		else 0 
+	,case
+		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+		else 0
 	 end as bed_cnt
-	,case 
+	,case
 		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
 		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBV', 'BCC' ) then 0.2
 		else 0
@@ -2490,14 +2543,14 @@ select
 	,dr.hpr_dept_key as dept_1_hpr_dept_key
 	,d.HUB_Dept_ID as dept_1_hub_dept_id
 	,d.CPC_Code as dept_1_cpc_code
-	,case 
-		when d.level_06 is not null then d.level_05 
+	,case
+		when d.level_06 is not null then d.level_05
 		when d.level_05 is not null then d.level_04
 		when d.level_04 is not null then d.level_03
 		when d.level_03 is not null then d.level_02
 		else d.level_01
 	  end as dept_1_parent_dept_name
-	,case 
+	,case
 		when d.level_06 is not null then d.level_06
 		when d.level_05 is not null then d.level_05
 		when d.level_04 is not null then d.level_04
@@ -2515,27 +2568,27 @@ inner join dbo.hpr_dept d
 	on dr.hpr_dept_key = d.hpr_dept_key
 	and d.Active_Flag = 'Y'
 left join dbo.Dept_Role_Volunteer_v drv
-	on dr.Dept_Role_Key = drv.Dept_Role_Key	
+	on dr.Dept_Role_Key = drv.Dept_Role_Key
 	and drv.Volunteer_Type_Description = 'VOLUNTEER'
 where dr.active_flag = 'Y'
 	and dr.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
 	--and dr.dept_role_key = 655
 	--and d.hpr_dept_key = 217
 	--and c.cal_dt = '2025-11-03'
-	and not exists ( 
-		select 1 from rpt.volunteer_rpt_v act 
-		where coalesce( drv.volunteer_key, -1 ) = act.volunteer_key 
+	and not exists (
+		select 1 from rpt.volunteer_rpt_v act
+		where coalesce( drv.volunteer_key, -1 ) = act.volunteer_key
 			and coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) = act.enrollment_1_code )
 go
 
 
 if object_id('rpt.Volunteer_v', 'V') is not null
 	drop view rpt.Volunteer_v
-go 
+go
 create view rpt.Volunteer_v
 as
 with base as (
-	select  
+	select
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
@@ -2551,7 +2604,7 @@ with base as (
 		,v.city
 		,s.state_code
 		,pc.Postal_Code
-		,v.home_phone		
+		,v.home_phone
 		,v.mobile_phone
 		,v.HUB_Volunteer_Num
 		,ve1.enrollment_site_code as enrollment_1_site_code
@@ -2567,7 +2620,7 @@ with base as (
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name		
+		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
 		,vd1.temp_flag as dept_1_temp_flag
@@ -2588,7 +2641,7 @@ with base as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name		
+		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,vd2.temp_flag as dept_2_temp_flag
@@ -2624,8 +2677,8 @@ with base as (
 		,v.staffing_number_exception_flag
 		,'HPR' as record_type
 	from dbo.volunteer v
-	inner join dbo.marital_status ms 
-		on v.marital_status_key = ms.marital_status_key	
+	inner join dbo.marital_status ms
+		on v.marital_status_key = ms.marital_status_key
 	inner join dbo.state s
 		on v.State_Key = s.State_Key
 	inner join dbo.Postal_Code pc
@@ -2661,7 +2714,7 @@ with base as (
 ),
 
 exceptions as (
-	select 
+	select
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
@@ -2678,7 +2731,7 @@ exceptions as (
 		,s.state_code
 		,pc.Postal_Code
 		,v.home_phone
-		,v.mobile_phone		
+		,v.mobile_phone
 		,v.HUB_Volunteer_Num
 		,ve1.enrollment_site_code as enrollment_1_site_code
 		,ve1.Enrollment_Code as enrollment_1_code
@@ -2688,12 +2741,12 @@ exceptions as (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key		
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
 		,vd1.hub_dept_id as dept_1_hub_dept_id
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name		
+		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
 		,vd1.temp_flag as dept_1_temp_flag
@@ -2714,7 +2767,7 @@ exceptions as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name		
+		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,vd2.temp_flag as dept_2_temp_flag
@@ -2730,10 +2783,10 @@ exceptions as (
 		,vd2.fri_flag as dept_2_fri_flag
 		,vd2.sat_flag as dept_2_sat_flag
 		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date		
+		,v.tentative_end_date
 		,v.alt_Email as bethel_email
 		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email	
+		,v.Email as personal_email
 		,v.volunteer_key
 		,v.HUB_Person_ID
 		,v.ba_volunteer_num
@@ -2750,7 +2803,7 @@ exceptions as (
 		,v.staffing_number_exception_flag
 		,'EXCEPTION' as record_type
 	from dbo.volunteer v
-	inner join dbo.marital_status ms 
+	inner join dbo.marital_status ms
 		on v.marital_status_key = ms.marital_status_key
 	inner join dbo.state s
 		on v.State_Key = s.State_Key
@@ -2790,7 +2843,7 @@ hpr as (
 ),
 
 woodgrove as (
-	select 
+	select
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
@@ -2807,7 +2860,7 @@ woodgrove as (
 		,s.state_code
 		,pc.Postal_Code
 		,v.home_phone
-		,v.mobile_phone		
+		,v.mobile_phone
 		,v.HUB_Volunteer_Num
 		,ve1.enrollment_site_code as enrollment_1_site_code
 		,ve1.Enrollment_Code as enrollment_1_code
@@ -2817,12 +2870,12 @@ woodgrove as (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key		
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
 		,vd1.hub_dept_id as dept_1_hub_dept_id
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name		
+		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
 		,vd1.temp_flag as dept_1_temp_flag
@@ -2843,7 +2896,7 @@ woodgrove as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name		
+		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,vd2.temp_flag as dept_2_temp_flag
@@ -2859,10 +2912,10 @@ woodgrove as (
 		,vd2.fri_flag as dept_2_fri_flag
 		,vd2.sat_flag as dept_2_sat_flag
 		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date		
+		,v.tentative_end_date
 		,v.alt_Email as bethel_email
 		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email	
+		,v.Email as personal_email
 		,v.volunteer_key
 		,v.HUB_Person_ID
 		,v.ba_volunteer_num
@@ -2879,7 +2932,7 @@ woodgrove as (
 		,v.staffing_number_exception_flag
 		,'WOODGROVE' as record_type
 	from dbo.volunteer v
-	inner join dbo.marital_status ms 
+	inner join dbo.marital_status ms
 		on v.marital_status_key = ms.marital_status_key
 	inner join dbo.state s
 		on v.State_Key = s.State_Key
@@ -2914,7 +2967,7 @@ woodgrove as (
 ),
 
 guest as (
-	select 
+	select
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
@@ -2931,7 +2984,7 @@ guest as (
 		,s.state_code
 		,pc.Postal_Code
 		,v.home_phone
-		,v.mobile_phone		
+		,v.mobile_phone
 		,v.HUB_Volunteer_Num
 		,ve1.enrollment_site_code as enrollment_1_site_code
 		,ve1.Enrollment_Code as enrollment_1_code
@@ -2941,12 +2994,12 @@ guest as (
 		,ve2.Enrollment_Code as enrollment_2_code
 		,ve2.Start_Date as enrollment_2_start_date
 		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key		
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
 		,vd1.hub_dept_id as dept_1_hub_dept_id
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name		
+		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
 		,vd1.temp_flag as dept_1_temp_flag
@@ -2967,7 +3020,7 @@ guest as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name		
+		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
 		,vd2.temp_flag as dept_2_temp_flag
@@ -2983,10 +3036,10 @@ guest as (
 		,vd2.fri_flag as dept_2_fri_flag
 		,vd2.sat_flag as dept_2_sat_flag
 		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date		
+		,v.tentative_end_date
 		,v.alt_Email as bethel_email
 		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email	
+		,v.Email as personal_email
 		,v.volunteer_key
 		,v.HUB_Person_ID
 		,v.ba_volunteer_num
@@ -3003,7 +3056,7 @@ guest as (
 		,v.staffing_number_exception_flag
 		,'GUEST' as record_type
 	from dbo.volunteer v
-	inner join dbo.marital_status ms 
+	inner join dbo.marital_status ms
 		on v.marital_status_key = ms.marital_status_key
 	left join dbo.state s
 		on v.State_Key = s.State_Key
@@ -3033,11 +3086,11 @@ guest as (
 	left join dbo.cong c
 		on v.Cong_Key = c.Cong_Key
 	inner join stg.stg_rooming r
-		on v.hub_person_id = r.person_id 
+		on v.hub_person_id = r.person_id
 	where 1=1
 		and r.overnight_guest_category is not null
 		and v.volunteer_key not in ( select volunteer_key from hpr )
-		and v.volunteer_key not in ( select volunteer_key from woodgrove )		
+		and v.volunteer_key not in ( select volunteer_key from woodgrove )
 		and v.hub_person_id <> 627794
 ),
 
@@ -3049,7 +3102,7 @@ final as (
 	select * from guest
 )
 
-select 
+select
 	 volunteer_key
  	,hub_volunteer_num
  	,hub_person_id
@@ -3079,7 +3132,7 @@ select
 	,spouse_hub_person_id
 	,spouse_hub_volunteer_num
 	,spouse_bethel_email
-	,spouse_jwpub_email		
+	,spouse_jwpub_email
 	-- BACKWARDS COMPATIBILITY ------
 	,enrollment_1_code as enrollment_code
 	,coalesce( enrollment_1_site_code, 'UNK' ) as enrollment_site_code
@@ -3088,7 +3141,7 @@ select
 	,case
 		when enrollment_1_code in ( 'BCV' ) then coalesce( enrollment_1_end_date, tentative_end_date )
 		else enrollment_1_end_date
-	 end as enrollment_end_date	 
+	 end as enrollment_end_date
 	,dept_1_hub_dept_id as hub_dept_id
 	,dept_1_parent_dept_name as parent_dept_name
 	,dept_1_cpc_code as parent_dept_code
@@ -3099,7 +3152,7 @@ select
 	,dept_1_end_date as dept_end_date
 	,dept_1_pc_category	as pc_category
 	,dept_1_temp_flag as temp_flag
-	,dept_1_primary_flag as primary_flag	
+	,dept_1_primary_flag as primary_flag
 	,dept_1_split_asgn_flag as split_asgn_flag
 	,dept_1_mon_flag as mon_flag
 	,dept_1_tue_flag as tue_flag
@@ -3108,7 +3161,7 @@ select
 	,dept_1_fri_flag as fri_flag
 	,dept_1_sat_flag as sat_flag
 	,dept_1_sun_flag as sun_flag
-	---------------------------------	
+	---------------------------------
 	,enrollment_1_code
 	,coalesce( enrollment_1_site_code, 'UNK' ) as enrollment_1_site_code
 	--,case when enrollment_1_start_date < dept_1_start_date then enrollment_1_start_date else dept_1_start_date end as enrollment_1_start_date
@@ -3183,56 +3236,56 @@ go
 
 if object_id('rpt.Volunteer_All_v', 'V') is not null
 	drop view rpt.Volunteer_All_v
-go 
+go
 create view rpt.Volunteer_All_v
 as
 with base as (
-	select 
+	select
 		 *
-		,case 
-			when enrollment_1_code in ( 'BBB', 'BBF', 'BBR', 'BCF', 'BCL', 'BCS', 'BCV', 'BRS' ) then 5 
+		,case
+			when enrollment_1_code in ( 'BBB', 'BBF', 'BBR', 'BCF', 'BCL', 'BCS', 'BCV', 'BRS' ) then 5
 			when enrollment_1_code in ( 'BBO', 'BOC' ) then 0
 			else
-				( case when dept_1_mon_flag = 'Y' then 1 else 0 end ) + 
+				( case when dept_1_mon_flag = 'Y' then 1 else 0 end ) +
 				( case when dept_1_tue_flag = 'Y' then 1 else 0 end ) +
 				( case when dept_1_wed_flag = 'Y' then 1 else 0 end ) +
 				( case when dept_1_thu_flag = 'Y' then 1 else 0 end ) +
 				( case when dept_1_fri_flag = 'Y' then 1 else 0 end ) +
 				( case when dept_1_sat_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_sun_flag = 'Y' then 1 else 0 end ) 
+				( case when dept_1_sun_flag = 'Y' then 1 else 0 end )
 		 end as work_days
 		,case when record_type in ( 'HPR', 'EXCEPTION' ) then 'Y' else 'N' end as hpr_flag
-		,upper( left( first_name, 1 ) + 
-		 substring( cast( hub_volunteer_num as varchar(30) ), 3, 1 ) + 
-		 substring( first_name, 2, 1 ) + 
-		 right( cast( hub_volunteer_num as varchar(30) ), 1 ) + 
+		,upper( left( first_name, 1 ) +
+		 substring( cast( hub_volunteer_num as varchar(30) ), 3, 1 ) +
+		 substring( first_name, 2, 1 ) +
+		 right( cast( hub_volunteer_num as varchar(30) ), 1 ) +
 		 right( last_name, 1 ) ) as base_helmet_id
 	from dbo.Volunteer_v_snp ),
 
 helmet as (
-	select 
+	select
 		volunteer_key
 		,row_number() over ( partition by base_helmet_id order by enrollment_1_start_date ) as rownum
 	from base )
 
-select 
-	 base.* 
+select
+	 base.*
 	,helmet.rownum
-	,case 
+	,case
 		when helmet.rownum = 1 then base.base_helmet_id
 		when helmet.rownum between 2 and 27 then base.base_helmet_id + char( 64 + helmet.rownum )	-- a=65, so 64+2=a, up to z=90
 		else base.base_helmet_id + '_' + cast( helmet.rownum as varchar )							-- fallback if more than 26 duplicates
 	 end as helmet_id
 	,case when enrollment_1_start_date > getdate() then 'INVITED' else 'ARRIVED' end as enrollment_status
 from base
-inner join helmet 
+inner join helmet
 	on base.volunteer_key = helmet.volunteer_key
 go
 
 
 if object_id('rpt.Volunteer_Rpt_v', 'V') is not null
 	drop view rpt.Volunteer_Rpt_v
-go 
+go
 create view rpt.Volunteer_Rpt_v
 as
 select *
@@ -3243,10 +3296,10 @@ go
 
 if object_id('rpt.Volunteer_Departure_v', 'V') is not null
 	drop view rpt.Volunteer_Departure_v
-go 
+go
 create view rpt.Volunteer_Departure_v
 as
-select 
+select
 	 volunteer_key
  	,hub_volunteer_num
  	,hub_person_id
@@ -3263,7 +3316,7 @@ select
 	,state_code
 	,postal_code
 	,home_phone
-	,mobile_phone	
+	,mobile_phone
 	,coalesce( enrollment_site_code, 'UNK' ) as enrollment_site_code
 	,enrollment_code
 	,case when enrollment_start_date < dept_start_date then enrollment_start_date else dept_start_date end as enrollment_start_date
@@ -3278,7 +3331,7 @@ select
 	,personal_email
 	,spouse_hub_volunteer_num
 	,spouse_bethel_email
-	,spouse_jwpub_email		
+	,spouse_jwpub_email
 	,primary_flag
 	,temp_flag
 	,split_asgn_flag
@@ -3289,20 +3342,20 @@ select
 	,fri_flag
 	,sat_flag
 	,sun_flag
-from (  
-	-- CORE 
-	select distinct 
+from (
+	-- CORE
+	select distinct
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
 		,v.gender_code
-		,ms.marital_status_code	
+		,ms.marital_status_code
 		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
 		,v.address
 		,v.city
 		,s.state_code
 		,pc.Postal_Code
-		,v.home_phone		
+		,v.home_phone
 		,v.mobile_phone
 		,v.HUB_Volunteer_Num
 		,ve.Site_Code as enrollment_site_code
@@ -3316,10 +3369,10 @@ from (
 		,tmp.Dept_Name as temp_dept_name
 		,v.alt_Email as bethel_email
 		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email		
+		,v.Email as personal_email
 		,vd.Start_Date as dept_start_date
 		,vd.Primary_Flag as primary_flag
-		,vd.Temp_Flag as temp_flag		
+		,vd.Temp_Flag as temp_flag
 		,case when vd.Primary_Flag = 'N' then 'Y' else 'N' end as split_asgn_flag
 		,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
 		,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
@@ -3335,17 +3388,17 @@ from (
 		,v.hub_person_guid
 		,mate.hub_volunteer_num as spouse_hub_volunteer_num
 		,mate.alt_email as spouse_bethel_email
-		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email		
+		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
 	from dbo.volunteer v
-	inner join dbo.marital_status ms 
-		on v.marital_status_key = ms.marital_status_key	
+	inner join dbo.marital_status ms
+		on v.marital_status_key = ms.marital_status_key
 	inner join dbo.state s
 		on v.State_Key = s.State_Key
 	inner join dbo.Postal_Code pc
 		on v.Postal_Code_Key = pc.Postal_Code_Key
 	inner join dbo.volunteer_enrollment ve
 		on v.volunteer_key = ve.Volunteer_Key
-		and ve.active_flag = 'N' 
+		and ve.active_flag = 'N'
 		and ve.start_Date < cast( getdate() as date )
 		and ve.end_date >= cast( getdate() - 30 as date )
 		--and ve.Geo_Name = 'USA'
@@ -3363,10 +3416,10 @@ from (
 	inner join dbo.HPR_Dept d
 		on vd.hub_dept_id = d.hub_dept_id
 		and d.Active_Flag = 'Y'
-		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )	
-		and d.level_01 = 'Headquarters Project Ramapo'		
-	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept 
-				 where hub_dept_id in ( select hub_dept_id from dbo.HPR_Dept where active_flag = 'Y' ) and ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi	 
+		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+		and d.level_01 = 'Headquarters Project Ramapo'
+	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept
+				 where hub_dept_id in ( select hub_dept_id from dbo.HPR_Dept where active_flag = 'Y' ) and ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi
 		on v.volunteer_key = multi.volunteer_key
 		and 'Y' = case when multi.cnt = 1 then 'Y' else vd.primary_flag end
 	left join dbo.volunteer_dept tmp
@@ -3380,23 +3433,23 @@ from (
 		on v.mate_hub_person_id = mate.hub_person_id
 	where 1=1
 		and v.volunteer_key not in ( select volunteer_key from dbo.Volunteer_v_snp )
-		
-	union all 
+
+	union all
 
 	-- EXCEPTIONS
-	select distinct 
+	select distinct
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
 		,v.gender_code
-		,ms.marital_status_code	
+		,ms.marital_status_code
 		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
 		,v.address
 		,v.city
 		,s.state_code
 		,pc.Postal_Code
 		,v.home_phone
-		,v.mobile_phone		
+		,v.mobile_phone
 		,v.HUB_Volunteer_Num
 		,ve.Site_Code as enrollment_site_code
 		,e.Enrollment_Code as enrollment_code
@@ -3409,10 +3462,10 @@ from (
 		,null as temp_dept_name
 		,v.alt_Email as bethel_email
 		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email	
+		,v.Email as personal_email
 		,vd.Start_Date as dept_start_date
 		,vd.Primary_Flag as primary_flag
-		,vd.Temp_Flag as temp_flag		
+		,vd.Temp_Flag as temp_flag
 		,case when vd.Primary_Flag = 'N' then 'Y' else 'N' end as split_asgn_flag
 		,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
 		,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
@@ -3430,7 +3483,7 @@ from (
 		,mate.alt_email as spouse_bethel_email
 		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
 	from dbo.volunteer v
-	inner join dbo.marital_status ms 
+	inner join dbo.marital_status ms
 		on v.marital_status_key = ms.marital_status_key
 	inner join dbo.state s
 		on v.State_Key = s.State_Key
@@ -3438,7 +3491,7 @@ from (
 		on v.Postal_Code_Key = pc.Postal_Code_Key
 	inner join dbo.volunteer_enrollment ve
 		on v.volunteer_key = ve.Volunteer_Key
-		and ve.active_flag = 'N' 
+		and ve.active_flag = 'N'
 		and ve.start_Date < cast( getdate() as date )
 		and ve.end_date >= cast( getdate() - 30 as date )
 		--and ve.Geo_Name = 'USA'
@@ -3452,7 +3505,7 @@ from (
 		and vd.start_Date < cast( getdate() as date )
 		and vd.end_date >= cast( getdate() - 30 as date )
 		--and vd.Parent_Dept_Name like 'HPR%'
-	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept 
+	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept
 				 where ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi
 		on v.volunteer_key = multi.volunteer_key
 		and 'Y' = case when multi.cnt = 1 then 'Y' else vd.primary_flag end
@@ -3464,10 +3517,10 @@ go
 
 if object_id('rpt.Volunteer_Training_v', 'V') is not null
 	drop view rpt.Volunteer_Training_v
-go 
+go
 create view rpt.Volunteer_Training_v
 as
-select  
+select
 	 v.hub_volunteer_num as volunteer_number
 	,v.volunteer_name
 	,v.bethel_email
@@ -3479,13 +3532,13 @@ select
 	,v.enrollment_1_end_date as enrollment_end_date
 	,t.class_number
 	,t.class_name
-	,t.host_branch_code	
+	,t.host_branch_code
 	,t.course_type
 	,t.course_name
 	,t.course_desc
 	,t.assign_date
 	,t.complete_date
-	,t.attendance_status	
+	,t.attendance_status
 	,t.active_flag
 	,v.volunteer_key
 from rpt.volunteer_rpt_v v
@@ -3494,16 +3547,16 @@ left join dbo.Volunteer_Training t
 where 1=1
 go
 
-	
+
 if object_id('rpt.Timecard_v', 'V') is not null
 	drop view rpt.Timecard_v
-go 
+go
 create view rpt.Timecard_v
 as
-select 
+select
  	 hub_volunteer_num as volunteer_num
 	,first_name
-	,last_name 	 
+	,last_name
 	,enrollment_site_code
 	,enrollment_code
 	,enrollment_start_date
@@ -3522,7 +3575,7 @@ select
 from rpt.volunteer_v
 where pc_category <> 'Support'
 	and enrollment_start_date <= getdate()
-/*where volunteer_name in ( 
+/*where volunteer_name in (
 	'Brust, Nicholas',
 	'Harbo, Reid',
 	'Jacks, Joshua',
@@ -3537,14 +3590,14 @@ where pc_category <> 'Support'
 	'Tipton, Melissa',
 	'Weber, Eric',
 	'Weber, Heather',
-	'Wilcox, Mark Patrick' 
+	'Wilcox, Mark Patrick'
 )*/
 go
 
 
 -- WDC reporting
 with raw as (
-	select 
+	select
 		 c.cal_dt
 		,v.volunteer_key
 		,v.full_name
@@ -3559,23 +3612,23 @@ with raw as (
 		on c.cal_dt between v.start_date and coalesce( v.end_date, '2030-12-31' )
 		and c.day_of_mth = 1
 	where 1=1
-		and v.site_code = 'RMP' 
+		and v.site_code = 'RMP'
 		--and c.cal_dt = '2025-03-01'
 		--and primary_flag = 'Y'
 		--and parent_dept_name = 'Warwick Computer Department' and dept_name = 'CD Engineering'
-		--and volunteer_key in (256215,725499,537287,339970,263665, 237671) 
+		--and volunteer_key in (256215,725499,537287,339970,263665, 237671)
 	group by c.cal_dt, v.volunteer_key, v.full_name order by full_name ),
 base as (
-	select 
+	select
 		 cal_dt
 		,parent_dept_nm
 		,dept_nm
-		,case 
-			when 
-				parent_dept_nm like 'HPR%' or 
+		,case
+			when
+				parent_dept_nm like 'HPR%' or
 				parent_dept_nm like '%-RMP' or
-				parent_dept_nm in ( 'Headquarters Project Ramapo', 'Architectural', 'Building Group', 'Construction Implementation', 'CPC Office', 'Design Development', 'MEP', 
-					'Personnel Support', 'Personnel Support Office', 'Procurement Cost Control', 'Site', 'Support', 'Trade Group' ) or 
+				parent_dept_nm in ( 'Headquarters Project Ramapo', 'Architectural', 'Building Group', 'Construction Implementation', 'CPC Office', 'Design Development', 'MEP',
+					'Personnel Support', 'Personnel Support Office', 'Procurement Cost Control', 'Site', 'Support', 'Trade Group' ) or
 				dept_nm like '%-RMP' or
 				dept_nm in ( 'Personnel Support Office', 'Personnel Support Office - Volunteer Desk', 'MEP - Electrical' ) then 'Y'
 			when parent_dept_nm in ( 'Purchasing Department' ) or dept_nm in ( 'Purchasing Department', 'Global Purchasing Department', 'WHQ CD Engineering', 'CD Engineering' ) then 'N'
@@ -3596,7 +3649,7 @@ base as (
 --select parent_dept_nm, dept_nm, count(*) from base  where hpr_flag <> 'X'  group by parent_dept_nm, dept_nm order by 1,2
 
 grp as (
-	select 
+	select
 		 cal_dt
 		,enrollment_code
 		,hpr_flag
@@ -3608,7 +3661,7 @@ grp as (
 		and cal_dt between '2019-04-01' and '2025-08-01'
 	group by cal_dt, enrollment_code, hpr_flag ),
 dw as (
-	select 
+	select
 		 enrollment_code
 		,hpr_flag
 		,cal_dt
@@ -3739,7 +3792,7 @@ dw as (
 		,coalesce( case when cal_dt = '2028-11-01' then total_cnt end, 0 ) as 'Nov_28'
 		,coalesce( case when cal_dt = '2028-12-01' then total_cnt end, 0 ) as 'Dec_28'
 	from grp )
-select 
+select
 	 enrollment_code
 	,hpr_flag
 	,sum( apr_19 ) as apr_19
@@ -3751,7 +3804,7 @@ select
 	,sum( oct_19 ) as oct_19
 	,sum( nov_19 ) as nov_19
 	,sum( dec_19 ) as dec_19
-	
+
 	,sum( jan_20 ) as jan_20
 	,sum( feb_20 ) as feb_20
 	,sum( mar_20 ) as mar_20
@@ -3764,7 +3817,7 @@ select
 	,sum( oct_20 ) as oct_20
 	,sum( nov_20 ) as nov_20
 	,sum( dec_20 ) as dec_20
-	
+
 	,sum( jan_21 ) as jan_21
 	,sum( feb_21 ) as feb_21
 	,sum( mar_21 ) as mar_21
@@ -3777,7 +3830,7 @@ select
 	,sum( oct_21 ) as oct_21
 	,sum( nov_21 ) as nov_21
 	,sum( dec_21 ) as dec_21
-	
+
 	,sum( jan_22 ) as jan_22
 	,sum( feb_22 ) as feb_22
 	,sum( mar_22 ) as mar_22
@@ -3816,7 +3869,7 @@ select
 	,sum( oct_24 ) as oct_24
 	,sum( nov_24 ) as nov_24
 	,sum( dec_24 ) as dec_24
-	
+
 	,sum( jan_25 ) as jan_25
 	,sum( feb_25 ) as feb_25
 	,sum( mar_25 ) as mar_25
@@ -3829,7 +3882,7 @@ select
 	--,sum( oct_25 ) as oct_25
 	--,sum( nov_25 ) as nov_25
 	--,sum( dec_25 ) as dec_25
-	
+
 	--,sum( jan_26 ) as jan_26
 	--,sum( feb_26 ) as feb_26
 	--,sum( mar_26 ) as mar_26
@@ -3842,7 +3895,7 @@ select
 	--,sum( oct_26 ) as oct_26
 	--,sum( nov_26 ) as nov_26
 	--,sum( dec_26 ) as dec_26
-	
+
 	--,sum( jan_27 ) as jan_27
 	--,sum( feb_27 ) as feb_27
 	--,sum( mar_27 ) as mar_27
