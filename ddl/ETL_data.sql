@@ -1125,6 +1125,29 @@ begin
 			and not exists ( select 1 from stg.stg_app a where volunteer_app.applicant_Id = a.applicant_id )
 
 		set @Upd = @Upd + @@rowcount
+        
+        -- UPDATE - ATTRIBUTES IN RVD NO LONGER IN HUB
+        update dbo.volunteer_app 
+        set 
+            attrib_approval_level_app_attrib_id = null,
+            attrib_approval_level_attrib_id = null,
+            attrib_approval_level_val = null,
+            attrib_pursued_by_app_attrib_id = null,
+            attrib_pursued_by_attrib_id = null,
+            attrib_pursued_by_val = null,
+            attrib_contacted_app_attrib_id = null,
+            attrib_contacted_attrib_id = null,
+            attrib_contacted_val = null
+        where 1=1
+            and active_flag = 'Y'
+            and ( 
+                coalesce( Attrib_Approval_Level_App_Attrib_ID, 0 ) != 0
+                or coalesce( Attrib_Pursued_By_App_Attrib_ID, 0 ) != 0
+                or coalesce( Attrib_Contacted_App_Attrib_ID, 0 ) != 0 
+                )
+            and not exists ( select 1 from stg.stg_App_Attribute aa where aa.Applicant_ID = volunteer_app.Applicant_ID )
+        
+        set @Upd = @Upd + @@rowcount
 
 		-- UPDATE - ATTRIBUTES
 		update dbo.volunteer_app
