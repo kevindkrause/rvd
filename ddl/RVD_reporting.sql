@@ -1899,265 +1899,268 @@ go
 
 
 if object_id('rpt.Resource_Plan_Vol_v', 'V') is not null
-	drop view rpt.Resource_Plan_Vol_v
+    drop view rpt.Resource_Plan_Vol_v
 go
 create view rpt.Resource_Plan_Vol_v
 as
 with cal as (
-	select cal_dt, day_of_wk, day_nm, day_of_mth
-	from dbo.cal_dim
-	where cal_dt between '2020-01-01' and '2030-03-01'
-		and day_of_wk = 2
+    select cal_dt, day_of_wk, day_nm, day_of_mth
+    from dbo.cal_dim
+    where 1=1
+        --and cal_dt between '2020-01-01' and '2030-03-01'
+        and cal_dt between '2025-01-01' and '2027-03-01'
+        and day_of_wk = 2
 ),
-
+ 
 bbo as (
-	select
-		 volunteer_key
-		,max( ba.mon ) as mon_flag
-		,max( ba.tue ) as tue_flag
-		,max( ba.wed ) as wed_flag
-		,max( ba.thu ) as thu_flag
-		,max( ba.fri ) as fri_flag
-		,max( ba.sat ) as sat_flag
-		,max( ba.sun ) as sun_flag
-	from rpt.Volunteer_Rpt_v v
-	inner join cal dt
-		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
-	inner join dbo.ba_event_snp ba
-		on v.ba_volunteer_num = ba.ba_volunteer_num
-		and dt.cal_dt between ba.start_date and ba.end_date
-	where enrollment_1_code in ( 'BBO' )
-	group by volunteer_key
+    select
+         volunteer_key
+        ,max( ba.mon ) as mon_flag
+        ,max( ba.tue ) as tue_flag
+        ,max( ba.wed ) as wed_flag
+        ,max( ba.thu ) as thu_flag
+        ,max( ba.fri ) as fri_flag
+        ,max( ba.sat ) as sat_flag
+        ,max( ba.sun ) as sun_flag
+    from rpt.Volunteer_Rpt_v v
+    inner join cal dt
+        on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
+    inner join dbo.ba_event_snp ba
+        on v.ba_volunteer_num = ba.ba_volunteer_num
+        and dt.cal_dt between ba.start_date and ba.end_date
+    where enrollment_1_code in ( 'BBO' )
+    group by volunteer_key
 ),
-
+ 
 actuals as (
-	select distinct
-		 v.volunteer_key
-		,dr.Dept_Role_Key as dept_asgn_key
-		,v.volunteer_name
-		,v.volunteer_name_short
-		,v.Enrollment_1_code as enrollment_code
-		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
-		,dr.crew_name
-		,dr.dept_role
-		,dr.dept_asgn_status_code
-		,c.cal_dt
-        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
-		,case
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-			else 0
-		 end as bed_cnt
-		,case
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
-			else 0
-		 end as fte
-		,case
-			when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 4 and v.dept_1_wed_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 5 and v.dept_1_thu_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 6 and v.dept_1_fri_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 2 and bbo.mon_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 3 and bbo.tue_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
-			else 'N'
-		 end as onsite_flag
-		,v.Room_Site_Code
-		,v.Room_Bldg
-		,v.Room_Bldg_Code
-		,v.Room
-		,v.record_type
-	from rpt.volunteer_rpt_v v
-	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
-		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
-		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
-	left join bbo
-		on v.volunteer_key = bbo.volunteer_key
-	left join dbo.Dept_Role_Volunteer_v drv  -- RG:  Believe this join of the Role_Volunteer data is needed to get the volunteer on a role that matches the HuB actual record by the volunteer key/enrollment code.  Will need to join in Role data to get the fields needed in this view.
-		on v.volunteer_key = drv.volunteer_key
-		and v.enrollment_1_code = drv.ps_enrollment_code
-		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )  -- RG:  Is this just double checking to make sure the RVD record start/end date lines up with HuB?  Don't think this needs to be the role start/end date, right?
-		and drv.active_flag = 'Y'
-		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
-	left join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the two fields referenced in this view
-		on drv.Dept_Role_Key = dr.Dept_Role_Key
-	where 1=1
-        and isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
-
+    select distinct
+         v.volunteer_key
+        ,dr.Dept_Role_Key as dept_asgn_key
+        ,v.volunteer_name
+        ,v.volunteer_name_short
+        ,v.Enrollment_1_code as enrollment_code
+        ,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
+        ,dr.crew_name
+        ,dr.dept_role
+        ,drv.dept_asgn_status_code
+        ,c.cal_dt
+        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
+        ,case
+            when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+            else 0
+         end as bed_cnt
+        ,case
+            when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
+            else 0
+         end as fte
+        ,case
+            when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 4 and v.dept_1_wed_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 5 and v.dept_1_thu_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 6 and v.dept_1_fri_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 2 and bbo.mon_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 3 and bbo.tue_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
+            else 'N'
+         end as onsite_flag
+        ,v.Room_Site_Code
+        ,v.Room_Bldg
+        ,v.Room_Bldg_Code
+        ,v.Room
+        ,v.record_type
+    from rpt.volunteer_rpt_v v
+    inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
+        on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
+        or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
+    left join bbo
+        on v.volunteer_key = bbo.volunteer_key
+    left join dbo.Dept_Role_Volunteer_v drv  -- RG:  Believe this join of the Role_Volunteer data is needed to get the volunteer on a role that matches the HuB actual record by the volunteer key/enrollment code.  Will need to join in Role data to get the fields needed in this view.
+        on v.volunteer_key = drv.volunteer_key
+        and v.enrollment_1_code = drv.ps_enrollment_code
+        and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )  -- RG:  Is this just double checking to make sure the RVD record start/end date lines up with HuB?  Don't think this needs to be the role start/end date, right?
+        and drv.active_flag = 'Y'
+        and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+    left join dbo.Dept_Role_v dr  -- RG:  Joining in Role data to get the two fields referenced in this view
+        on drv.Dept_Role_Key = dr.Dept_Role_Key
+    where 1=1
+        and isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' --RG:  Added this to identify only Volunteers and exclude Candidates
+ 
 ),
-
+ 
 projected as (
-	select
-		 v.volunteer_key
-		,v.Dept_Role_Key as dept_asgn_key
-		,v.volunteer_name
-		,v.volunteer_name_short
-		,v.enrollment_code
-		,v.hpr_dept_key
-		,v.crew_name
-		,v.dept_role
-		,v.dept_asgn_status_code
-		,v.cal_dt
-	    ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
-		,v.bed_cnt
-		,v.fte
-		,v.onsite_flag
-		,null as Room_Site_Code
-		,null as Room_Bldg
-		,null as Room_Bldg_Code
-		,null as Room
-		,v.record_type
-	from rpt.Volunteer_Projected_v v
-	inner join cal c
-		on c.cal_dt = v.cal_dt
+    select
+         v.volunteer_key
+        ,v.Dept_Role_Key as dept_asgn_key
+        ,v.volunteer_name
+        ,v.volunteer_name_short
+        ,v.enrollment_code
+        ,v.hpr_dept_key
+        ,v.crew_name
+        ,v.dept_role
+        ,v.dept_asgn_status_code
+        ,v.cal_dt
+        ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
+        ,v.bed_cnt
+        ,v.fte
+        ,v.onsite_flag
+        ,null as Room_Site_Code
+        ,null as Room_Bldg
+        ,null as Room_Bldg_Code
+        ,null as Room
+        ,v.record_type
+    from rpt.Volunteer_Projected_v v
+    inner join cal c
+        on c.cal_dt = v.cal_dt
 ),
-
+ 
 base as (
-	select * from actuals
-	union all
-	select * from projected
+    select * from actuals
+    union all
+    select * from projected
 )
-
+ 
 select *
 from base
 --where cal_dt = '2025-07-07'
-	--and volunteer_key in (641583)
+    --and volunteer_key in (641583)
 --order by 3
 go
-
-
+ 
 if object_id('rpt.Resource_Plan_Vol_Daily_v', 'V') is not null
-	drop view rpt.Resource_Plan_Vol_Daily_v
+    drop view rpt.Resource_Plan_Vol_Daily_v
 go
 create view rpt.Resource_Plan_Vol_Daily_v
 as
 with cal as (
-	select cal_dt, day_of_wk, day_nm, day_of_mth
-	from dbo.cal_dim
-	where cal_dt between '2020-01-01' and '2030-03-01'
+    select cal_dt, day_of_wk, day_nm, day_of_mth
+    from dbo.cal_dim
+    where 1=1
+        --and cal_dt between '2020-01-01' and '2030-03-01'
+        and cal_dt between '2025-01-01' and '2027-03-01'
 ),
-
+ 
 bbo as (
-	select
-		 volunteer_key
-		,max( ba.mon ) as mon_flag
-		,max( ba.tue ) as tue_flag
-		,max( ba.wed ) as wed_flag
-		,max( ba.thu ) as thu_flag
-		,max( ba.fri ) as fri_flag
-		,max( ba.sat ) as sat_flag
-		,max( ba.sun ) as sun_flag
-	from rpt.Volunteer_Rpt_v v
-	inner join cal dt
-		on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
-	inner join dbo.ba_event_snp ba
-		on v.ba_volunteer_num = ba.ba_volunteer_num
-		and dt.cal_dt between ba.start_date and ba.end_date
-	where enrollment_1_code in ( 'BBO' )
-	group by volunteer_key
+    select
+         volunteer_key
+        ,max( ba.mon ) as mon_flag
+        ,max( ba.tue ) as tue_flag
+        ,max( ba.wed ) as wed_flag
+        ,max( ba.thu ) as thu_flag
+        ,max( ba.fri ) as fri_flag
+        ,max( ba.sat ) as sat_flag
+        ,max( ba.sun ) as sun_flag
+    from rpt.Volunteer_Rpt_v v
+    inner join cal dt
+        on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
+    inner join dbo.ba_event_snp ba
+        on v.ba_volunteer_num = ba.ba_volunteer_num
+        and dt.cal_dt between ba.start_date and ba.end_date
+    where enrollment_1_code in ( 'BBO' )
+    group by volunteer_key
 ),
-
+ 
 actuals as (
-	select distinct
-		 v.volunteer_key
-		,dr.Dept_Role_Key as dept_asgn_key
-		,v.volunteer_name
-		,v.volunteer_name_short
-		,v.Enrollment_1_code as enrollment_code
-		,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
-		,dr.crew_name
-		,dr.dept_role
-		,dr.dept_asgn_status_code
-		,c.cal_dt
-        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
-		,case
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-			else 0
-		 end as bed_cnt
-		,case
-			when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
-			else 0
-		 end as fte
-		,case
-			when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 4 and v.dept_1_wed_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 5 and v.dept_1_thu_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 6 and v.dept_1_fri_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 2 and bbo.mon_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 3 and bbo.tue_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
-			when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
-			else 'N'
-		 end as onsite_flag
-		,v.Room_Site_Code
-		,v.Room_Bldg
-		,v.Room_Bldg_Code
-		,v.Room
-		,v.record_type
-	from rpt.volunteer_rpt_v v
-	inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
-		on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
-		or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
-	left join bbo
-		on v.volunteer_key = bbo.volunteer_key
-	left join dbo.Dept_Role_Volunteer_v drv
-		on v.volunteer_key = drv.volunteer_key
-		and v.enrollment_1_code = drv.ps_enrollment_code
-		and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )
-		and drv.active_flag = 'Y'
-		and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
-	left join dbo.Dept_Role_v dr
-		on drv.Dept_Role_Key = dr.Dept_Role_Key
-	where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' ),
-
+    select distinct
+         v.volunteer_key
+        ,dr.Dept_Role_Key as dept_asgn_key
+        ,v.volunteer_name
+        ,v.volunteer_name_short
+        ,v.Enrollment_1_code as enrollment_code
+        ,coalesce( v.dept_1_hpr_dept_key, v.dept_2_hpr_dept_key ) as hpr_dept_key
+        ,dr.crew_name
+        ,dr.dept_role
+        ,drv.dept_asgn_status_code
+        ,c.cal_dt
+        ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
+        ,case
+            when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+            else 0
+         end as bed_cnt
+        ,case
+            when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) then 0.2
+            else 0
+         end as fte
+        ,case
+            when v.Enrollment_1_code in ( 'BCS', 'BBR', 'BCF', 'BBF', 'BCV', 'BCL', 'BBV', 'BCC' ) then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 2 and v.dept_1_mon_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 3 and v.dept_1_tue_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 4 and v.dept_1_wed_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 5 and v.dept_1_thu_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBV', 'BCC' ) and c.day_of_wk = 6 and v.dept_1_fri_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 2 and bbo.mon_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 3 and bbo.tue_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 4 and bbo.wed_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 5 and bbo.thu_flag = 'Y' then 'Y'
+            when v.Enrollment_1_code in ( 'BBO' ) and c.day_of_wk = 6 and bbo.fri_flag = 'Y' then 'Y'
+            else 'N'
+         end as onsite_flag
+        ,v.Room_Site_Code
+        ,v.Room_Bldg
+        ,v.Room_Bldg_Code
+        ,v.Room
+        ,v.record_type
+    from rpt.volunteer_rpt_v v
+    inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
+        on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
+        or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
+    left join bbo
+        on v.volunteer_key = bbo.volunteer_key
+    left join dbo.Dept_Role_Volunteer_v drv
+        on v.volunteer_key = drv.volunteer_key
+        and v.enrollment_1_code = drv.ps_enrollment_code
+        and c.cal_dt between drv.vol_start_date and coalesce( drv.vol_end_date, '2030-12-31' )
+        and drv.active_flag = 'Y'
+        and drv.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+    left join dbo.Dept_Role_v dr
+        on drv.Dept_Role_Key = dr.Dept_Role_Key
+    where isnull(drv.Volunteer_Type_Description, 'VOLUNTEER') = 'VOLUNTEER' ),
+ 
 projected as (
-	select
-		 v.volunteer_key
-		,v.Dept_Role_Key as dept_asgn_key
-		,v.volunteer_name
-		,v.volunteer_name_short
-		,v.enrollment_code
-		,v.hpr_dept_key
-		,v.crew_name
-		,v.dept_role
-		,v.dept_asgn_status_code
-		,v.cal_dt
-	    ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
-		,v.bed_cnt
-		,v.fte
-		,v.onsite_flag
-		,null as Room_Site_Code
-		,null as Room_Bldg
-		,null as Room_Bldg_Code
-		,null as Room
-		,v.record_type
-	from rpt.Volunteer_Projected_v v
-	inner join cal c
-		on c.cal_dt = v.cal_dt
+    select
+         v.volunteer_key
+        ,v.Dept_Role_Key as dept_asgn_key
+        ,v.volunteer_name
+        ,v.volunteer_name_short
+        ,v.enrollment_code
+        ,v.hpr_dept_key
+        ,v.crew_name
+        ,v.dept_role
+        ,v.dept_asgn_status_code
+        ,v.cal_dt
+        ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
+        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
+        ,v.bed_cnt
+        ,v.fte
+        ,v.onsite_flag
+        ,null as Room_Site_Code
+        ,null as Room_Bldg
+        ,null as Room_Bldg_Code
+        ,null as Room
+        ,v.record_type
+    from rpt.Volunteer_Projected_v v
+    inner join cal c
+        on c.cal_dt = v.cal_dt
 ),
-
+ 
 base as (
-	select * from actuals
-	union all
-	select * from projected
+    select * from actuals
+    union all
+    select * from projected
 )
-
+ 
 select *
 from base
 --where cal_dt = '2025-10-27'
---	and volunteer_key in (641583)
+--  and volunteer_key in (641583)
 --order by 3
 go
 
