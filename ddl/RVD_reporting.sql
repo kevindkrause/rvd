@@ -2524,7 +2524,7 @@ select
 	,coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) as enrollment_code
 	,dr.crew_name
 	,dr.dept_role
-	,drv.dept_asgn_status_code
+	,coalesce( drv.dept_asgn_status_code, dr.dept_asgn_status_code ) as dept_asgn_status_code
     ,dr.role_start_date_rpt as role_start_date
     ,dr.role_end_date_rpt as role_end_date
 	,case
