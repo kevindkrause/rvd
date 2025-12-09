@@ -528,6 +528,7 @@ vol as (
 		,v.hpr_dept_key
 		,v.volunteer_key
 		,c.wk_num
+        ,v.role_start_date
 	from dates c
 	left join rpt.Resource_Plan_vol_v v
 		on c.cal_dt = v.cal_dt
@@ -549,32 +550,32 @@ select
 	,dept_asgn_status
 	,dept_asgn_key
 	,volunteer_key
-	,max( case when wk_num = 1 then volunteer_name else null end ) as wk_01
-	,max( case when wk_num = 2 then volunteer_name else null end ) as wk_02
-	,max( case when wk_num = 3 then volunteer_name else null end ) as wk_03
-	,max( case when wk_num = 4 then volunteer_name else null end ) as wk_04
-	,max( case when wk_num = 5 then volunteer_name else null end ) as wk_05
-	,max( case when wk_num = 6 then volunteer_name else null end ) as wk_06
-	,max( case when wk_num = 7 then volunteer_name else null end ) as wk_07
-	,max( case when wk_num = 8 then volunteer_name else null end ) as wk_08
-	,max( case when wk_num = 9 then volunteer_name else null end ) as wk_09
-	,max( case when wk_num = 10 then volunteer_name else null end ) as wk_10
-	,max( case when wk_num = 11 then volunteer_name else null end ) as wk_11
-	,max( case when wk_num = 12 then volunteer_name else null end ) as wk_12
-	,max( case when wk_num = 13 then volunteer_name else null end ) as wk_13
-	,max( case when wk_num = 14 then volunteer_name else null end ) as wk_14
-	,max( case when wk_num = 15 then volunteer_name else null end ) as wk_15
-	,max( case when wk_num = 16 then volunteer_name else null end ) as wk_16
-	,max( case when wk_num = 17 then volunteer_name else null end ) as wk_17
-	,max( case when wk_num = 18 then volunteer_name else null end ) as wk_18
-	,max( case when wk_num = 19 then volunteer_name else null end ) as wk_19
-	,max( case when wk_num = 20 then volunteer_name else null end ) as wk_20
-	,max( case when wk_num = 21 then volunteer_name else null end ) as wk_21
-	,max( case when wk_num = 22 then volunteer_name else null end ) as wk_22
-	,max( case when wk_num = 23 then volunteer_name else null end ) as wk_23
-	,max( case when wk_num = 24 then volunteer_name else null end ) as wk_24
-	,max( case when wk_num = 25 then volunteer_name else null end ) as wk_25
-	,max( case when wk_num = 26 then volunteer_name else null end ) as wk_26
+	,max( case when wk_num = 1 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_01
+	,max( case when wk_num = 2 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_02
+	,max( case when wk_num = 3 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_03
+	,max( case when wk_num = 4 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_04
+	,max( case when wk_num = 5 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_05
+	,max( case when wk_num = 6 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_06
+	,max( case when wk_num = 7 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_07
+	,max( case when wk_num = 8 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_08
+	,max( case when wk_num = 9 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_09
+	,max( case when wk_num = 10 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_10
+	,max( case when wk_num = 11 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_11
+	,max( case when wk_num = 12 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_12
+	,max( case when wk_num = 13 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_13
+	,max( case when wk_num = 14 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_14
+	,max( case when wk_num = 15 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_15
+	,max( case when wk_num = 16 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_16
+	,max( case when wk_num = 17 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_17
+	,max( case when wk_num = 18 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_18
+	,max( case when wk_num = 19 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_19
+	,max( case when wk_num = 20 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_20
+	,max( case when wk_num = 21 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_21
+	,max( case when wk_num = 22 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_22
+	,max( case when wk_num = 23 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_23
+	,max( case when wk_num = 24 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_24
+	,max( case when wk_num = 25 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_25
+	,max( case when wk_num = 26 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_26
 from vol
 where 1=1
 	--and cpc_code = 'CI'
@@ -1945,7 +1946,7 @@ actuals as (
         ,drv.dept_asgn_status_code
         ,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
+        ,coalesce( drv.vol_end_date, dr.role_end_date, '2030-03-01' ) as role_end_date
         ,case
             when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
             else 0
@@ -2028,10 +2029,12 @@ base as (
  
 select *
 from base
---where cal_dt = '2025-07-07'
+where dept_asgn_key is not null
+    --and cal_dt = '2025-07-07'
     --and volunteer_key in (641583)
 --order by 3
 go
+
  
 if object_id('rpt.Resource_Plan_Vol_Daily_v', 'V') is not null
     drop view rpt.Resource_Plan_Vol_Daily_v
@@ -2079,7 +2082,7 @@ actuals as (
         ,drv.dept_asgn_status_code
         ,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( dr.role_end_date,'2030-03-01' ) as role_end_date
+        ,coalesce( drv.vol_end_date, dr.role_end_date, '2030-03-01' ) as role_end_date
         ,case
             when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
             else 0
@@ -2159,8 +2162,9 @@ base as (
  
 select *
 from base
---where cal_dt = '2025-10-27'
---  and volunteer_key in (641583)
+where dept_asgn_key is not null
+    --and cal_dt = '2025-07-07'
+    --and volunteer_key in (641583)
 --order by 3
 go
 
@@ -2525,8 +2529,8 @@ select
 	,dr.crew_name
 	,dr.dept_role
 	,coalesce( drv.dept_asgn_status_code, dr.dept_asgn_status_code ) as dept_asgn_status_code
-    ,dr.role_start_date_rpt as role_start_date
-    ,dr.role_end_date_rpt as role_end_date
+    ,coalesce( drv.vol_start_date, dr.role_start_date_rpt ) as role_start_date
+    ,coalesce( drv.vol_end_date, dr.role_end_date_rpt ) as role_end_date
 	,case
 		when coalesce( drv.ps_enrollment_code, dr.dept_enrollment_code ) in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
 		else 0
@@ -2573,11 +2577,16 @@ inner join dbo.hpr_dept d
 left join dbo.Dept_Role_Volunteer_v drv
 	on dr.Dept_Role_Key = drv.Dept_Role_Key
 	and drv.Volunteer_Type_Description = 'VOLUNTEER'
+    and drv.active_flag = 'Y'
 where dr.active_flag = 'Y'
-	and dr.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED
+	--and dr.Dept_Asgn_Status_Key not in ( 19, 22 ) -- DO NOT PURSUE, DEPARTED, USE DATE FILTER BELOW FOR PERF
 	--and dr.dept_role_key = 655
 	--and d.hpr_dept_key = 217
 	--and c.cal_dt = '2025-11-03'
+	and ( 
+	       getdate() between coalesce( drv.vol_start_date, dr.role_start_date_rpt ) and coalesce( dr.role_end_date_rpt, drv.vol_end_date )
+		or coalesce( drv.vol_start_date, dr.role_start_date_rpt ) > getdate()
+		)
 	and not exists (
 		select 1 from rpt.volunteer_rpt_v act
 		where coalesce( drv.volunteer_key, -1 ) = act.volunteer_key
