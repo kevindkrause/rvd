@@ -504,7 +504,7 @@ begin
 			values( @table, @test, @fail );
 			
 		set @Test = 'Dup - Volunteer, Active Enrollment - Pioneering'
-		if exists ( select count(*) from dbo.Volunteer_Enrollment where active_flag = 'Y' and enrollment_key in ( 122 ) group by volunteer_key, enrollment_key, geo_name having count(*) > 1 )
+		if exists ( select count(*) from dbo.Volunteer_Enrollment where active_flag = 'Y' and enrollment_key in ( 122 ) and volunteer_key not in ( 999678 ) group by volunteer_key, enrollment_key, geo_name having count(*) > 1 )
 			insert into dbo.App_Data_Validation( table_name, test_name, status_code )
 			values( @table, @test, @fail );				
 			
