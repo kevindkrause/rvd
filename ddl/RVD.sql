@@ -2116,6 +2116,7 @@ create table dbo.Volunteer_Dept_Rpt(
 	HUB_Dept_ID						integer,
 	Parent_Dept_Name				nvarchar(100),
 	Dept_Name 						nvarchar(100)			not null,
+	Dept_Role						nvarchar(500),
 	Temp_Flag 						nvarchar(1)				not null constraint df_volunteer_dept_rpt_temp_flag default 'N',
 	Primary_Flag					nvarchar(1)				not null constraint df_volunteer_dept_rpt_primary_flag default 'Y', 
 	Split_Allocation_Pct			integer,

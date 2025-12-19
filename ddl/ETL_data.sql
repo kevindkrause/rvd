@@ -2005,6 +2005,7 @@ begin
 			,hub_dept_id
 			,parent_dept_name
 			,dept_name
+			,dept_role
 			,temp_flag
 			,primary_flag
 			,split_allocation_pct
@@ -2025,6 +2026,7 @@ begin
 			,hub_dept_id
 			,parent_dept_name
 			,dept_name
+			,dept_role
 			,temp_flag
 			,primary_flag
 			,split_allocation_pct
@@ -2047,6 +2049,7 @@ begin
 				,hub_dept_id
 				,parent_dept_name
 				,dept_name
+				,dept_role
 				,temp_flag
 				,primary_flag
 				,split_allocation_pct
@@ -2069,6 +2072,7 @@ begin
 					,vd.hub_dept_id
 					,vd.parent_dept_name
 					,vd.dept_name
+					,vd.dept_role
 					,vd.temp_flag
 					,vd.primary_flag
 					,vd.split_allocation_pct
@@ -2110,6 +2114,7 @@ begin
 					,vd.hub_dept_id
 					,vd.parent_dept_name
 					,vd.dept_name
+					,vd.dept_role
 					,vd.temp_flag
 					,vd.primary_flag
 					,vd.split_allocation_pct
@@ -2150,6 +2155,7 @@ begin
 					,vd.hub_dept_id
 					,vd.parent_dept_name
 					,vd.dept_name
+					,vd.dept_role
 					,vd.temp_flag
 					,vd.primary_flag
 					,vd.split_allocation_pct
@@ -2188,6 +2194,7 @@ begin
                 ,hub_dept_id
                 ,parent_dept_name
                 ,dept_name
+				,dept_role
                 ,temp_flag
                 ,primary_flag
                 ,split_allocation_pct
@@ -2210,6 +2217,7 @@ begin
 					,vd.hub_dept_id
 					,vd.parent_dept_name
 					,vd.dept_name
+					,vd.dept_role
 					,vd.temp_flag
 					,vd.primary_flag
 					,vd.split_allocation_pct
@@ -2252,6 +2260,7 @@ begin
 				,vd.hub_dept_id
 				,vd.parent_dept_name
 				,vd.dept_name
+				,vd.dept_role
 				,vd.temp_flag
 				,vd.primary_flag
 				,vd.split_allocation_pct
@@ -2287,6 +2296,7 @@ begin
 			,hub_dept_id
 			,parent_dept_name
 			,dept_name
+			,dept_role
 			,temp_flag
 			,primary_flag
 			,split_allocation_pct
@@ -2307,6 +2317,7 @@ begin
 			,hub_dept_id
 			,parent_dept_name
 			,dept_name
+			,dept_role
 			,temp_flag
 			,primary_flag
 			,split_allocation_pct
@@ -2336,6 +2347,7 @@ begin
 				,vd.hub_dept_id
 				,vd.parent_dept_name
 				,vd.dept_name
+				,vd.dept_role
 				,vd.temp_flag
 				,vd.primary_flag
 				,vd.split_allocation_pct
@@ -2371,6 +2383,7 @@ begin
 			,hub_dept_id
 			,parent_dept_name
 			,dept_name
+			,dept_role
 			,temp_flag
 			,primary_flag
 			,split_allocation_pct
@@ -2391,6 +2404,7 @@ begin
 			,hub_dept_id
 			,parent_dept_name
 			,dept_name
+			,dept_role
 			,temp_flag
 			,primary_flag
 			,split_allocation_pct
@@ -5595,6 +5609,7 @@ begin
 			,dept_1_cpc_code
 			,dept_1_parent_dept_name
 			,dept_1_dept_name
+			,dept_1_dept_role
 			,dept_1_ovsr_name
 			,dept_1_start_date
 			,dept_1_end_date
@@ -5616,6 +5631,7 @@ begin
 			,dept_2_cpc_code
 			,dept_2_parent_dept_name
 			,dept_2_dept_name
+			,dept_2_dept_role
 			,dept_2_ovsr_name
 			,dept_2_start_date
 			,dept_2_end_date
@@ -5687,6 +5703,7 @@ begin
 			,dept_1_cpc_code
 			,dept_1_parent_dept_name
 			,dept_1_dept_name
+			,dept_1_dept_role
 			,dept_1_ovsr_name
 			,dept_1_start_date
 			,dept_1_end_date
@@ -5708,6 +5725,7 @@ begin
 			,dept_2_cpc_code
 			,dept_2_parent_dept_name
 			,dept_2_dept_name
+			,dept_2_dept_role
 			,dept_2_ovsr_name
 			,dept_2_start_date
 			,dept_2_end_date
