@@ -2216,10 +2216,12 @@ select
 	,enrollment_2_end_date
 	,dept_1_hpr_dept_key
 	,dept_1_hub_dept_id
+	,d.PC_Code_full as dept_1_hub_dept_code
 	,dept_1_cpc_code
 	,dept_1_parent_dept_name
 	,dept_1_dept_name
 	,dept_1_ovsr_name
+	,dept_1_dept_role
 	,dept_1_start_date
 	,dept_1_end_date
 	,dept_1_temp_flag
@@ -2237,9 +2239,11 @@ select
 	,dept_1_sun_flag
 	,dept_2_hpr_dept_key
 	,dept_2_hub_dept_id
+	,d2.PC_Code_full as dept_2_hub_dept_code
 	,dept_2_cpc_code
 	,dept_2_parent_dept_name
 	,dept_2_dept_name
+	,dept_2_dept_role
 	,dept_2_ovsr_name
 	,dept_2_start_date
 	,dept_2_end_date
@@ -2271,7 +2275,11 @@ select
 	,rownum
 	,helmet_id
 	,enrollment_status
-from rpt.Volunteer_All_v
+from rpt.Volunteer_All_v v
+left join dbo.hpr_dept d
+	on v.dept_1_hpr_dept_key = d.hpr_dept_key
+left join dbo.hpr_dept d2
+	on v.dept_2_hpr_dept_key = d2.hpr_dept_key
 
 union all
 
@@ -2317,9 +2325,11 @@ select
 	,null as enrollment_2_end_date
 	,p.dept_1_hpr_dept_key
 	,p.dept_1_hub_dept_id
+	,d.PC_Code_full as dept_1_hub_dept_code
 	,p.dept_1_cpc_code
 	,p.dept_1_parent_dept_name
 	,p.dept_1_dept_name
+	,null as dept_1_dept_role
 	,d.Dept_Ovsr as dept_1_ovsr_name
 	,p.dept_1_start_date
 	,p.dept_1_end_date
@@ -2338,9 +2348,11 @@ select
 	,null as dept_1_sun_flag
 	,null as dept_2_hpr_dept_key
 	,null as dept_2_hub_dept_id
+	,null as dept_2_hub_dept_code
 	,null as dept_2_cpc_code
 	,null as dept_2_parent_dept_name
 	,null as dept_2_dept_name
+	,null as dept_2_dept_role
 	,null as dept_2_ovsr_name
 	,null as dept_2_start_date
 	,null as dept_2_end_date
@@ -2426,9 +2438,11 @@ select
 	,null as enrollment_2_end_date
 	,null as dept_1_hpr_dept_key
 	,null as dept_1_hub_dept_id
+	,dept_pc_code as dept_1_hub_dept_code
 	,null as dept_1_cpc_code
 	,parent_dept_name as dept_1_parent_dept_name
 	,dept_name as dept_1_dept_name
+	,null as dept_1_dept_role
 	,null as dept_1_ovsr_name
 	,null as dept_1_start_date
 	,null as dept_1_end_date
@@ -2447,9 +2461,11 @@ select
 	,sun_flag as dept_1_sun_flag
 	,null as dept_2_hpr_dept_key
 	,null as dept_2_hub_dept_id
+	,null as dept_2_hub_dept_code
 	,null as dept_2_cpc_code
 	,null as dept_2_parent_dept_name
 	,null as dept_2_dept_name
+	,null as dept_2_dept_role
 	,null as dept_2_ovsr_name
 	,null as dept_2_start_date
 	,null as dept_2_end_date
@@ -2632,6 +2648,7 @@ with base as (
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
+		,vd1.dept_role as dept_1_dept_role
 		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
@@ -2653,6 +2670,7 @@ with base as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
+		,vd2.dept_role as dept_2_dept_role
 		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
@@ -2758,6 +2776,7 @@ exceptions as (
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
+		,vd1.dept_role as dept_1_dept_role
 		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
@@ -2779,6 +2798,7 @@ exceptions as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
+		,vd2.dept_role as dept_2_dept_role
 		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
@@ -2887,6 +2907,7 @@ woodgrove as (
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
+		,vd1.dept_role as dept_1_dept_role
 		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
@@ -2908,6 +2929,7 @@ woodgrove as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
+		,vd2.dept_role as dept_2_dept_role
 		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
@@ -3011,6 +3033,7 @@ guest as (
 		,d1.cpc_code as dept_1_cpc_code
 		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
 		,vd1.Dept_Name as dept_1_dept_name
+		,vd1.dept_role as dept_1_dept_role
 		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
 		,vd1.start_date as dept_1_start_date
 		,vd1.end_date as dept_1_end_date
@@ -3032,6 +3055,7 @@ guest as (
 		,d2.cpc_code as dept_2_cpc_code
 		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
 		,vd2.Dept_Name as dept_2_dept_name
+		,vd2.dept_role as dept_2_dept_role
 		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
 		,vd2.start_date as dept_2_start_date
 		,vd2.end_date as dept_2_end_date
@@ -3196,6 +3220,7 @@ select
 	,dept_1_cpc_code
 	,dept_1_parent_dept_name
 	,dept_1_dept_name
+	,dept_1_dept_role
 	,dept_1_ovsr_name
 	,dept_1_start_date
 	,dept_1_end_date
@@ -3217,6 +3242,7 @@ select
 	,dept_2_cpc_code
 	,dept_2_parent_dept_name
 	,dept_2_dept_name
+	,dept_2_dept_role
 	,dept_2_ovsr_name
 	,dept_2_start_date
 	,dept_2_end_date
@@ -3336,6 +3362,7 @@ select
 	,parent_dept_name
 	,parent_dept_code
 	,dept_name
+	,dept_pc_code
 	,temp_parent_dept_name + ' > ' + temp_dept_name as loan_dept_name
 	,pc_category
 	,bethel_email
@@ -3377,6 +3404,7 @@ from (
 		,vd.Parent_Dept_Name as parent_dept_name
 		,d.cpc_code as parent_dept_code
 		,vd.Dept_Name as dept_name
+		,d.PC_Code_Full as dept_pc_code
 		,tmp.Parent_Dept_Name as temp_parent_dept_name
 		,tmp.Dept_Name as temp_dept_name
 		,v.alt_Email as bethel_email
@@ -3470,6 +3498,7 @@ from (
 		,vd.Parent_Dept_Name as parent_dept_name
 		,'PCC' as parent_dept_code
 		,vd.Dept_Name as dept_name
+		,d.PC_Code_Full as dept_pc_code
 		,null as temp_parent_dept_name
 		,null as temp_dept_name
 		,v.alt_Email as bethel_email
@@ -3521,6 +3550,11 @@ from (
 				 where ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi
 		on v.volunteer_key = multi.volunteer_key
 		and 'Y' = case when multi.cnt = 1 then 'Y' else vd.primary_flag end
+	inner join dbo.HPR_Dept d
+		on vd.hub_dept_id = d.hub_dept_id
+		and d.Active_Flag = 'Y'
+		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+		and d.level_01 = 'Headquarters Project Ramapo'
 	left join dbo.volunteer mate
 		on v.mate_hub_person_id = mate.hub_person_id
 	where v.hpr_volunteer_exception_flag = 'Y' ) core

@@ -486,6 +486,8 @@ select
 	,drv.vol_enrollment_key
 	,drv.active_flag
     ,v.Mate_HUB_Person_ID
+    datediff( month, drv.vol_start_date, coalesce( drv.vol_end_date, 
+        convert( datetime, '2030-03-01 00:00:00', 102 ) ) ) as duration_in_months_vol
 from dbo.dept_role_volunteer as drv
 left outer join dbo.enrollment as ve
 	on drv.vol_enrollment_key = ve.enrollment_key
