@@ -2329,8 +2329,8 @@ select
 	,p.dept_1_cpc_code
 	,p.dept_1_parent_dept_name
 	,p.dept_1_dept_name
-	,null as dept_1_dept_role
 	,d.Dept_Ovsr as dept_1_ovsr_name
+	,null as dept_1_dept_role
 	,p.dept_1_start_date
 	,p.dept_1_end_date
 	,'N' as dept_1_temp_flag
@@ -2442,8 +2442,8 @@ select
 	,null as dept_1_cpc_code
 	,parent_dept_name as dept_1_parent_dept_name
 	,dept_name as dept_1_dept_name
-	,null as dept_1_dept_role
 	,null as dept_1_ovsr_name
+	,null as dept_1_dept_role
 	,null as dept_1_start_date
 	,null as dept_1_end_date
 	,temp_flag as dept_1_temp_flag
