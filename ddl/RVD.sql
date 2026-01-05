@@ -975,29 +975,6 @@ create table dbo.Event_Type(
 go
 
 
-if object_id('dbo.HPR_Crew', 'U') is not null
-	drop table dbo.HPR_Crew
-go 
-create table dbo.HPR_Crew(
-	HPR_Crew_Key				integer identity(1,1) 	not null constraint hpr_crew_pk primary key,
-	HPR_Crew_Sharepoint_Key		nvarchar(255),
-	HPR_Dept_Key 				integer 			 	not null,
-	HPR_Dept_Sharepoint_Key		nvarchar(255),	
-	Crew_Name					nvarchar(255)			not null,			
-	Crew_Ovsr					nvarchar(255)			not null,
-	Crew_Ovsr_Person_ID			integer,
-	Crew_Ovsr_Email				nvarchar(255)			not null,
-	Start_Date					date,
-	Active_Flag 				nvarchar(1) 			not null constraint df_hpr_crew_active_flag default 'Y',
-	Load_Date 					datetime 				not null constraint df_hpr_crew_load_date default getdate(),
-	Update_Date 				datetime 				not null constraint df_hpr_crew_update_date default getdate(),
-	constraint hpr_crew_ak unique ( hpr_dept_key, crew_name ) )
-go	
-
-alter table dbo.hpr_crew add constraint hpr_crew_fk_hpr_dept foreign key ( hpr_dept_key ) references dbo.hpr_dept( hpr_dept_key )
-go		
-
-
 if object_id('dbo.HPR_Dept', 'U') is not null
 	drop table dbo.HPR_Dept
 go 
@@ -1057,6 +1034,30 @@ create table dbo.HPR_Dept(
 go
 
 
+if object_id('dbo.HPR_Dept_Crew', 'U') is not null
+	drop table dbo.HPR_Dept_Crew
+go 
+create table dbo.HPR_Dept_Crew(
+	HPR_Crew_Key				integer identity(1,1) 	not null constraint hpr_crew_pk primary key,
+	HPR_Crew_Sharepoint_Key		nvarchar(255),
+	HPR_Dept_Key 				integer 			 	not null,
+	HPR_Dept_Sharepoint_Key		nvarchar(255),	
+	Crew_Name					nvarchar(255)			not null,			
+	Crew_Ovsr					nvarchar(255)			not null,
+	Crew_Ovsr_Person_ID			integer,
+	Crew_Ovsr_Email				nvarchar(255)			not null,
+	SortOrder_Crew				integer,
+	Start_Date					date,
+	Active_Flag 				nvarchar(1) 			not null constraint df_hpr_crew_active_flag default 'Y',
+	Load_Date 					datetime 				not null constraint df_hpr_crew_load_date default getdate(),
+	Update_Date 				datetime 				not null constraint df_hpr_crew_update_date default getdate(),
+	constraint hpr_crew_ak unique ( hpr_dept_key, crew_name ) )
+go	
+
+alter table dbo.HPR_Dept_Crew add constraint hpr_crew_fk_hpr_dept foreign key ( hpr_dept_key ) references dbo.hpr_dept( hpr_dept_key )
+go		
+
+
 if object_id('dbo.HPR_Dept_Role', 'U') is not null
 	drop table dbo.HPR_Dept_Role
 go 
@@ -1064,7 +1065,9 @@ create table dbo.HPR_Dept_Role(
 	HPR_Dept_Role_Key			integer identity(1,1) 	not null constraint hpr_dept_role_pk primary key,
 	HPR_Dept_Role_Sharepoint_Key nvarchar(255),
 	CPC_Code					nvarchar(10)			not null,
+	HPR_Dept_Key 				int,
 	Dept_Role					nvarchar(150) 			not null,
+	SortOrder_Role				integer,
 	Active_Flag 				nvarchar(1) 			not null constraint df_hpr_dept_role_active_flag default 'Y',
 	Load_Date 					datetime 				not null constraint df_hpr_dept_role_load_date default getdate(),
 	Update_Date 				datetime 				not null constraint df_hpr_dept_role_update_date default getdate() )
