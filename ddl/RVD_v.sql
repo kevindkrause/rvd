@@ -240,7 +240,7 @@ inner join dbo.hpr_dept d
 left join dbo.Dept_Asgn_Status das
 	on da.dept_asgn_status_key = das.dept_asgn_status_key
 	and das.dept_asgn_status_type = 'DA'
-left join dbo.hpr_crew c
+left join dbo.hpr_dept_crew c
 	on da.hpr_crew_key = c.hpr_crew_key
 left join dbo.hpr_dept_role  dr
 	on da.hpr_dept_role_key = dr.hpr_dept_role_key
@@ -435,7 +435,7 @@ inner join dbo.hpr_dept as d
 left outer join dbo.dept_asgn_status as das
 	on da.dept_asgn_status_key = das.dept_asgn_status_key
 	and das.dept_asgn_status_type = 'DA'
-left outer join dbo.hpr_crew as c
+left outer join dbo.hpr_dept_crew as c
 	on da.hpr_crew_key = c.hpr_crew_key
 left outer join dbo.hpr_dept_role as dr
 	on da.hpr_dept_role_key = dr.hpr_dept_role_key
