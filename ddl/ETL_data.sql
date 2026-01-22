@@ -5837,14 +5837,7 @@ begin
 		select
 			 coalesce( dept_1_hpr_dept_key, dept_2_hpr_dept_key )	as hpr_dept_key
 			,0														as hpr_crew_key -- Set to 'Unassigned'
-			,case coalesce( d.cpc_code, d2.cpc_code )
-				when 'CI' then 76
-				when 'DD' then 77
-				when 'PCC' then 78
-				when 'CO' then 79
-				when 'PS' then 54
-				else 95 -- VD
-			 end													as hpr_dept_role_key  -- Set to 'Volunteer' based on CPC_Code
+			,dr.hpr_dept_role_key -- Set to Helper
 			,( select Enrollment_Key from dbo.Enrollment
 			   where enrollment_code = vr.enrollment_1_code
 					and Active_Flag = 'Y' )							as enrollment_key
@@ -5869,6 +5862,16 @@ begin
 			,cast( getdate() as date )								as load_date
 			,cast( getdate() as date )								as update_date
 		FROM rpt.Volunteer_Rpt_v VR
+		left outer join 
+			( select dr.hpr_dept_key, min(dr.hpr_dept_role_key) as hpr_dept_role_key 
+			  from hpr_dept_role dr
+			  inner join hpr_dept d
+				on dr.hpr_dept_key = d.hpr_dept_key
+			  where dr.dept_role = 'Helper' 
+			  	and dr.active_flag = 'Y' 
+				and d.active_flag = 'Y'
+			  group by dr.hpr_dept_key ) dr
+			on coalesce( dept_1_hpr_dept_key, dept_2_hpr_dept_key ) = dr.hpr_dept_key		
 		left outer join dbo.HPR_Dept D
 			on D.HPR_Dept_Key = VR.dept_1_hpr_dept_key
 		left outer join dbo.HPR_Dept D2
