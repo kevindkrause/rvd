@@ -240,9 +240,9 @@ inner join dbo.hpr_dept d
 left join dbo.Dept_Asgn_Status das
 	on da.dept_asgn_status_key = das.dept_asgn_status_key
 	and das.dept_asgn_status_type = 'DA'
-left join dbo.hpr_dept_crew c
+left join dbo.HPR_Dept_Crew_Hist c
 	on da.hpr_crew_key = c.hpr_crew_key
-left join dbo.hpr_dept_role  dr
+left join dbo.HPR_Dept_Role_Hist  dr
 	on da.hpr_dept_role_key = dr.hpr_dept_role_key
 left join dbo.enrollment e
 	on da.enrollment_key = e.enrollment_key
@@ -695,6 +695,44 @@ select
 	,status_code
 from dbo.ETL_Table_Run_v
 where start_time > cast(getdate() as date)
+go
+
+
+if object_id('dbo.HPR_Dept_Role_v_usagecount', 'V') is not null
+	drop view dbo.HPR_Dept_Role_v_usagecount
+go
+create view dbo.HPR_dept_role_v_usagecount
+as
+select 
+	 hpr_dept_role.hpr_dept_role_key
+	,hpr_dept_role.hpr_dept_key
+	,hpr_dept_role.dept_role
+	,hpr_dept_role.active_flag
+	,count(dept_role.dept_role_key) as countusage
+from dbo.hpr_dept_role 
+left outer join dbo.dept_role 
+	on hpr_dept_role.hpr_dept_role_key = dept_role.hpr_dept_role_key
+where dept_role.active_flag = 'Y'
+group by hpr_dept_role.hpr_dept_role_key, hpr_dept_role.hpr_dept_key, hpr_dept_role.dept_role, hpr_dept_role.active_flag
+go
+
+
+if object_id('dbo.HPR_Dept_Crew_v_usagecount', 'V') is not null
+	drop view dbo.HPR_Dept_Crew_v_usagecount
+go
+create view dbo.HPR_Dept_Crew_v_usagecount
+as
+select
+	 hpr_dept_crew.hpr_crew_key
+	,hpr_dept_crew.hpr_dept_key
+	,hpr_dept_crew.crew_name
+	,hpr_dept_crew.active_flag
+	,count(dept_role.dept_role_key) as countusage
+from dbo.hpr_dept_crew 
+left outer join dbo.dept_role 
+	on hpr_dept_crew.hpr_crew_key = dept_role.hpr_crew_key
+where dept_role.active_flag = 'Y'
+group by hpr_dept_crew.hpr_crew_key, hpr_dept_crew.hpr_dept_key, hpr_dept_crew.crew_name, hpr_dept_crew.active_flag
 go
 
 

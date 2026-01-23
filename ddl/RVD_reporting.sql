@@ -644,7 +644,7 @@ select
 	,d.hub_flag
 	,d.hub_dept_id
 from dbo.hpr_dept d
-left join dbo.hpr_crew c
+left join dbo.hpr_dept_crew c
 	on d.hpr_dept_key = c.hpr_dept_key
 	and c.active_flag = 'Y'
 where 1=1
