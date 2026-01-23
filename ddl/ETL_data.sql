@@ -5837,7 +5837,7 @@ begin
 		select
 			 coalesce( dept_1_hpr_dept_key, dept_2_hpr_dept_key )	as hpr_dept_key
 			,0														as hpr_crew_key -- Set to 'Unassigned'
-			,dr.hpr_dept_role_key -- Set to Helper
+			,dr.hpr_dept_role_key -- Set to Apprentice
 			,( select Enrollment_Key from dbo.Enrollment
 			   where enrollment_code = vr.enrollment_1_code
 					and Active_Flag = 'Y' )							as enrollment_key
@@ -5867,7 +5867,7 @@ begin
 			  from hpr_dept_role dr
 			  inner join hpr_dept d
 				on dr.hpr_dept_key = d.hpr_dept_key
-			  where dr.dept_role = 'Helper' 
+			  where dr.dept_role = 'Apprentice' 
 			  	and dr.active_flag = 'Y' 
 				and d.active_flag = 'Y'
 			  group by dr.hpr_dept_key ) dr
@@ -5887,7 +5887,6 @@ begin
 				  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
 
 		set @Ins = @Ins + @@rowcount
-
 
 		--Step 1b - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role_Volunteer
 		insert into dbo.dept_role_volunteer(
@@ -6018,7 +6017,6 @@ begin
 						)
 					and coalesce( vr.enrollment_1_end_date, vr.dept_1_end_date, '12/31/9999' ) > vr.dept_1_start_date -- END AFTER START
 
-
 		--Step 2 - UPDATE DATES:  Sync Dept_Asgn Dept start/end date to Hub start/end dates where records are currently active or have a future date and extension_flag is 'N'
 		--			Note:  Duplicate records (active records with same volunteer and enrollment) are being excluded from this check
 		update dbo.dept_role_volunteer
@@ -6064,8 +6062,6 @@ begin
 
 		set @Upd = @Upd + @@rowcount
 
-
-
 		--STEP 3 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
 		SELECT drv.Volunteer_Key, vr.volunteer_name, drv.Vol_Enrollment_Key, vr.enrollment_1_code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, (SELECT dept_asgn_status_code from dbo.dept_asgn_status where dept_asgn_status_key = drv.dept_asgn_status_key), NULL, NULL, 'APPROVED', NULL, NULL, cast(GETDATE() as date)
@@ -6099,7 +6095,6 @@ begin
 			and da.active_flag = 'Y' -- ACTIVE_FLAG = 'Y'
 
 		set @Upd = @Upd + @@rowcount
-
 
 		--STEP 4 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
@@ -6141,7 +6136,6 @@ begin
 
 		set @Upd = @Upd + @@rowcount
 
-
 		--STEP 5 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
 		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, (SELECT dept_asgn_status_code from dbo.dept_asgn_status where dept_asgn_status_key = drv.dept_asgn_status_key), NULL, NULL, 'DEPARTED', NULL, NULL, cast(GETDATE() as date)
@@ -6178,7 +6172,6 @@ begin
 
 		set @Upd = @Upd + @@rowcount
 
-
 		--STEP 6 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
 		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Blank Status', NULL, '', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date)
@@ -6212,7 +6205,6 @@ begin
 				and drv.active_flag = 'Y' -- ACTIVE_FLAG = 'Y'
 
 		set @Upd = @Upd + @@rowcount
-
 
 /*** RG (10/31/25) - Removed steps 6/7 below that were checking data to assign to 'NEEDS HANDLING'.  This is replaced with the Step 6 above  ************************************
 		--STEP 6 (AUDIT) - Add records to Audit table
@@ -6266,8 +6258,6 @@ begin
 			and da.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
 
 		set @Upd = @Upd + @@rowcount
-
-
 
 		--STEP 7 (AUDIT) - Add records to Audit table
 		INSERT INTO [arch].[ETL_Status_Audit]
