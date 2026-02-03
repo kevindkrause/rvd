@@ -2393,6 +2393,7 @@ inner join dbo.hpr_dept d
 	on p.hpr_dept_key = d.HPR_Dept_Key
 where 1=1
 	and p.cal_dt = cast( getdate() as date )
+	and p.dept_asgn_status_code != 'DEPARTED'
 
 union all
 
