@@ -578,6 +578,7 @@ select
 	,max( case when wk_num = 26 and role_start_date <= cal_dt then volunteer_name else null end ) as wk_26
 from vol
 where 1=1
+	and coalesce( dept_asgn_status, '' ) != 'Departed'
 	--and cpc_code = 'CI'
 	--and level_03 = 'Trade Group'
 	--and level_04 = 'Siteworks'
