@@ -4405,7 +4405,9 @@ begin
 			select hpr_dept_key, cast( left( 'jun_30', 3 ) +  ' 01 ' + '20' + right( 'jun_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jun_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
 			select hpr_dept_key, cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
 			select hpr_dept_key, cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
-			select hpr_dept_key, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_v ) x
+			select hpr_dept_key, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'oct_30', 3 ) +  ' 01 ' + '20' + right( 'oct_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select oct_30 as bed_cnt, * FROM stg.stg_prp_v ) x UNION ALL
+			select hpr_dept_key, cast( left( 'nov_30', 3 ) +  ' 01 ' + '20' + right( 'nov_30', 2 ) as date ) as cal_dt, bed_cnt, cpc_code, hub_dept_name, dept_name, work_group_name, pc_category, pc_code, prp_cnt from ( select nov_30 as bed_cnt, * FROM stg.stg_prp_v ) x
 		) core
 
 		set @Ins = @Ins + @@rowcount
@@ -4547,7 +4549,9 @@ begin
 			select cast( left( 'jun_30', 3 ) +  ' 01 ' + '20' + right( 'jun_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jun_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x	UNION ALL
 			select cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
 			select cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
-			select cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x
+			select cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'oct_30', 3 ) +  ' 01 ' + '20' + right( 'oct_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select oct_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x UNION ALL
+			select cast( left( 'nov_30', 3 ) +  ' 01 ' + '20' + right( 'nov_30', 2 ) as date ) as cal_dt, rooming_category, rooming_detail, bed_cnt from ( select nov_30 as bed_cnt, * FROM stg.stg_prp_bed_space_v ) x
 		) core
 
 		set @Ins = @Ins + @@rowcount
@@ -4703,7 +4707,9 @@ begin
 			select cpc_code, cast( left( 'jun_30', 3 ) +  ' 01 ' + '20' + right( 'jun_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jun_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
 			select cpc_code, cast( left( 'jul_30', 3 ) +  ' 01 ' + '20' + right( 'jul_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select jul_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
 			select cpc_code, cast( left( 'aug_30', 3 ) +  ' 01 ' + '20' + right( 'aug_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select aug_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
-			select cpc_code, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x
+			select cpc_code, cast( left( 'sep_30', 3 ) +  ' 01 ' + '20' + right( 'sep_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select sep_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'oct_30', 3 ) +  ' 01 ' + '20' + right( 'oct_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select oct_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x UNION ALL
+			select cpc_code, cast( left( 'nov_30', 3 ) +  ' 01 ' + '20' + right( 'nov_30', 2 ) as date ) as cal_dt, bed_cnt, pc_code from ( select nov_30 as bed_cnt, * FROM stg.stg_prp_cpc_v ) x
 		) core
 
 		set @Ins = @Ins + @@rowcount
