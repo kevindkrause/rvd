@@ -5811,13 +5811,13 @@ begin
 		INSERT INTO arch.Dept_Role
 		SELECT *, cast(getdate() as date) FROM dbo.Dept_Role
 
-		set @Ins = @Ins + @@rowcount
+		--set @Ins = @Ins + @@rowcount
 
 		--Backup Dept_Role_Volunteer table
 		INSERT INTO arch.Dept_Role_Volunteer
 		SELECT *, cast(getdate() as date) FROM dbo.Dept_Role_Volunteer
 
-		set @Ins = @Ins + @@rowcount
+		--set @Ins = @Ins + @@rowcount
 
 		--Step 1a - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role
 		insert into dbo.dept_role(
@@ -5892,7 +5892,7 @@ begin
 			and not ( isnull( dept_1_hpr_dept_key, 999999999 ) = 999999999 -- AT LEAST 1 VALID DEPT KEY
 				  and isnull( dept_2_hpr_dept_key, 999999999 ) = 999999999 )
 
-		set @Ins = @Ins + @@rowcount
+		set @Ins = @@rowcount
 
 		--Step 1b - NEW RECORDS:  Insert new requests showing in HuB into Dept_Role_Volunteer
 		insert into dbo.dept_role_volunteer(
@@ -5949,14 +5949,6 @@ begin
 			on D2.HPR_Dept_Key = VR.dept_2_hpr_dept_key
 		inner join dbo.dept_role dr
 			on coalesce(vr.dept_1_hpr_dept_key, vr.dept_2_hpr_dept_key ) = dr.hpr_dept_key
-			and case coalesce( d.cpc_code, d2.cpc_code )
-						when 'CI' then 76
-						when 'DD' then 77
-						when 'PCC' then 78
-						when 'CO' then 79
-						when 'PS' then 54
-						else 95
-						end = dr.hpr_dept_role_key
 			 and dr.update_addlink1 = vr.volunteer_key
 			 and dr.update_addlink2 =
 				( select Enrollment_Key from dbo.Enrollment
