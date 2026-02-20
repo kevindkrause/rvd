@@ -2602,8 +2602,8 @@ where dr.active_flag = 'Y'
 	--and d.hpr_dept_key = 217
 	--and c.cal_dt = '2025-11-03'
 	and ( 
-	       getdate() between coalesce( drv.vol_start_date, dr.role_start_date_rpt ) and coalesce( dr.role_end_date_rpt, drv.vol_end_date )
-		or coalesce( drv.vol_start_date, dr.role_start_date_rpt ) > getdate()
+	       cast( getdate() as date ) between coalesce( drv.vol_start_date, dr.role_start_date_rpt ) and coalesce( dr.role_end_date_rpt, drv.vol_end_date )
+		or coalesce( drv.vol_start_date, dr.role_start_date_rpt ) > cast( getdate() as date )
 		)
 	and not exists (
 		select 1 from rpt.volunteer_rpt_v act
