@@ -972,6 +972,39 @@ begin
 
 		set @Upd = @Upd + @@rowcount
 
+		-- SET HPR_EXCEPTION FLAG FOR NON-HPR VOLUNTEERS TRACKED ON THE PRP
+		-- LOGIC: VOLUNTEER LIVES AT RMP BUT HAS AN ACTIVE, PRIMARY ASSIGNMENT IN A "BC" DEPARTMENT
+		-- BC DEPARTMENT: PURCHASING, GLOBAL PURCHASING, WHQ CDE
+
+		-- RESET EXISTING FLAG, EXCEPT FOR KNOWN VOLUNTEERS WHO SHOULD BE EXEMPT
+		update dbo.volunteer 
+		set hpr_volunteer_exception_flag = 'N' 
+		where hpr_volunteer_exception_flag = 'Y'
+			and volunteer_key not in ( 905187, 905188, 951495, 876267 ) 
+
+		set @Upd = @Upd + @@rowcount;
+
+		-- SET FLAG 
+		with tmp as (
+			select v.volunteer_key
+			from dbo.volunteer v
+			inner join dbo.volunteer_dept vd
+				on v.volunteer_key = vd.Volunteer_Key
+				and vd.Active_Flag = 'Y'
+				and vd.Primary_Flag = 'Y'
+			inner join dbo.hpr_dept d
+				on vd.HUB_Dept_ID = d.HUB_Dept_ID
+				and d.CPC_Code = 'BC'
+			where room_site_code = 'RMP' )
+	
+		update dbo.volunteer
+		set hpr_volunteer_exception_flag = 'Y'
+		from dbo.volunteer v
+		inner join tmp
+			on v.volunteer_key = tmp.volunteer_key
+
+		set @Upd = @Upd + @@rowcount;
+
 		set @End = getdate()
 
 		execute dbo.ETL_Table_Run_proc
