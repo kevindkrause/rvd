@@ -2128,7 +2128,7 @@ begin
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
 					and d.Active_Flag = 'Y'
-					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 				  where 1=1
 					and vd.active_flag = 'Y'
 					--and vd.volunteer_dept_key not in ( 71744681, 76839101 ) -- JUSTIN POTTER RDC  KEVIN KUZMINSKI PCC
@@ -2169,7 +2169,7 @@ begin
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
 					and d.Active_Flag = 'Y'
-					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 				  where 1=1
                     --and v.volunteer_key = 968295
 					and vd.active_flag = 'Y'
@@ -2210,7 +2210,7 @@ begin
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
 					and d.Active_Flag = 'Y'
-					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 				  where 1=1
                     --and v.volunteer_key = 968295
 					and vd.active_flag = 'Y'
@@ -2273,7 +2273,7 @@ begin
 				  left join dbo.HPR_Dept d
 					on vd.hub_dept_id = d.hub_dept_id
 					and d.Active_Flag = 'Y'
-					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+					and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 				  where 1=1
                     --and v.volunteer_key = 968295
 					and vd.start_date > cast( getdate() as date )
@@ -2315,7 +2315,7 @@ begin
 			inner join dbo.HPR_Dept d
 				on vd.hub_dept_id = d.hub_dept_id
 				and d.Active_Flag = 'Y'
-				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 				and d.level_01 = 'Headquarters Project Ramapo'
 			where 1=1
 				and v.volunteer_key not in ( select volunteer_key from dbo.volunteer_dept_rpt where hpr_flag = 'Y' group by volunteer_key )
@@ -2402,7 +2402,7 @@ begin
 		  	left join dbo.HPR_Dept d
 				on vd.hub_dept_id = d.hub_dept_id
 				and d.Active_Flag = 'Y'
-				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
+				and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 				and d.level_01 = 'Headquarters Project Ramapo'
 			where 1=1
 				and v.volunteer_key not in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
