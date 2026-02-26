@@ -708,7 +708,7 @@ from dbo.hpr_dept
 where 1=1
 	and active_flag = 'Y'
 	and nyc_flag = 'N'
-	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI', 'VD' )
+	and cpc_code in ( 'CO', 'DD', 'PCC', 'PS', 'CI', 'VD', 'BC' )
 go
 
 
@@ -3458,8 +3458,7 @@ from (
 	inner join dbo.HPR_Dept d
 		on vd.hub_dept_id = d.hub_dept_id
 		and d.Active_Flag = 'Y'
-		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
-		and d.level_01 = 'Headquarters Project Ramapo'
+		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept
 				 where hub_dept_id in ( select hub_dept_id from dbo.HPR_Dept where active_flag = 'Y' ) and ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi
 		on v.volunteer_key = multi.volunteer_key
@@ -3555,8 +3554,7 @@ from (
 	inner join dbo.HPR_Dept d
 		on vd.hub_dept_id = d.hub_dept_id
 		and d.Active_Flag = 'Y'
-		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD' )
-		and d.level_01 = 'Headquarters Project Ramapo'
+		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
 	left join dbo.volunteer mate
 		on v.mate_hub_person_id = mate.hub_person_id
 	where v.hpr_volunteer_exception_flag = 'Y' ) core
