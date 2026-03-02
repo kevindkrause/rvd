@@ -547,7 +547,7 @@ from
 		,[Nov-30]
 	  from stg.stg_PRP_Dept
 	  where 1=1
-		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR HQ', 'HPR PU', 'HPR VD', 'HPR BC' )
+		and teamcode in ( 'HPR CO', 'HPR DD', 'HPR PCC', 'HPR PS', 'HPR CI', 'HPR CD', 'HPR PU', 'HPR VD', 'HPR BC' )
 		and teamtrade like 'Total%'
 		) core
 group by cpc_code
