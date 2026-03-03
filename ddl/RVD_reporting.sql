@@ -2503,6 +2503,25 @@ from rpt.Volunteer_Departure_v
 go
 
 
+if object_id('rpt.Volunteer_App_Pipeline_v', 'V') is not null
+	drop view rpt.Volunteer_App_Pipeline_v
+go
+create view rpt.Volunteer_App_Pipeline_v
+as
+with base as (
+	select 
+		 cast( dateadd( week, datediff( week, 0, app_date ), 0 ) as date ) as week_date
+		,cast( dateadd( month, datediff( month, 0, app_date ), 0 ) as date ) as month_date
+		,app_type_code
+	from dbo.Volunteer_App_v
+	where app_date >= '2020-01-01' )
+
+select week_date, month_date, app_type_code, count(*) as app_cnt
+from base
+group by week_date, month_date, app_type_code
+go
+
+
 if object_id('rpt.User_Permissions_v', 'V') is not null
 	drop view rpt.User_Permissions_v
 go
