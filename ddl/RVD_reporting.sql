@@ -2509,16 +2509,21 @@ go
 create view rpt.Volunteer_App_Pipeline_v
 as
 with base as (
-	select 
-		 cast( dateadd( week, datediff( week, 0, app_date ), 0 ) as date ) as week_date
-		,cast( dateadd( month, datediff( month, 0, app_date ), 0 ) as date ) as month_date
-		,app_type_code
-	from dbo.Volunteer_App_v
-	where app_date >= '2020-01-01' )
+	select
+		 s.state_code
+		,cast( dateadd( week, datediff( week, 0, va.app_date ), 0 ) as date ) as week_date
+		,cast( dateadd( month, datediff( month, 0, va.app_date ), 0 ) as date ) as month_date
+		,va.app_type_code
+	from dbo.Volunteer_App_v va
+	inner join dbo.volunteer v
+		on va.volunteer_key = v.volunteer_key
+	inner join dbo.State s
+		on v.State_Key = s.State_Key
+	where va.app_date >= '2020-01-01' )
 
-select week_date, month_date, app_type_code, count(*) as app_cnt
+select state_code, week_date, month_date, app_type_code, count(*) as app_cnt
 from base
-group by week_date, month_date, app_type_code
+group by state_code, week_date, month_date, app_type_code
 go
 
 
