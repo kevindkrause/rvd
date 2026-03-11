@@ -94,6 +94,7 @@ inner join dbo.Volunteer_App_v a
 	on h.Applicant_ID = a.applicant_id
 where h.status = 'Pending'
 	and h.Attribute_Value is not null
+	and a.app_status_code not in ( 'PNDC', 'PNDE', 'DISE', 'DISC', 'DEN' )
 go
 
 
@@ -128,4 +129,5 @@ where 1=1
 	and h.attribute_id = 103
 	and ( p.Volunteer_Pursuit_Cancel_Reason_Key is not null or p.requested_flag = 'Y' )
 	and h.status = 'Pending'
+	and a.app_status_code not in ( 'PNDC', 'PNDE', 'DISE', 'DISC', 'DEN' )	
 go
