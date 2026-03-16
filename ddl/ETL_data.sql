@@ -995,7 +995,7 @@ begin
 			inner join dbo.hpr_dept d
 				on vd.HUB_Dept_ID = d.HUB_Dept_ID
 				and d.CPC_Code = 'BC'
-			where room_site_code = 'RMP' )
+			where ( v.room_site_code = 'RMP' or vd.site_code = 'RMP' ) )
 	
 		update dbo.volunteer
 		set hpr_volunteer_exception_flag = 'Y'
