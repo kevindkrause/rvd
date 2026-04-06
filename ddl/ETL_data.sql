@@ -6237,85 +6237,42 @@ begin
 
 		set @Upd = @Upd + @@rowcount
 
-/*** RG (10/31/25) - Removed steps 6/7 below that were checking data to assign to 'NEEDS HANDLING'.  This is replaced with the Step 6 above  ************************************
-		--STEP 6 (AUDIT) - Add records to Audit table
+		-- STEP 7 (AUDIT) - Add records to Audit table for
+		-- INACTIVE RECORDS (ARRIVED that should be DEPARTED) - Update active_flag='N' for volunteers showing ARRIVED but have no have HuB records so should be DEPARTED
 		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date)
+		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Inactivated - ARRIVED but no active record in HuB', NULL, 'active_flag=Y', NULL, NULL, 'active_flag=N', NULL, NULL, cast(GETDATE() as date)
 		FROM dbo.dept_role_volunteer drv
-			inner join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
-			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
-			left outer join -- FUTURE DEPT START DATE
-				( select volunteer_key, enrollment_1_code
-					from rpt.volunteer_rpt_v
-					where dept_1_start_date >= cast( getdate() as date ) ) a
-				on a.volunteer_key = drv.volunteer_key
-				and drv.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = a.enrollment_1_code and active_flag = 'Y' )
-			left outer join -- FUTURE ENROLLMENT 2 START DATE
-				( select volunteer_key, enrollment_2_code
-					from rpt.volunteer_rpt_v
-					where enrollment_2_start_date >= cast( getdate() as date ) ) b
-				on b.volunteer_key = drv.volunteer_key
-				and drv.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = b.enrollment_2_code and active_flag = 'Y' )
-		WHERE isnull( a.volunteer_key, 999999999 ) = 999999999		-- NO FUTURE DEPT START DATE
-			and isnull( b.volunteer_key, 999999999 ) = 999999999	-- NO FUTURE ENRL 2 START DATE
+			left outer join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
+			left outer join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
+			left outer join rpt.volunteer_rpt_v h
+			on h.volunteer_key = drv.volunteer_key
+			and ( select enrollment_key from dbo.enrollment where enrollment_code = h.enrollment_1_code and active_flag = 'Y' ) = drv.vol_enrollment_key
+			where 1=1
+			and volunteer_type = 26  --VOLUNTEER
 			and drv.active_flag = 'Y'
-			and drv.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
-
-		--Step 6 - STATUS UPATE (CHANGE TO NEEDS HANDLING) - Update Dept_Asgn_Status_Key to 'Needs Handling' where status is Approved and no future record exists in the Volunteer_Enrollment table
+			and Dept_Asgn_Status_Key = (select dept_asgn_status_key from Dept_Asgn_status where Dept_Asgn_Status_Code = 'ARRIVED')
+			and drv.volunteer_key not in ( select volunteer_key from rpt.Volunteer_Rpt_v ) --NO CURRENT HUB RECORD
+			and drv.volunteer_key not in (select volunteer_key from dbo.Volunteer_v_snp where record_type = 'WOODGROVE')
+		
+		--Step 7 - INACTIVE RECORDS (ARRIVED that should be DEPARTED) - Update active_flag='N' for volunteers showing ARRIVED but have no have HuB records so should be DEPARTED
 		update dbo.dept_role_volunteer
-		set dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING'),
+		set Active_Flag = 'N',
 			Update_Source = 'HuB',
-			Update_Type = 'Status to NEEDS HANDLING - No future record',
-			UpdateDate_Source = cast( getdate() as date ),
-			Update_ReviewedByUser = 'N',
-			Update_Date = cast( getdate() as date )
-		--select da.Dept_Start_Date, da.dept_asgn_status_key, *
-		from dbo.dept_role_volunteer da
-		left outer join -- FUTURE DEPT START DATE
-			( select volunteer_key, enrollment_1_code
-			  from rpt.volunteer_rpt_v
-			  where dept_1_start_date >= cast( getdate() as date ) ) a
-			on a.volunteer_key = da.volunteer_key
-			and da.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = a.enrollment_1_code and active_flag = 'Y' )
-		left outer join -- FUTURE ENROLLMENT 2 START DATE
-			( select volunteer_key, enrollment_2_code
-			  from rpt.volunteer_rpt_v
-			  where enrollment_2_start_date >= cast( getdate() as date ) ) b
-			on b.volunteer_key = da.volunteer_key
-			and da.vol_enrollment_key = ( select enrollment_key from dbo.enrollment where enrollment_code = b.enrollment_2_code and active_flag = 'Y' )
-		where isnull( a.volunteer_key, 999999999 ) = 999999999		-- NO FUTURE DEPT START DATE
-			and isnull( b.volunteer_key, 999999999 ) = 999999999	-- NO FUTURE ENRL 2 START DATE
-			and da.active_flag = 'Y'
-			and da.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'APPROVED' )
-
-		set @Upd = @Upd + @@rowcount
-
-		--STEP 7 (AUDIT) - Add records to Audit table
-		INSERT INTO [arch].[ETL_Status_Audit]
-		SELECT drv.Volunteer_Key, vr.Full_Name, drv.Vol_Enrollment_Key, e.Enrollment_Code, drv.Dept_Role_Key, drv.Dept_Role_Vol_Key, 'Status Change', NULL, 'APPROVED', NULL, NULL, 'NEEDS HANDLING', NULL, NULL, cast(GETDATE() as date)
-		FROM dbo.dept_role_volunteer drv
-			inner join Volunteer vr on vr.Volunteer_Key = drv.Volunteer_Key
-			inner join Enrollment e on e.Enrollment_Key = drv.Vol_Enrollment_Key
-		WHERE isnull( drv.volunteer_key, 999999999 ) = 999999999 -- NO VOLUNTEER KEY
-			and drv.active_flag = 'Y'
-			and drv.dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' )
-
-		--Step 7 - STATUS UPATE (CHANGE TO NEEDS HANDLING) - Update Dept_Asgn_Status_Key to 'Needs Handling' where status is ARRIVED and no volunteer is assigned
-		update dbo.dept_role_volunteer
-		set dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'NEEDS HANDLING' ),
-			Update_Source = 'HuB',
-			Update_Type = 'Status to NEEDS HANDLING - Arrived no volunteer',
+			Update_Type = 'INACTIVATED - ARRIVED but no active HuB record',
 			UpdateDate_Source = cast( getdate() as date ),
 			Update_ReviewedByUser = 'N',
 			Update_Date = cast( getdate() as date )
 		--select *
-		from dbo.dept_role_volunteer
-		where isnull( volunteer_key, 999999999 ) = 999999999 -- NO VOLUNTEER KEY
+			from Dept_Role_Volunteer
+			where 1=1
+			and volunteer_type = 26  --VOLUNTEER
 			and active_flag = 'Y'
-			and dept_asgn_status_key = ( select dept_asgn_status_key from dbo.dept_asgn_status where dept_asgn_status_code = 'ARRIVED' )
-
-		set @Upd = @Upd + @@rowcount
-***************************************/
+			and Dept_Asgn_Status_Key = (select dept_asgn_status_key from Dept_Asgn_status where Dept_Asgn_Status_Code = 'ARRIVED')
+			and volunteer_key not in ( select volunteer_key from rpt.Volunteer_Rpt_v ) --NO CURRENT HUB RECORD
+			and volunteer_key not in (select volunteer_key from dbo.Volunteer_v_snp where record_type = 'WOODGROVE')
+		
+		
+		set @Upd = @Upd + @@rowcount 
 
 		set @End = getdate()
 
