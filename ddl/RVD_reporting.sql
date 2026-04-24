@@ -493,10 +493,10 @@ where c.active_flag = 'Y'
 go
 
 
-if object_id('rpt.CVC_v', 'V') is not null
-	drop view rpt.CVC_v
+if object_id('rpt.CVC_Step1_v', 'V') is not null
+	drop view rpt.CVC_Step1_v
 go
-create view rpt.CVC_v
+create view rpt.CVC_Step1_v
 as
 with dates as (
 	select top 26 cal_dt, rank() over (order by cal_dt ) as wk_num
@@ -652,6 +652,57 @@ group by
 	,dept_asgn_key
 go
 
+
+if object_id('rpt.CVC_v', 'V') is not null
+	drop view rpt.CVC_v
+go
+create view rpt.cvc_v
+as
+select        
+	 c.cpc_code
+	,c.level_03
+	,c.level_04
+	,c.level_05
+	,c.level_06
+	,c.dept_lowest_level
+	,c.crew_name
+	,c.dept_role
+	,c.enrollment_code
+	,c.used_bed_cnt
+	,c.dept_asgn_status
+	,c.dept_asgn_key
+	,c.wk_01
+	,c.wk_02
+	,c.wk_03
+	,c.wk_04
+	,c.wk_05
+	,c.wk_06
+	,c.wk_07
+	,c.wk_08
+	,c.wk_09
+	,c.wk_10
+	,c.wk_11
+	,c.wk_12
+	,c.wk_13
+	,c.wk_14
+	,c.wk_15
+	,c.wk_16
+	,c.wk_17
+	,c.wk_18
+	,c.wk_19
+	,c.wk_20
+	,c.wk_21
+	,c.wk_22
+	,c.wk_23
+	,c.wk_24
+	,c.wk_25
+	,c.wk_26
+	,rs.dept_asgn_status_key as dept_role_status_key
+	,rs.dept_asgn_status_code as dept_role_status_code
+from rpt.cvc_step1_v as c 
+left outer join dbo.dept_role_status_calc_v as rs 
+	on c.dept_asgn_key = rs.dept_role_key
+go
 
 if object_id('rpt.Dept_Crew_v', 'V') is not null
 	drop view rpt.Dept_Crew_v

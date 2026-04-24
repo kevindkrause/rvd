@@ -445,6 +445,37 @@ left outer join dbo.enrollment as e
 go
 
 
+if object_id('dbo.Dept_Role_Status_Calc_v', 'V') is not null
+	drop view dbo.Dept_Role_Status_Calc_v
+go
+CREATE VIEW dbo.Dept_Role_Status_Calc_v
+AS
+SELECT        dr.Dept_Role_Key, dr.Role_Start_Date, dr.Role_End_Date, DATEDIFF(day, dr.Role_Start_Date, COALESCE (dr.Role_End_Date, CONVERT(DATETIME, '2030-03-30 00:00:00', 102))) AS Role_num_days, drv_1.Vol_num_days, 
+                         drv_2_1.num_vols, drv_3_1.num_vols_only, drv_4_1.max_new_vol_status, CASE WHEN DATEDIFF(day, dr.role_start_date, COALESCE (dr.role_end_date, CONVERT(DATETIME, '2030-03-30 00:00:00', 102))) 
+                         <= drv_1.Vol_num_days AND max_new_vol_status = 'FILLED' THEN 29 WHEN num_vols IS NULL THEN 27 ELSE 28 END AS dept_asgn_status_key, 
+                         CASE WHEN dept_asgn_status_key = 27 THEN 'NEW' WHEN dept_asgn_status_key = 28 THEN 'OPEN' ELSE 'FILLED' END AS dept_asgn_status_code
+FROM            dbo.Dept_Role AS dr LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, SUM(DATEDIFF(day, Vol_Start_Date, COALESCE (Vol_End_Date, CONVERT(DATETIME, '2030-03-30 00:00:00', 102)))) AS Vol_num_days
+                               FROM            dbo.Dept_Role_Volunteer_v AS drv
+                               WHERE        (volunteer_type_description = N'Volunteer') AND (Active_Flag = N'Y')
+                               GROUP BY Dept_Role_Key) AS drv_1 ON dr.Dept_Role_Key = drv_1.Dept_Role_Key LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, COUNT(Volunteer_Key) AS num_vols
+                               FROM            dbo.Dept_Role_Volunteer_v AS drv_2
+                               WHERE        (Active_Flag = N'Y')
+                               GROUP BY Dept_Role_Key) AS drv_2_1 ON dr.Dept_Role_Key = drv_2_1.Dept_Role_Key LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, COUNT(Volunteer_Key) AS num_vols_only
+                               FROM            dbo.Dept_Role_Volunteer_v AS drv_3
+                               WHERE        (Active_Flag = N'Y') AND (volunteer_type_description = N'Volunteer')
+                               GROUP BY Dept_Role_Key) AS drv_3_1 ON dr.Dept_Role_Key = drv_3_1.Dept_Role_Key LEFT OUTER JOIN
+                             (SELECT        Dept_Role_Key, COUNT(Volunteer_Key) AS Num_Vol_Only, 
+                                                         MAX(CASE WHEN Dept_Asgn_Status_Code = 'APPROVED' THEN 'FILLED' WHEN Dept_Asgn_Status_Code = 'ARRIVED' THEN 'FILLED' WHEN Dept_Asgn_Status_Code = 'DEPARTED' THEN 'FILLED' ELSE 'OPEN' END)
+                                                          AS max_new_vol_status
+                               FROM            dbo.Dept_Role_Volunteer_v AS drv_4
+                               WHERE        (volunteer_type_description = N'Volunteer') AND (Active_Flag = N'Y')
+                               GROUP BY Dept_Role_Key) AS drv_4_1 ON dr.Dept_Role_Key = drv_4_1.Dept_Role_Key
+go
+
+
 if object_id('dbo.Dept_Role_Volunteer_v', 'V') is not null
     drop view dbo.Dept_Role_Volunteer_v
 go
