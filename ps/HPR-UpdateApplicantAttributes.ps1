@@ -1,4 +1,4 @@
-﻿Clear-Host
+Clear-Host
 . C:\src\hub-shell-scripts\Global\Templates\Common.ps1
 
 # adjust these variables
@@ -11,7 +11,7 @@ $VerbosePreference = "SilentlyContinue" #disable verbose logging
 $todayDateTime= Get-Date -Format 'yyyy-MM-dd hh:mm:ss'
 
 # Reading data from SQL Server View. Select only new attributes that need to be created.
-$rrex = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE [applicant_attribute_id] IS NULL ORDER BY [load_date]"
+$rrex = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE coalesce([applicant_attribute_id],0) = 0 ORDER BY [load_date]"
 Write-Host "Processing ApplicantId IS NULL: Creating" -ForegroundColor Cyan
 foreach ($rrec in $rrex)
 {
@@ -94,7 +94,7 @@ foreach ($rrec in $rrexupdate)
 }
 
 # Reading data from SQL Server View. Select existing attributes that need to be deleted.
-$rrexdelete = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE [attribute] IS NULL AND [attribute_value] IS NULL ORDER BY [load_date]"
+$rrexdelete = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_Removal_v] WHERE [attribute] IS NULL AND [attribute_value] IS NULL ORDER BY [load_date]"
 Write-Host "Processing Attribute and AttributeValue ARE NULL: Deleting" -ForegroundColor Cyan
 
 foreach ($rrec in $rrexdelete)
@@ -107,19 +107,18 @@ foreach ($rrec in $rrexdelete)
        
     #Delete request If $rrec.attribute AND $rrec.attribute_value are null
     $datas= GetHttp -Uri "$($HuB)/ApplicantAttributesRequest?applicantId=$($ApplicantId)"
-    $data= $datas.where({$_.ItemAttributeId -eq $ItemAttributeId})
+    $data= $datas.where({$_.AttributeId -eq $AttributeId})
 
      $updatedata= 
-     @{
-          DeleteRequests= 
-            @{
-              ItemAttributeId= $ItemAttributeId
-              ConcurrencyTokens= $data.ConcurrencyTokens
-             }
+     @{     DeleteRequests= 
+            @(@{
+              ItemAttributeId= $data.ItemAttributeId
+              ConcurrencyTokens= @($data.ConcurrencyTokens)
+             })
           ApplicantId= $ApplicantId
        }
     #Send the DeleteRequest
-    $null= PostHttp -Uri "$($HuB)/ApplicantAttributesChangeRequest"-Data $updatedata -ErrorVariable ErrorMessage -ContinueOnError
+    $null= PostHTTP -Uri "$($HuB)/ApplicantAttributesChangeRequest"-Data $updatedata -ErrorVariable ErrorMessage -ContinueOnError
 
     If ($ErrorMessage){ Write-Host "Error: Update not completed" -ForegroundColor DarkRed
         "$Id;Update not completed;$todayDateTime" | Out-File $($logfile) -Append
