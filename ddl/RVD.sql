@@ -2308,6 +2308,7 @@ create table dbo.Volunteer_Role(
 go	
 
 alter table dbo.volunteer_role add constraint volunteer_role_fk_volunteer foreign key ( volunteer_key ) references dbo.volunteer( volunteer_key )
+	on delete cascade
 go
 
 
