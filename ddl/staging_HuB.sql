@@ -112,7 +112,8 @@ create table stg.stg_bethel_member_availability (
        daysperweekbitwise_fri_am 	int not null,
        daysperweekbitwise_fri_pm 	int not null,
        daysperweekbitwise_sat_am 	int not null,
-       daysperweekbitwise_sat_pm 	int not null
+       daysperweekbitwise_sat_pm 	int not null,
+	   arrivaldate 					date null
 )
 go
 
