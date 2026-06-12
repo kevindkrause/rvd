@@ -2384,11 +2384,16 @@ select
 	,rownum
 	,helmet_id
 	,enrollment_status
+	,bm.bethel_arrival_date
 from rpt.Volunteer_All_v v
 left join dbo.hpr_dept d
 	on v.dept_1_hpr_dept_key = d.hpr_dept_key
 left join dbo.hpr_dept d2
 	on v.dept_2_hpr_dept_key = d2.hpr_dept_key
+left join ( select personid, max( arrivaldate ) as bethel_arrival_date
+			from stg.stg_Bethel_Member_Availability
+			group by personid ) bm
+	on v.hub_person_id = bm.personid
 
 union all
 
@@ -2493,6 +2498,7 @@ select
 	,null as rownum
 	,null as helmet_id
 	,'REQUESTED' as enrollment_status
+	,bm.bethel_arrival_date
 from rpt.Volunteer_Projected_v p
 inner join dbo.volunteer v
 	on p.volunteer_key = v.volunteer_key
@@ -2500,6 +2506,10 @@ inner join dbo.Marital_Status ms
 	on v.Marital_Status_Key = ms.Marital_Status_Key
 inner join dbo.hpr_dept d
 	on p.hpr_dept_key = d.HPR_Dept_Key
+left join ( select personid, max( arrivaldate ) as bethel_arrival_date
+			from stg.stg_Bethel_Member_Availability
+			group by personid ) bm
+	on v.hub_person_id = bm.personid
 where 1=1
 	and p.cal_dt = cast( getdate() as date )
 	and p.dept_asgn_status_code != 'DEPARTED'
@@ -2607,7 +2617,12 @@ select
 	,null as rownum
 	,null as helmet_id
 	,'DEPARTED' as enrollment_status
-from rpt.Volunteer_Departure_v
+	,bm.bethel_arrival_date
+from rpt.Volunteer_Departure_v d
+left join ( select personid, max( arrivaldate ) as bethel_arrival_date
+			from stg.stg_Bethel_Member_Availability
+			group by personid ) bm
+	on d.hub_person_id = bm.personid
 go
 
 
