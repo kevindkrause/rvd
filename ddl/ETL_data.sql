@@ -6336,7 +6336,7 @@ begin
 	exec dbo.ETL_PRP_Data_proc
 	exec dbo.ETL_App_Attributes_Cleanup_proc
 	exec dbo.ETL_Bad_Data_Cleanup_proc
-	exec dbo.ETL_Status_Update_Process_Roles
+	--exec dbo.ETL_Status_Update_Process_Roles
 	exec dbo.ETL_Reporting_Snapshots_proc
 end
 go
