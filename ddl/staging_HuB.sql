@@ -288,7 +288,7 @@ create table stg.stg_Person_Education(
 	Training_Course 					nvarchar(300),
 	Training_Course_Long_Description 	nvarchar(1000),
 	Class_Number 						nvarchar(40),
-	Completed_Date 						datetime,
+	Completed_Date 						date,
 	Host_Branch_Code 					nvarchar(20),
 	Host_Branch_Name 					nvarchar(200),
 	Class_Completion_Notes 				nvarchar(1000),
