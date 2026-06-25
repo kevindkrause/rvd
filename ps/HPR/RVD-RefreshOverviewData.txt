@@ -1,0 +1,7 @@
+﻿Write-Output "Start: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+
+# SET AND RUN PROCEDURE
+$proc = "exec dbo.ETL_PRP_Data_proc"
+Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $proc -TrustServerCertificate
+
+Write-Output "End: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"

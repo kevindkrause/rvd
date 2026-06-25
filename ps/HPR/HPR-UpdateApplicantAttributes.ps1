@@ -1,5 +1,6 @@
-Clear-Host
-. C:\src\hub-shell-scripts\Global\Templates\Common.ps1
+﻿Clear-Host
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+. F:\hub-shell-scripts\Global\Templates\Common.ps1
 
 # adjust these variables
 $HuB = Get-HuBServer -InstanceCode "us" -EnvironmentCode Deliver
@@ -11,7 +12,7 @@ $VerbosePreference = "SilentlyContinue" #disable verbose logging
 $todayDateTime= Get-Date -Format 'yyyy-MM-dd hh:mm:ss'
 
 # Reading data from SQL Server View. Select only new attributes that need to be created.
-$rrex = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE coalesce([applicant_attribute_id],0) = 0 ORDER BY [load_date]"
+$rrex = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE coalesce([applicant_attribute_id],0) = 0 ORDER BY [load_date]" -TrustServerCertificate
 Write-Host "Processing ApplicantId IS NULL: Creating" -ForegroundColor Cyan
 foreach ($rrec in $rrex)
 {
@@ -48,13 +49,13 @@ foreach ($rrec in $rrex)
     else {Write-Host "Update completed" -ForegroundColor Green
          "$Id;Upated;$todayDateTime" | Out-File $($logfile) -Append 
     # Confirmation routine executes the stored procedure that will set Status complete
-    $procudurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
-    Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procudurevalue
+    $procedurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
+    Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procedurevalue -TrustServerCertificate
          }
 } 
 
 # Reading data from SQL Server View. Select existing attributes that need to be updated.
-$rrexupdate= Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE [applicant_attribute_id] IS NOT NULL AND [attribute] IS NOT NULL ORDER BY [load_date]"
+$rrexupdate= Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_v] WHERE [applicant_attribute_id] IS NOT NULL AND [attribute] IS NOT NULL ORDER BY [load_date]" -TrustServerCertificate
 Write-Host "Processing ApplicantId IS NOT NULL: Updating" -ForegroundColor Cyan
 
 foreach ($rrec in $rrexupdate)
@@ -88,13 +89,13 @@ foreach ($rrec in $rrexupdate)
         else {Write-Host "Update completed" -ForegroundColor Green
         "$Id;Upated;$todayDateTime" | Out-File $($logfile) -Append
         # Confirmation routine executes the stored procedure that will set Status complete 
-        $procudurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
-        Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procudurevalue
+        $procedurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
+        Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procedurevalue  -TrustServerCertificate
              }
 }
 
 # Reading data from SQL Server View. Select existing attributes that need to be deleted.
-$rrexdelete = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_Removal_v] WHERE [attribute] IS NULL AND [attribute_value] IS NULL ORDER BY [load_date]"
+$rrexdelete = Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query "SELECT [app_attribute_hist_key], [applicant_id], [applicant_attribute_id], [attribute_id], [attribute], [attribute_value] FROM [data_xchg].[App_Attribute_Pending_Removal_v] WHERE [attribute] IS NULL AND [attribute_value] IS NULL ORDER BY [load_date]" -TrustServerCertificate
 Write-Host "Processing Attribute and AttributeValue ARE NULL: Deleting" -ForegroundColor Cyan
 
 foreach ($rrec in $rrexdelete)
@@ -126,12 +127,12 @@ foreach ($rrec in $rrexdelete)
         else {Write-Host "Update completed" -ForegroundColor Green
         "$Id;Upated;$todayDateTime" | Out-File $($logfile) -Append
         # Confirmation routine executes the stored procedure that will set Status complete
-        $procudurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
-        Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procudurevalue
+        $procedurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
+        Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procedurevalue  -TrustServerCertificate
               }
 }
 
 
 # UPDATE RVD METADATA TABLE WITH LATEST RUN TIMESTAMP
 $sql = "update dbo.app_metadata set attribute_value = format( getdate(), 'MM/dd/yy hh:mm tt' ) where attribute_name = 'HUB_Sync_Datetime'"
-Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $sql
+Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $sql -TrustServerCertificate
