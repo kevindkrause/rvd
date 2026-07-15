@@ -47,7 +47,7 @@ foreach ($rrec in $rrex)
         "$Id;Update not completed;$todayDateTime" | Out-File $($logfile) -Append 
                       }
     else {Write-Host "Update completed" -ForegroundColor Green
-         "$Id;Upated;$todayDateTime" | Out-File $($logfile) -Append 
+         "$Id;Updated;$todayDateTime" | Out-File $($logfile) -Append 
     # Confirmation routine executes the stored procedure that will set Status complete
     $procedurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
     Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procedurevalue -TrustServerCertificate
@@ -87,7 +87,7 @@ foreach ($rrec in $rrexupdate)
        "$Id;Update not completed;$todayDateTime" | Out-File $($logfile) -Append 
                       }
         else {Write-Host "Update completed" -ForegroundColor Green
-        "$Id;Upated;$todayDateTime" | Out-File $($logfile) -Append
+        "$Id;Updated;$todayDateTime" | Out-File $($logfile) -Append
         # Confirmation routine executes the stored procedure that will set Status complete 
         $procedurevalue= "EXEC dbo.Pursued_By_Set_Complete_proc @p_app_attribute_hist_key="+$Id
         Invoke-Sqlcmd -ServerInstance "USSQLRVD" -Database "rvd" -Query $procedurevalue  -TrustServerCertificate

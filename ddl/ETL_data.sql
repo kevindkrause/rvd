@@ -1774,6 +1774,22 @@ begin
 		@End datetime
 
 	begin try
+		-- CLEANUP BAD DATA FROM HUB
+		with dups as (
+			select *,
+				row_number() over (
+					partition by person_id, parent_department_name, department_name,
+								 start_date, end_date, temporary_flag, primary_flag,
+								 effective_enrollment_code, site_code
+					order by (select null)
+				) as rn
+			from stg.stg_person_dept_history
+		)
+
+		delete from dups where rn > 1;
+
+		set @Del = @@rowcount
+
 		-- DELETE
 		if object_id('stg.tmp_vol_dept', 'U') is not null
 			drop table stg.tmp_vol_dept
@@ -1817,7 +1833,7 @@ begin
 		delete from dbo.volunteer_dept
 		where volunteer_dept_key in ( select volunteer_dept_key from stg.tmp_vol_dept_rvd )
 
-		set @Del = @@rowcount
+		set @Del = @Del + @@rowcount
 
 		-- UPDATE
 		update dbo.volunteer_dept
