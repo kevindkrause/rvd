@@ -464,14 +464,14 @@ begin
 		-- UPDATE - MEETING TIMES		
 		update dbo.Cong
 		set
-			Midweek_Meeting_DOW = src.Midweek_Day,
-			Midweek_Meeting_Time = src.Midweek_Time,
-			Weekend_Meeting_DOW = src.Weekend_Day,
-			Weekend_Meeting_Time = src.Weekend_Time,		
+			Midweek_Meeting_DOW = src.Midweek_Meeting_Day_Description,
+			Midweek_Meeting_Time = src.Midweek_Meeting_Time,
+			Weekend_Meeting_DOW = src.Weekend_Meeting_Day_Desc,
+			Weekend_Meeting_Time = src.Weekend_Meeting_Time,
 			update_date = getdate()
 		from dbo.Cong tgt
-		inner join stg.stg_Cong_meeting src
-			on tgt.cong_number = src.cong_num		
+		inner join stg.stg_Cong src
+			on tgt.cong_number = src.cong_number
 
 		set @Upd = @Upd + @@rowcount			
 
