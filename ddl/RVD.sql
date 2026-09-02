@@ -2137,6 +2137,36 @@ create table dbo.Volunteer_Dept_Rpt(
 go
 
 
+if object_id('dbo.Volunteer_Dept_Rpt_Hist', 'U') is not null
+	drop table dbo.Volunteer_Dept_Rpt_Hist
+go 
+create table dbo.Volunteer_Dept_Rpt_Hist(
+	cal_dt 							date 			not null,
+	volunteer_key 					int 			not null,
+	full_name 						nvarchar(255),
+	hub_dept_id 					int,
+	parent_dept_name 				nvarchar(100),
+	dept_name 						nvarchar(100) 	not null,
+	dept_role 						nvarchar(200),
+	temp_flag 						nvarchar(1) 	not null,
+	primary_flag 					nvarchar(1) 	not null,
+	split_allocation_pct 			int,
+	start_date 						date 			not null,
+	end_date 						date,
+	hpr_volunteer_exception_flag 	nvarchar(1)		not null,
+	hpr_flag 						nvarchar(1) 	not null,
+	mon_flag 						nvarchar(1) 	not null,
+	tue_flag 						nvarchar(1) 	not null,
+	wed_flag 						nvarchar(1) 	not null,
+	thu_flag 						nvarchar(1) 	not null,
+	fri_flag 						nvarchar(1) 	not null,
+	sat_flag 						nvarchar(1) 	not null,
+	sun_flag 						nvarchar(1) 	not null,
+	hpr_dept_key 					int,
+	row_num 						int )
+go
+
+
 if object_id('dbo.Volunteer_Enrollment', 'U') is not null
 	drop table dbo.Volunteer_Enrollment
 go 
@@ -2173,6 +2203,22 @@ if object_id('dbo.Volunteer_Enrollment_Rpt', 'U') is not null
 	drop table dbo.Volunteer_Enrollment_Rpt
 go 
 create table dbo.Volunteer_Enrollment_Rpt(
+	Volunteer_Key 					integer					not null,
+	Full_Name						nvarchar(1000),
+	Enrollment_Key 					integer					not null,
+	Enrollment_Code					nvarchar(30)			not null,
+	Enrollment_Site_Code			nvarchar(10),
+	Start_Date 						date					not null,
+	End_Date 						date,
+	Row_Num							integer					not null )
+go
+
+
+if object_id('dbo.Volunteer_Enrollment_Rpt_Hist', 'U') is not null
+	drop table dbo.Volunteer_Enrollment_Rpt_Hist
+go 
+create table dbo.Volunteer_Enrollment_Rpt_Hist(
+	Cal_Dt							date					not null,
 	Volunteer_Key 					integer					not null,
 	Full_Name						nvarchar(1000),
 	Enrollment_Key 					integer					not null,
@@ -2228,6 +2274,134 @@ alter table dbo.volunteer_event_data add constraint volunteer_event_data_fk_volu
 go
 
 alter table dbo.volunteer_event_data add constraint volunteer_event_data_fk_event_attribute foreign key ( event_attribute_key ) references dbo.event_attribute( event_attribute_key )
+go
+
+
+if object_id('dbo.Volunteer_Fact_Actual', 'U') is not null
+	drop table dbo.Volunteer_Fact_Actual
+go
+
+create table dbo.Volunteer_Fact_Actual(
+	volunteer_key					integer				not null,
+	hub_volunteer_num				integer,
+	hub_person_id					integer,
+	hub_person_guid					uniqueidentifier,
+	ba_volunteer_num				varchar(10),
+	first_name						nvarchar(150),
+	last_name						nvarchar(150),
+	volunteer_name					nvarchar(255),
+	volunteer_name_short			nvarchar(154),
+	gender_code						nvarchar(1),
+	marital_status_code				nvarchar(30),
+	cong_servant_code 				nvarchar(3),
+	cong_midweek_mt_dow 			nvarchar(100),
+	cong_midweek_mt_time 			nvarchar(100),
+	cong_weekend_mt_dow 			nvarchar(100),
+	cong_weekend_mt_time 			nvarchar(100),
+	age 							decimal(4, 1),
+	address 						nvarchar(150),
+	city 							nvarchar(150),
+	state_code 						nvarchar(30),
+	postal_code 					nvarchar(10),
+	home_phone 						nvarchar(100),
+	mobile_phone 					nvarchar(100),
+	bethel_email 					nvarchar(150),
+	jwpub_email 					nvarchar(160),
+	personal_email 					nvarchar(150),
+	spouse_hub_person_id 			int NULL,
+	spouse_hub_volunteer_num 		int NULL,
+	spouse_bethel_email 			nvarchar(150),
+	spouse_jwpub_email 				nvarchar(160),
+	enrollment_code 				nvarchar(30) 		not null,
+	enrollment_site_code 			nvarchar(10),
+	enrollment_start_date 			date,
+	enrollment_start_date_raw 		date 				not null,
+	enrollment_end_date 			date,
+	hub_dept_id 					int,
+	parent_dept_name 				nvarchar(100),
+	parent_dept_code 				nvarchar(10),
+	dept_name 						nvarchar(100),
+	non_hpr_parent_dept_name 		int,
+	non_hpr_dept_name 				int,
+	dept_start_date 				date,
+	dept_end_date 					date,
+	pc_category 					nvarchar(100),
+	temp_flag 						nvarchar(1),
+	primary_flag 					nvarchar(1),
+	split_asgn_flag 				varchar(1) 			not null,
+	mon_flag 						nvarchar(1),
+	tue_flag 						nvarchar(1),
+	wed_flag 						nvarchar(1),
+	thu_flag 						nvarchar(1),
+	fri_flag 						nvarchar(1),
+	sat_flag 						nvarchar(1),
+	sun_flag 						nvarchar(1),
+	enrollment_1_code 				nvarchar(30) 		not null,
+	enrollment_1_site_code 			nvarchar(10),
+	enrollment_1_start_date 		date 				not null,
+	enrollment_1_start_date_raw 	date 				not null,
+	enrollment_1_end_date 			date,
+	enrollment_2_code 				nvarchar(30),
+	enrollment_2_site_code 			nvarchar(10),
+	enrollment_2_start_date 		date,
+	enrollment_2_start_date_raw 	date,
+	enrollment_2_end_date 			date,
+	dept_1_hpr_dept_key 			int,
+	dept_1_hub_dept_id 				int,
+	dept_1_cpc_code 				nvarchar(10),
+	dept_1_parent_dept_name 		nvarchar(100),
+	dept_1_dept_name 				nvarchar(100),
+	dept_1_dept_role 				nvarchar(500),
+	dept_1_ovsr_name 				nvarchar(255),
+	dept_1_start_date 				date,
+	dept_1_end_date 				date,
+	dept_1_temp_flag 				nvarchar(1),
+	dept_1_primary_flag 			nvarchar(1),
+	dept_1_split_asgn_flag 			varchar(1) 			not null,
+	dept_1_split_allocation_pct 	int,
+	dept_1_hpr_flag 				nvarchar(1),
+	dept_1_pc_category 				nvarchar(100),
+	dept_1_mon_flag 				nvarchar(1),
+	dept_1_tue_flag 				nvarchar(1),
+	dept_1_wed_flag 				nvarchar(1),
+	dept_1_thu_flag 				nvarchar(1),
+	dept_1_fri_flag 				nvarchar(1),
+	dept_1_sat_flag 				nvarchar(1),
+	dept_1_sun_flag 				nvarchar(1),
+	dept_2_hpr_dept_key 			int,
+	dept_2_hub_dept_id 				int,
+	dept_2_cpc_code 				nvarchar(10),
+	dept_2_parent_dept_name 		nvarchar(100),
+	dept_2_dept_name 				nvarchar(100),
+	dept_2_dept_role 				nvarchar(500),
+	dept_2_ovsr_name 				nvarchar(255),
+	dept_2_start_date 				date,
+	dept_2_end_date 				date,
+	dept_2_temp_flag 				nvarchar(1),
+	dept_2_primary_flag 			nvarchar(1),
+	dept_2_split_asgn_flag 			varchar(1) 			not null,
+	dept_2_split_allocation_pct 	int,
+	dept_2_hpr_flag 				nvarchar(1),
+	dept_2_pc_category 				nvarchar(100),
+	dept_2_mon_flag 				nvarchar(1),
+	dept_2_tue_flag 				nvarchar(1),
+	dept_2_wed_flag 				nvarchar(1),
+	dept_2_thu_flag 				nvarchar(1),
+	dept_2_fri_flag 				nvarchar(1),
+	dept_2_sat_flag 				nvarchar(1),
+	dept_2_sun_flag 				nvarchar(1),
+	loan_dept_name 					nvarchar(203),
+	tentative_end_date 				date,
+	room_site_code 					nvarchar(30),
+	room_bldg 						nvarchar(100),
+	room_bldg_code 					nvarchar(30),
+	room_bldg_desc 					nvarchar(30),
+	room 							nvarchar(30),
+	staffing_number_exception_flag 	nvarchar(1) 		not null,
+	hpr_volunteer_exception_flag 	nvarchar(1) 		not null,
+	cal_dt 							date,
+	current_flag 					varchar(1) 			not null,
+	record_type 					varchar(9) 			not null )
 go
 
 
