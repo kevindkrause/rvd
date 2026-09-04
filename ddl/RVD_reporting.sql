@@ -9,7 +9,7 @@ if object_id('rpt.Arrival_Departure_v', 'V') is not null
 go
 create view rpt.Arrival_Departure_v
 as
-select distinct
+select 
 	 hub_volunteer_num
 	,first_name
 	,last_name
@@ -18,60 +18,16 @@ select distinct
 	,state_code
 	,postal_code
 	,gender_code
-	,marital_status_code
+	,marital_status_code	
 	,home_phone
 	,mobile_phone
 	,bethel_email
 	,jwpub_email
 	,personal_email
-	,dept_1_cpc_code as cpc_code
-	,dept_1_parent_dept_name as parent_dept_name
-	,dept_1_dept_name as dept_name
-	,case
-		when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
-		else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
-	 end as sub_dept_name
-	,enrollment_1_code as enrollment_code
-	,enrollment_1_start_date as enrollment_start_date
-	,enrollment_1_end_date as enrollment_end_date
-	,spouse_hub_volunteer_num
-	,spouse_bethel_email
-	,spouse_jwpub_email
-	,volunteer_key
-	,case
-		when enrollment_1_start_date > cast( getdate() as date ) then 'Invited'
-		when enrollment_1_end_date < cast( getdate() as date ) then 'Departed'
-		else 'Arrived'
-	 end as enrollment_status
-from dbo.Volunteer_v_snp
-where 1=1
-	and dept_1_parent_dept_name not like '%WHQ Computer%'
-	and dept_1_parent_dept_name not like '%Purchasing%'
-
-union all
-
-select distinct
-	 hub_volunteer_num
-	,first_name
-	,last_name
-	,address
-	,city
-	,state_code
-	,postal_code
-	,gender_code
-	,marital_status_code
-	,home_phone
-	,mobile_phone
-	,bethel_email
-	,jwpub_email
-	,personal_email
-	,parent_dept_code as cpc_code
+	,cpc_code
 	,parent_dept_name
 	,dept_name
-	,case
-		when charindex( ' - ', dept_name ) = 0 then dept_name
-		else right( dept_name, charindex( ' - ', reverse( dept_name ) ) - 1 )
-	 end as sub_dept_name
+	,sub_dept_name
 	,enrollment_code
 	,enrollment_start_date
 	,enrollment_end_date
@@ -79,56 +35,119 @@ select distinct
 	,spouse_bethel_email
 	,spouse_jwpub_email
 	,volunteer_key
-	,case
-		when enrollment_start_date > cast( getdate() as date ) then 'Invited'
-		when enrollment_end_date < cast( getdate() as date ) then 'Departed'
-		else 'Arrived'
-	 end as enrollment_status
-from rpt.Volunteer_Departure_v
-where 1=1
-	and parent_dept_name not like '%WHQ Computer%'
-	and parent_dept_name not like '%Purchasing%'
+	,enrollment_status
+from 
+	(
+	  select
+		 a.hub_volunteer_num
+    	,a.first_name
+		,a.last_name
+		,a.address
+		,a.city
+		,a.state_code
+		,a.postal_code
+		,a.gender_code
+		,a.marital_status_code	
+		,a.home_phone
+		,a.mobile_phone
+		,a.bethel_email
+		,a.jwpub_email
+		,a.personal_email
+		,a.dept_1_cpc_code as cpc_code
+		,a.parent_dept_name
+		,a.dept_name
+		,case
+			when charindex( ' - ', a.dept_1_dept_name ) = 0 then a.dept_1_dept_name
+			else right( a.dept_1_dept_name, charindex( ' - ', reverse( a.dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,a.enrollment_code
+		,a.enrollment_start_date
+		,a.enrollment_end_date
+		,a.spouse_hub_volunteer_num
+		,a.spouse_bethel_email
+		,a.spouse_jwpub_email
+		,a.volunteer_key
+		,case
+			when 
+			  ( a.enrollment_1_start_date < cast( getdate() as date )
+				and a.enrollment_1_end_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) ) or
+			  ( a.enrollment_2_start_date < cast( getdate() as date )
+				and a.enrollment_2_end_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) )
+			then 'Departing'
+			else 'Arrived'
+	 	 end as enrollment_status
+	  from dbo.volunteer_fact_actual a
+	  where a.current_flag = 'Y'
 
-union all
+	  union all
 
-select distinct
-	 hub_volunteer_num
-	,first_name
-	,last_name
-	,address
-	,city
-	,state_code
-	,postal_code
-	,gender_code
-	,marital_status_code
-	,home_phone
-	,mobile_phone
-	,bethel_email
-	,jwpub_email
-	,personal_email
-	,dept_2_cpc_code as cpc_code
-	,dept_2_parent_dept_name as parent_dept_name
-	,dept_2_dept_name as dept_name
-	,case
-		when charindex( ' - ', dept_2_dept_name ) = 0 then dept_2_dept_name
-		else right( dept_2_dept_name, charindex( ' - ', reverse( dept_2_dept_name ) ) - 1 )
-	 end as sub_dept_name
-	,coalesce( enrollment_2_code, enrollment_1_code ) as enrollment_code
-	,coalesce( enrollment_2_start_date, dept_2_start_date ) as enrollment_start_date
-	,coalesce( enrollment_2_end_date, dept_2_end_date ) as enrollment_end_date
-	,spouse_hub_volunteer_num
-	,spouse_bethel_email
-	,spouse_jwpub_email
-	,volunteer_key
-	,'Transfer' as enrollment_status
-from rpt.Volunteer_Rpt_v
-where 1=1
-	and dept_2_parent_dept_name not like '%WHQ Computer%'
-	and dept_2_parent_dept_name not like '%Purchasing%'
-	and dept_1_cpc_code is null
-	and dept_1_end_date is not null
-	and dept_2_cpc_code is not null
-	and dept_2_start_date > cast(getdate() as date)
+  	  select 
+		 hub_volunteer_num
+		,first_name
+		,last_name
+		,address
+		,city
+		,state_code
+		,postal_code
+		,gender_code
+		,marital_status_code	
+		,home_phone
+		,mobile_phone
+		,bethel_email
+		,jwpub_email
+		,personal_email
+		,dept_1_cpc_code as cpc_code
+		,parent_dept_name
+		,dept_name
+		,case
+			when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
+			else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,enrollment_code
+		,enrollment_start_date
+		,enrollment_end_date
+		,spouse_hub_volunteer_num
+		,spouse_bethel_email
+		,spouse_jwpub_email
+		,volunteer_key
+		,'Invited' as enrollment_status
+	  from rpt.Volunteer_Arrival_v
+	  where volunteer_key not in ( select volunteer_key from rpt.Volunteer_Transfer_v )
+
+ 	  union all
+
+  	  select 
+		 hub_volunteer_num
+		,first_name
+		,last_name
+		,address
+		,city
+		,state_code
+		,postal_code
+		,gender_code
+		,marital_status_code	
+		,home_phone
+		,mobile_phone
+		,bethel_email
+		,jwpub_email
+		,personal_email
+		,dept_1_cpc_code as cpc_code
+		,parent_dept_name
+		,dept_name
+		,case
+			when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
+			else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,enrollment_code
+		,enrollment_start_date
+		,enrollment_end_date
+		,spouse_hub_volunteer_num
+		,spouse_bethel_email
+		,spouse_jwpub_email
+		,volunteer_key
+		,'Transfer' as enrollment_status
+	  from rpt.Volunteer_Transfer_v
+  ) x
 go
 
 
@@ -3614,7 +3633,7 @@ select
 	,v.cal_dt
 	,v.current_flag
 	,v.record_type
-	,null as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
 from dbo.Volunteer_Fact_Actual v
 inner join 
 	( select volunteer_key, min( cal_dt ) as cal_dt
@@ -3758,7 +3777,7 @@ select
 	,v.cal_dt
 	,v.current_flag
 	,v.record_type
-	,null as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
 from dbo.Volunteer_Fact_Actual v
 inner join 
 	( select volunteer_key, max( cal_dt ) as cal_dt
@@ -3949,7 +3968,7 @@ select
 	,cal_dt
 	,current_flag
 	,record_type
-	,null as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
 from 
 	( select
 		 v.full_name as volunteer_name
@@ -4074,8 +4093,6 @@ from
 		on v.mate_hub_person_id = mate.hub_person_id
 	  left join dbo.cong c
 		on v.Cong_Key = c.Cong_Key
-	  inner join stg.stg_rooming r
-		on v.hub_person_id = r.person_id
 	  where 1=1
 		and vd2.Parent_Dept_Name not like '%WHQ Computer%'
 		and vd2.Parent_Dept_Name not like '%Purchasing%'
