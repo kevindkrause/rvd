@@ -997,7 +997,8 @@ begin
 				and d.CPC_Code = 'BC'
 			where ( v.room_site_code = 'RMP' or vd.site_code = 'RMP' or
 				v.volunteer_key in ( 
-					817485 -- Michael Berna 
+					-0
+					--817485 -- Michael Berna 
 					) 
 				) 
 			)
@@ -6046,7 +6047,7 @@ begin
 				,v.hpr_volunteer_exception_flag
 				,ve1.cal_dt
 				,case when ve1.cal_dt = cast( getdate() as date ) then 'Y' else 'N' end as current_flag
-				,'HPR' as record_type
+				,case when v.hpr_volunteer_exception_flag = 'Y' then 'EXCEPTION' else 'HPR' end as record_type
 			from dbo.volunteer_v v
 			inner join dbo.volunteer_enrollment_rpt_hist ve1
 				on v.volunteer_key = ve1.volunteer_key
