@@ -2087,7 +2087,7 @@ with cal as (
     from dbo.cal_dim
     where 1=1
         --and cal_dt between '2020-01-01' and '2030-11-01'
-        and cal_dt between '2025-01-01' and '2027-03-01'
+        and cal_dt between '2026-06-01' and '2027-03-01'
         and day_of_wk = 2
 ),
  
@@ -2101,7 +2101,7 @@ bbo as (
         ,max( ba.fri ) as fri_flag
         ,max( ba.sat ) as sat_flag
         ,max( ba.sun ) as sun_flag
-    from rpt.Volunteer_Rpt_v v
+    from dbo.Volunteer_Rpt_v_snp v
     inner join cal dt
         on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
     inner join dbo.ba_event_snp ba
@@ -2155,7 +2155,7 @@ actuals as (
         ,v.Room_Bldg_Code
         ,v.Room
         ,v.record_type
-    from rpt.volunteer_rpt_v v
+    from dbo.Volunteer_Rpt_v_snp v
     inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
         on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
         or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
