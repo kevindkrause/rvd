@@ -9,7 +9,7 @@ if object_id('rpt.Arrival_Departure_v', 'V') is not null
 go
 create view rpt.Arrival_Departure_v
 as
-select distinct
+select 
 	 hub_volunteer_num
 	,first_name
 	,last_name
@@ -18,60 +18,16 @@ select distinct
 	,state_code
 	,postal_code
 	,gender_code
-	,marital_status_code
+	,marital_status_code	
 	,home_phone
 	,mobile_phone
 	,bethel_email
 	,jwpub_email
 	,personal_email
-	,dept_1_cpc_code as cpc_code
-	,dept_1_parent_dept_name as parent_dept_name
-	,dept_1_dept_name as dept_name
-	,case
-		when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
-		else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
-	 end as sub_dept_name
-	,enrollment_1_code as enrollment_code
-	,enrollment_1_start_date as enrollment_start_date
-	,enrollment_1_end_date as enrollment_end_date
-	,spouse_hub_volunteer_num
-	,spouse_bethel_email
-	,spouse_jwpub_email
-	,volunteer_key
-	,case
-		when enrollment_1_start_date > cast( getdate() as date ) then 'Invited'
-		when enrollment_1_end_date < cast( getdate() as date ) then 'Departed'
-		else 'Arrived'
-	 end as enrollment_status
-from dbo.Volunteer_v_snp
-where 1=1
-	and dept_1_parent_dept_name not like '%WHQ Computer%'
-	and dept_1_parent_dept_name not like '%Purchasing%'
-
-union all
-
-select distinct
-	 hub_volunteer_num
-	,first_name
-	,last_name
-	,address
-	,city
-	,state_code
-	,postal_code
-	,gender_code
-	,marital_status_code
-	,home_phone
-	,mobile_phone
-	,bethel_email
-	,jwpub_email
-	,personal_email
-	,parent_dept_code as cpc_code
+	,cpc_code
 	,parent_dept_name
 	,dept_name
-	,case
-		when charindex( ' - ', dept_name ) = 0 then dept_name
-		else right( dept_name, charindex( ' - ', reverse( dept_name ) ) - 1 )
-	 end as sub_dept_name
+	,sub_dept_name
 	,enrollment_code
 	,enrollment_start_date
 	,enrollment_end_date
@@ -79,56 +35,168 @@ select distinct
 	,spouse_bethel_email
 	,spouse_jwpub_email
 	,volunteer_key
-	,case
-		when enrollment_start_date > cast( getdate() as date ) then 'Invited'
-		when enrollment_end_date < cast( getdate() as date ) then 'Departed'
-		else 'Arrived'
-	 end as enrollment_status
-from rpt.Volunteer_Departure_v
-where 1=1
-	and parent_dept_name not like '%WHQ Computer%'
-	and parent_dept_name not like '%Purchasing%'
+	,enrollment_status
+from 
+	(
+	  select
+		 a.hub_volunteer_num
+    	,a.first_name
+		,a.last_name
+		,a.address
+		,a.city
+		,a.state_code
+		,a.postal_code
+		,a.gender_code
+		,a.marital_status_code	
+		,a.home_phone
+		,a.mobile_phone
+		,a.bethel_email
+		,a.jwpub_email
+		,a.personal_email
+		,a.dept_1_cpc_code as cpc_code
+		,a.parent_dept_name
+		,a.dept_name
+		,case
+			when charindex( ' - ', a.dept_1_dept_name ) = 0 then a.dept_1_dept_name
+			else right( a.dept_1_dept_name, charindex( ' - ', reverse( a.dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,a.enrollment_code
+		,a.enrollment_start_date
+		,a.enrollment_end_date
+		,a.spouse_hub_volunteer_num
+		,a.spouse_bethel_email
+		,a.spouse_jwpub_email
+		,a.volunteer_key
+		,case
+			when 
+			  ( a.enrollment_1_start_date < cast( getdate() as date )
+				and a.enrollment_1_end_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) ) or
+			  ( a.enrollment_2_start_date < cast( getdate() as date )
+				and a.enrollment_2_end_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) )
+			then 'Departing'
+			else 'Arrived'
+	 	 end as enrollment_status
+	  from dbo.volunteer_fact_actual a
+	  where a.current_flag = 'Y'
 
-union all
+	  union all
 
-select distinct
-	 hub_volunteer_num
-	,first_name
-	,last_name
-	,address
-	,city
-	,state_code
-	,postal_code
-	,gender_code
-	,marital_status_code
-	,home_phone
-	,mobile_phone
-	,bethel_email
-	,jwpub_email
-	,personal_email
-	,dept_2_cpc_code as cpc_code
-	,dept_2_parent_dept_name as parent_dept_name
-	,dept_2_dept_name as dept_name
-	,case
-		when charindex( ' - ', dept_2_dept_name ) = 0 then dept_2_dept_name
-		else right( dept_2_dept_name, charindex( ' - ', reverse( dept_2_dept_name ) ) - 1 )
-	 end as sub_dept_name
-	,coalesce( enrollment_2_code, enrollment_1_code ) as enrollment_code
-	,coalesce( enrollment_2_start_date, dept_2_start_date ) as enrollment_start_date
-	,coalesce( enrollment_2_end_date, dept_2_end_date ) as enrollment_end_date
-	,spouse_hub_volunteer_num
-	,spouse_bethel_email
-	,spouse_jwpub_email
-	,volunteer_key
-	,'Transfer' as enrollment_status
-from rpt.Volunteer_Rpt_v
-where 1=1
-	and dept_2_parent_dept_name not like '%WHQ Computer%'
-	and dept_2_parent_dept_name not like '%Purchasing%'
-	and dept_1_cpc_code is null
-	and dept_1_end_date is not null
-	and dept_2_cpc_code is not null
-	and dept_2_start_date > cast(getdate() as date)
+	  select
+		 a.hub_volunteer_num
+    	,a.first_name
+		,a.last_name
+		,a.address
+		,a.city
+		,a.state_code
+		,a.postal_code
+		,a.gender_code
+		,a.marital_status_code	
+		,a.home_phone
+		,a.mobile_phone
+		,a.bethel_email
+		,a.jwpub_email
+		,a.personal_email
+		,a.dept_1_cpc_code as cpc_code
+		,a.parent_dept_name
+		,a.dept_name
+		,case
+			when charindex( ' - ', a.dept_1_dept_name ) = 0 then a.dept_1_dept_name
+			else right( a.dept_1_dept_name, charindex( ' - ', reverse( a.dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,a.enrollment_code
+		,a.enrollment_start_date
+		,a.enrollment_end_date
+		,a.spouse_hub_volunteer_num
+		,a.spouse_bethel_email
+		,a.spouse_jwpub_email
+		,a.volunteer_key
+		,'Departed' as enrollment_status
+	  from dbo.volunteer_fact_actual a
+	  inner join 
+		( select volunteer_key, max( cal_dt ) as cal_dt
+		  from dbo.Volunteer_Fact_Actual
+		  where 1=1
+			and cal_dt < cast( getdate() as date ) -- HISTORICAL RECORDS
+			-- ENROLLMENT ENDED IN LAST 30 DAYS
+			and (
+				( enrollment_1_start_date < cast( getdate() as date )
+					and enrollment_1_end_date between cast( getdate() - 30 as date ) and cast( getdate() - 1 as date ) ) or
+				( enrollment_2_start_date < cast( getdate() as date )
+					and enrollment_2_end_date between cast( getdate() - 30 as date ) and cast( getdate() - 1 as date ) )
+				)
+		  group by volunteer_key ) d
+		on a.volunteer_key = d.volunteer_key
+		and a.cal_dt = d.cal_dt
+
+	  union all
+
+  	  select 
+		 hub_volunteer_num
+		,first_name
+		,last_name
+		,address
+		,city
+		,state_code
+		,postal_code
+		,gender_code
+		,marital_status_code	
+		,home_phone
+		,mobile_phone
+		,bethel_email
+		,jwpub_email
+		,personal_email
+		,dept_1_cpc_code as cpc_code
+		,parent_dept_name
+		,dept_name
+		,case
+			when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
+			else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,enrollment_code
+		,enrollment_start_date
+		,enrollment_end_date
+		,spouse_hub_volunteer_num
+		,spouse_bethel_email
+		,spouse_jwpub_email
+		,volunteer_key
+		,'Invited' as enrollment_status
+	  from rpt.Volunteer_Arrival_v
+	  where volunteer_key not in ( select volunteer_key from rpt.Volunteer_Transfer_v )
+
+ 	  union all
+
+  	  select 
+		 hub_volunteer_num
+		,first_name
+		,last_name
+		,address
+		,city
+		,state_code
+		,postal_code
+		,gender_code
+		,marital_status_code	
+		,home_phone
+		,mobile_phone
+		,bethel_email
+		,jwpub_email
+		,personal_email
+		,dept_1_cpc_code as cpc_code
+		,parent_dept_name
+		,dept_name
+		,case
+			when charindex( ' - ', dept_1_dept_name ) = 0 then dept_1_dept_name
+			else right( dept_1_dept_name, charindex( ' - ', reverse( dept_1_dept_name ) ) - 1 )
+		 end as sub_dept_name
+		,enrollment_code
+		,enrollment_start_date
+		,enrollment_end_date
+		,spouse_hub_volunteer_num
+		,spouse_bethel_email
+		,spouse_jwpub_email
+		,volunteer_key
+		,'Transferring' as enrollment_status
+	  from rpt.Volunteer_Transfer_v
+  ) x
 go
 
 
@@ -1022,7 +1090,12 @@ select
 	,dept_2_start_date
 	,dept_2_end_date
 	,room
-	,hpr_flag
+	,case
+		when dept_1_hpr_flag = 'Y' and dept_1_start_date <= cast( getdate() as date ) then 'Y'
+		when dept_2_hpr_flag = 'Y' and dept_2_start_date <= cast( getdate() as date ) then 'Y'
+		when record_type = 'EXCEPTION' and dept_1_start_date <= cast( getdate() as date ) then 'Y'
+		else 'N'
+	 end as hpr_flag
 	,work_days
 	,volunteer_key
 	,m.attribute_value as refresh_date
@@ -1061,7 +1134,7 @@ inner join dbo.hpr_dept d
 	on v.hpr_dept_key = d.HPR_Dept_Key
 inner join dbo.cal_dim c
 	on v.cal_dt = c.cal_dt
-	and c.day_of_mth = 1
+	and c.day_of_wk = 2
 where 1=1
 	and v.record_type <> 'PROJECTED'
 	--and v.cal_dt between '2025-07-01' and '2025-07-07'
@@ -2013,8 +2086,8 @@ with cal as (
     select cal_dt, day_of_wk, day_nm, day_of_mth
     from dbo.cal_dim
     where 1=1
-        --and cal_dt between '2020-01-01' and '2030-03-01'
-        and cal_dt between '2025-01-01' and '2027-03-01'
+        --and cal_dt between '2020-01-01' and '2030-11-01'
+        and cal_dt between '2026-06-01' and '2027-03-01'
         and day_of_wk = 2
 ),
  
@@ -2028,7 +2101,7 @@ bbo as (
         ,max( ba.fri ) as fri_flag
         ,max( ba.sat ) as sat_flag
         ,max( ba.sun ) as sun_flag
-    from rpt.Volunteer_Rpt_v v
+    from dbo.Volunteer_Rpt_v_snp v
     inner join cal dt
         on dt.cal_dt between v.enrollment_1_start_date and coalesce( v.enrollment_1_end_date, '2030-01-01' )
     inner join dbo.ba_event_snp ba
@@ -2052,8 +2125,8 @@ actuals as (
         ,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
 		,dr.role_start_date as role_start_date_raw
-        ,coalesce( drv.vol_end_date, dr.role_end_date, '2030-03-01' ) as role_end_date
-		,coalesce( dr.role_end_date, '2030-03-01' ) as role_end_date_raw
+        ,coalesce( drv.vol_end_date, dr.role_end_date, '2030-11-01' ) as role_end_date
+		,coalesce( dr.role_end_date, '2030-11-01' ) as role_end_date_raw
         ,case
             when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
             else 0
@@ -2082,7 +2155,7 @@ actuals as (
         ,v.Room_Bldg_Code
         ,v.Room
         ,v.record_type
-    from rpt.volunteer_rpt_v v
+    from dbo.Volunteer_Rpt_v_snp v
     inner join cal c -- JOIN ON DEPT 1 OR DEPT 2 IF ITS A HPR ASSIGNMENT
         on ( c.cal_dt between coalesce( v.dept_1_start_date, v.enrollment_1_start_date ) and coalesce( coalesce( v.dept_1_end_date, v.enrollment_1_end_date ), '2030-12-31' ) and v.dept_1_hpr_flag = 'Y' )
         or ( c.cal_dt between coalesce( v.dept_2_start_date, v.enrollment_2_start_date ) and coalesce( coalesce( v.dept_2_end_date, v.enrollment_2_end_date ), '2030-12-31' ) and v.dept_2_hpr_flag = 'Y' )
@@ -2115,7 +2188,7 @@ projected as (
         ,v.cal_dt
         ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
 		,v.role_start_date_raw
-        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
+        ,coalesce( v.role_end_date,'2030-11-01' ) as role_end_date
 		,v.role_end_date_raw
         ,v.bed_cnt
         ,v.fte
@@ -2191,7 +2264,7 @@ actuals as (
         ,drv.dept_asgn_status_code
         ,c.cal_dt
         ,coalesce( dr.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( drv.vol_end_date, dr.role_end_date, '2030-03-01' ) as role_end_date
+        ,coalesce( drv.vol_end_date, dr.role_end_date, '2030-11-01' ) as role_end_date
         ,case
             when v.Enrollment_1_code in ( 'BBC', 'BBF', 'BBR', 'BBT', 'BCF', 'BCS', 'BCV', 'BCL', 'BRS' ) then 1
             else 0
@@ -2249,7 +2322,7 @@ projected as (
         ,v.dept_asgn_status_code
         ,v.cal_dt
         ,coalesce( v.role_start_date, cast( dateadd( wk, datediff( wk, 0, getdate() ), 0 ) as date ) ) as role_start_date
-        ,coalesce( v.role_end_date,'2030-03-01' ) as role_end_date
+        ,coalesce( v.role_end_date,'2030-11-01' ) as role_end_date
         ,v.bed_cnt
         ,v.fte
         ,v.onsite_flag
@@ -2623,6 +2696,7 @@ left join ( select personid, max( arrivaldate ) as bethel_arrival_date
 			from stg.stg_Bethel_Member_Availability
 			group by personid ) bm
 	on d.hub_person_id = bm.personid
+where d.enrollment_status = 'Departed'
 go
 
 
@@ -2680,7 +2754,7 @@ as
 with cal as (
 	select cal_dt, day_of_wk, day_nm, day_of_mth
 	from dbo.cal_dim
-	where cal_dt between '2020-01-01' and '2030-03-01'
+	where cal_dt between '2020-01-01' and '2030-11-01'
 )
 
 select
@@ -2761,534 +2835,1069 @@ where dr.active_flag = 'Y'
 go
 
 
+
 if object_id('rpt.Volunteer_v', 'V') is not null
 	drop view rpt.Volunteer_v
 go
 create view rpt.Volunteer_v
 as
-with base as (
-	select
-		 v.full_name as volunteer_name
-		,v.first_name
-		,v.last_Name
-		,v.gender_code
-		,ms.marital_status_code
-		,v.cong_servant_code
-		,c.midweek_meeting_dow as cong_midweek_mt_dow
-		,c.midweek_meeting_time as cong_midweek_mt_time
-		,c.weekend_meeting_dow as cong_weekend_mt_dow
-		,c.weekend_meeting_time as cong_weekend_mt_time
-		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-		,v.address
-		,v.city
-		,s.state_code
-		,pc.Postal_Code
-		,v.home_phone
-		,v.mobile_phone
-		,v.HUB_Volunteer_Num
-		,ve1.enrollment_site_code as enrollment_1_site_code
-		,ve1.Enrollment_Code as enrollment_1_code
-		,ve1.Start_Date as enrollment_1_start_date
-		,ve1.end_date as enrollment_1_end_date
-		,ve2.enrollment_site_code as enrollment_2_site_code
-		,ve2.Enrollment_Code as enrollment_2_code
-		,ve2.Start_Date as enrollment_2_start_date
-		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key
-		,vd1.hub_dept_id as dept_1_hub_dept_id
-		,d1.cpc_code as dept_1_cpc_code
-		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
-		,vd1.Dept_Name as dept_1_dept_name
-		,vd1.dept_role as dept_1_dept_role
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
-		,vd1.start_date as dept_1_start_date
-		,vd1.end_date as dept_1_end_date
-		,vd1.temp_flag as dept_1_temp_flag
-		,vd1.primary_flag as dept_1_primary_flag
-		,case when vd1.Primary_Flag = 'N' then 'Y' else 'N' end as dept_1_split_asgn_flag
-		,vd1.split_allocation_pct as dept_1_split_allocation_pct
-		,vd1.hpr_flag as dept_1_hpr_flag
-		,d1.PC_Category as dept_1_pc_category
-		,vd1.mon_flag as dept_1_mon_flag
-		,vd1.tue_flag as dept_1_tue_flag
-		,vd1.wed_flag as dept_1_wed_flag
-		,vd1.thu_flag as dept_1_thu_flag
-		,vd1.fri_flag as dept_1_fri_flag
-		,vd1.sat_flag as dept_1_sat_flag
-		,vd1.sun_flag as dept_1_sun_flag
-		,d2.hpr_dept_key as dept_2_hpr_dept_key
-		,vd2.hub_dept_id as dept_2_hub_dept_id
-		,d2.cpc_code as dept_2_cpc_code
-		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
-		,vd2.Dept_Name as dept_2_dept_name
-		,vd2.dept_role as dept_2_dept_role
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
-		,vd2.start_date as dept_2_start_date
-		,vd2.end_date as dept_2_end_date
-		,vd2.temp_flag as dept_2_temp_flag
-		,vd2.primary_flag as dept_2_primary_flag
-		,case when vd2.Primary_Flag = 'N' then 'Y' else 'N' end as dept_2_split_asgn_flag
-		,vd2.split_allocation_pct as dept_2_split_allocation_pct
-		,vd2.hpr_flag as dept_2_hpr_flag
-		,d2.PC_Category as dept_2_pc_category
-		,vd2.mon_flag as dept_2_mon_flag
-		,vd2.tue_flag as dept_2_tue_flag
-		,vd2.wed_flag as dept_2_wed_flag
-		,vd2.thu_flag as dept_2_thu_flag
-		,vd2.fri_flag as dept_2_fri_flag
-		,vd2.sat_flag as dept_2_sat_flag
-		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date
-		,v.alt_Email as bethel_email
-		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email
-		,v.volunteer_key
-		,v.HUB_Person_ID
-		,v.ba_volunteer_num
-		,v.hub_person_guid
-		,v.mate_hub_person_id as spouse_hub_person_id
-		,mate.hub_volunteer_num as spouse_hub_volunteer_num
-		,mate.alt_email as spouse_bethel_email
-		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
-		,nullif( v.Room_Site_Code, '' ) as room_site_code
-		,nullif( v.Room_Bldg, '' ) as room_bldg
-		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
-		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
-		,nullif( v.Room, '' ) as room
-		,v.staffing_number_exception_flag
-		,'HPR' as record_type
-	from dbo.volunteer v
-	inner join dbo.marital_status ms
-		on v.marital_status_key = ms.marital_status_key
-	inner join dbo.state s
-		on v.State_Key = s.State_Key
-	inner join dbo.Postal_Code pc
-		on v.Postal_Code_Key = pc.Postal_Code_Key
-	inner join ( select volunteer_key from dbo.volunteer_dept_rpt where hpr_flag = 'Y' group by volunteer_key ) hpr_vol
-		on v.volunteer_key = hpr_vol.volunteer_key
-	inner join dbo.volunteer_enrollment_rpt ve1
-		on v.volunteer_key = ve1.volunteer_key
-		and ve1.row_num = 1
-	left join dbo.volunteer_enrollment_rpt ve2
-		on v.volunteer_key = ve2.volunteer_key
-		and ve2.row_num = 2
-	inner join dbo.volunteer_dept_rpt vd1
-		on v.volunteer_key = vd1.volunteer_key
-		and vd1.Row_Num = ( select min( row_num ) from dbo.volunteer_dept_rpt x1 where x1.volunteer_key = vd1.volunteer_Key )
-	left join dbo.HPR_Dept d1
-		on vd1.hub_dept_id = d1.hub_dept_id
-		and d1.Active_Flag = 'Y'
-	left join dbo.volunteer_dept_rpt vd2  -- GET 2ND DEPT, IF EXISTS
-		on v.volunteer_key = vd2.volunteer_key
-		and vd2.row_num = ( select max( row_num ) from dbo.volunteer_dept_rpt x2 where x2.volunteer_key = vd2.volunteer_key )
-		and vd2.volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
-	left join dbo.HPR_Dept d2
-		on vd2.hub_dept_id = d2.hub_dept_id
-		and d2.Active_Flag = 'Y'
-	left join dbo.volunteer mate
-		on v.mate_hub_person_id = mate.hub_person_id
-	left join dbo.cong c
-		on v.Cong_Key = c.Cong_Key
-	where 1=1
-		and v.hpr_volunteer_exception_flag = 'N'
-		--and v.volunteer_key = 238580
-),
+select * 
+from (
+	select 
+	   volunteer_key
+      ,hub_volunteer_num
+      ,hub_person_id
+      ,hub_person_guid
+      ,ba_volunteer_num
+      ,first_name
+      ,last_name
+      ,volunteer_name
+      ,volunteer_name_short
+      ,gender_code
+      ,marital_status_code
+      ,cong_servant_code
+      ,cong_midweek_mt_dow
+      ,cong_midweek_mt_time
+      ,cong_weekend_mt_dow
+      ,cong_weekend_mt_time
+      ,age
+      ,address
+      ,city
+      ,state_code
+      ,postal_code
+      ,home_phone
+      ,mobile_phone
+      ,bethel_email
+      ,jwpub_email
+      ,personal_email
+      ,spouse_hub_person_id
+      ,spouse_hub_volunteer_num
+      ,spouse_bethel_email
+      ,spouse_jwpub_email
+      ,enrollment_code
+      ,enrollment_site_code
+      ,enrollment_start_date
+      ,enrollment_start_date_raw
+      ,enrollment_end_date
+      ,hub_dept_id
+      ,parent_dept_name
+      ,parent_dept_code
+      ,dept_name
+      ,non_hpr_parent_dept_name
+      ,non_hpr_dept_name
+      ,dept_start_date
+      ,dept_end_date
+      ,pc_category
+      ,temp_flag
+      ,primary_flag
+      ,split_asgn_flag
+      ,mon_flag
+      ,tue_flag
+      ,wed_flag
+      ,thu_flag
+      ,fri_flag
+      ,sat_flag
+      ,sun_flag
+      ,enrollment_1_code
+      ,enrollment_1_site_code
+      ,enrollment_1_start_date
+      ,enrollment_1_start_date_raw
+      ,enrollment_1_end_date
+      ,enrollment_2_code
+      ,enrollment_2_site_code
+      ,enrollment_2_start_date
+      ,enrollment_2_start_date_raw
+      ,enrollment_2_end_date
+      ,dept_1_hpr_dept_key
+      ,dept_1_hub_dept_id
+      ,dept_1_cpc_code
+      ,dept_1_parent_dept_name
+      ,dept_1_dept_name
+      ,dept_1_dept_role
+      ,dept_1_ovsr_name
+      ,dept_1_start_date
+      ,dept_1_end_date
+      ,dept_1_temp_flag
+      ,dept_1_primary_flag
+      ,dept_1_split_asgn_flag
+      ,dept_1_split_allocation_pct
+      ,dept_1_hpr_flag
+      ,dept_1_pc_category
+      ,dept_1_mon_flag
+      ,dept_1_tue_flag
+      ,dept_1_wed_flag
+      ,dept_1_thu_flag
+      ,dept_1_fri_flag
+      ,dept_1_sat_flag
+      ,dept_1_sun_flag
+      ,dept_2_hpr_dept_key
+      ,dept_2_hub_dept_id
+      ,dept_2_cpc_code
+      ,dept_2_parent_dept_name
+      ,dept_2_dept_name
+      ,dept_2_dept_role
+      ,dept_2_ovsr_name
+      ,dept_2_start_date
+      ,dept_2_end_date
+      ,dept_2_temp_flag
+      ,dept_2_primary_flag
+      ,dept_2_split_asgn_flag
+      ,dept_2_split_allocation_pct
+      ,dept_2_hpr_flag
+      ,dept_2_pc_category
+      ,dept_2_mon_flag
+      ,dept_2_tue_flag
+      ,dept_2_wed_flag
+      ,dept_2_thu_flag
+      ,dept_2_fri_flag
+      ,dept_2_sat_flag
+      ,dept_2_sun_flag
+      ,loan_dept_name
+      ,tentative_end_date
+      ,room_site_code
+      ,room_bldg
+      ,room_bldg_code
+      ,room_bldg_desc
+      ,room
+      ,staffing_number_exception_flag
+      ,hpr_volunteer_exception_flag
+      ,cal_dt
+      ,current_flag
+      ,record_type 
+	  ,'Arrived' as enrollment_status
+	from dbo.volunteer_fact_actual 
+	where current_flag = 'Y' 
 
-exceptions as (
-	select
-		 v.full_name as volunteer_name
-		,v.first_name
-		,v.last_Name
-		,v.gender_code
-		,ms.marital_status_code
-		,v.cong_servant_code
-		,c.midweek_meeting_dow
-		,c.midweek_meeting_time
-		,c.weekend_meeting_dow
-		,c.weekend_meeting_time
-		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-		,v.address
-		,v.city
-		,s.state_code
-		,pc.Postal_Code
-		,v.home_phone
-		,v.mobile_phone
-		,v.HUB_Volunteer_Num
-		,ve1.enrollment_site_code as enrollment_1_site_code
-		,ve1.Enrollment_Code as enrollment_1_code
-		,ve1.Start_Date as enrollment_1_start_date
-		,ve1.end_date as enrollment_1_end_date
-		,ve2.enrollment_site_code as enrollment_2_site_code
-		,ve2.Enrollment_Code as enrollment_2_code
-		,ve2.Start_Date as enrollment_2_start_date
-		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key
-		,vd1.hub_dept_id as dept_1_hub_dept_id
-		,d1.cpc_code as dept_1_cpc_code
-		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
-		,vd1.Dept_Name as dept_1_dept_name
-		,vd1.dept_role as dept_1_dept_role
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
-		,vd1.start_date as dept_1_start_date
-		,vd1.end_date as dept_1_end_date
-		,vd1.temp_flag as dept_1_temp_flag
-		,vd1.primary_flag as dept_1_primary_flag
-		,case when vd1.Primary_Flag = 'N' then 'Y' else 'N' end as dept_1_split_asgn_flag
-		,vd1.split_allocation_pct as dept_1_split_allocation_pct
-		,vd1.hpr_flag as dept_1_hpr_flag
-		,d1.PC_Category as dept_1_pc_category
-		,vd1.mon_flag as dept_1_mon_flag
-		,vd1.tue_flag as dept_1_tue_flag
-		,vd1.wed_flag as dept_1_wed_flag
-		,vd1.thu_flag as dept_1_thu_flag
-		,vd1.fri_flag as dept_1_fri_flag
-		,vd1.sat_flag as dept_1_sat_flag
-		,vd1.sun_flag as dept_1_sun_flag
-		,d2.hpr_dept_key as dept_2_hpr_dept_key
-		,vd2.hub_dept_id as dept_2_hub_dept_id
-		,d2.cpc_code as dept_2_cpc_code
-		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
-		,vd2.Dept_Name as dept_2_dept_name
-		,vd2.dept_role as dept_2_dept_role
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
-		,vd2.start_date as dept_2_start_date
-		,vd2.end_date as dept_2_end_date
-		,vd2.temp_flag as dept_2_temp_flag
-		,vd2.primary_flag as dept_2_primary_flag
-		,case when vd2.Primary_Flag = 'N' then 'Y' else 'N' end as dept_2_split_asgn_flag
-		,vd2.split_allocation_pct as dept_2_split_allocation_pct
-		,vd2.hpr_flag as dept_2_hpr_flag
-		,d2.PC_Category as dept_2_pc_category
-		,vd2.mon_flag as dept_2_mon_flag
-		,vd2.tue_flag as dept_2_tue_flag
-		,vd2.wed_flag as dept_2_wed_flag
-		,vd2.thu_flag as dept_2_thu_flag
-		,vd2.fri_flag as dept_2_fri_flag
-		,vd2.sat_flag as dept_2_sat_flag
-		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date
-		,v.alt_Email as bethel_email
-		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email
-		,v.volunteer_key
-		,v.HUB_Person_ID
-		,v.ba_volunteer_num
-		,v.hub_person_guid
-		,v.mate_hub_person_id as spouse_hub_person_id
-		,mate.hub_volunteer_num as spouse_hub_volunteer_num
-		,mate.alt_email as spouse_bethel_email
-		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
-		,nullif( v.Room_Site_Code, '' ) as room_site_code
-		,nullif( v.Room_Bldg, '' ) as room_bldg
-		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
-		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
-		,nullif( v.Room, '' ) as room
-		,v.staffing_number_exception_flag
-		,'EXCEPTION' as record_type
-	from dbo.volunteer v
-	inner join dbo.marital_status ms
-		on v.marital_status_key = ms.marital_status_key
-	inner join dbo.state s
-		on v.State_Key = s.State_Key
-	inner join dbo.Postal_Code pc
-		on v.Postal_Code_Key = pc.Postal_Code_Key
-	inner join dbo.volunteer_enrollment_rpt ve1
-		on v.volunteer_key = ve1.volunteer_key
-		and ve1.row_num = 1
-	left join dbo.volunteer_enrollment_rpt ve2
-		on v.volunteer_key = ve2.volunteer_key
-		and ve2.row_num = 2
-	inner join dbo.volunteer_dept_rpt vd1
-		on v.volunteer_key = vd1.volunteer_key
-		and vd1.Row_Num = ( select min( row_num ) from dbo.volunteer_dept_rpt x1 where x1.volunteer_key = vd1.volunteer_Key )
-	left join dbo.HPR_Dept d1
-		on vd1.hub_dept_id = d1.hub_dept_id
-		and d1.Active_Flag = 'Y'
-	left join dbo.volunteer_dept_rpt vd2  -- GET 2ND DEPT, IF EXISTS
-		on v.volunteer_key = vd2.volunteer_key
-		and vd2.row_num = ( select max( row_num ) from dbo.volunteer_dept_rpt x2 where x2.volunteer_key = vd2.volunteer_key )
-		and vd2.volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
-	left join dbo.HPR_Dept d2
-		on vd2.hub_dept_id = d2.hub_dept_id
-		and d2.Active_Flag = 'Y'
-	left join dbo.volunteer mate
-		on v.mate_hub_person_id = mate.hub_person_id
-	left join dbo.cong c
-		on v.Cong_Key = c.Cong_Key
-	where v.hpr_volunteer_exception_flag = 'Y'
-		--and v.volunteer_key = 908039
-),
-
-hpr as (
-	select * from base
 	union all
-	select * from exceptions
-),
+	
+	select 
+	   volunteer_key
+      ,hub_volunteer_num
+      ,hub_person_id
+      ,hub_person_guid
+      ,ba_volunteer_num
+      ,first_name
+      ,last_name
+      ,volunteer_name
+      ,volunteer_name_short
+      ,gender_code
+      ,marital_status_code
+      ,cong_servant_code
+      ,cong_midweek_mt_dow
+      ,cong_midweek_mt_time
+      ,cong_weekend_mt_dow
+      ,cong_weekend_mt_time
+      ,age
+      ,address
+      ,city
+      ,state_code
+      ,postal_code
+      ,home_phone
+      ,mobile_phone
+      ,bethel_email
+      ,jwpub_email
+      ,personal_email
+      ,spouse_hub_person_id
+      ,spouse_hub_volunteer_num
+      ,spouse_bethel_email
+      ,spouse_jwpub_email
+      ,enrollment_code
+      ,enrollment_site_code
+      ,enrollment_start_date
+      ,enrollment_start_date_raw
+      ,enrollment_end_date
+      ,hub_dept_id
+      ,parent_dept_name
+      ,parent_dept_code
+      ,dept_name
+      ,non_hpr_parent_dept_name
+      ,non_hpr_dept_name
+      ,dept_start_date
+      ,dept_end_date
+      ,pc_category
+      ,temp_flag
+      ,primary_flag
+      ,split_asgn_flag
+      ,mon_flag
+      ,tue_flag
+      ,wed_flag
+      ,thu_flag
+      ,fri_flag
+      ,sat_flag
+      ,sun_flag
+      ,enrollment_1_code
+      ,enrollment_1_site_code
+      ,enrollment_1_start_date
+      ,enrollment_1_start_date_raw
+      ,enrollment_1_end_date
+      ,enrollment_2_code
+      ,enrollment_2_site_code
+      ,enrollment_2_start_date
+      ,enrollment_2_start_date_raw
+      ,enrollment_2_end_date
+      ,dept_1_hpr_dept_key
+      ,dept_1_hub_dept_id
+      ,dept_1_cpc_code
+      ,dept_1_parent_dept_name
+      ,dept_1_dept_name
+      ,dept_1_dept_role
+      ,dept_1_ovsr_name
+      ,dept_1_start_date
+      ,dept_1_end_date
+      ,dept_1_temp_flag
+      ,dept_1_primary_flag
+      ,dept_1_split_asgn_flag
+      ,dept_1_split_allocation_pct
+      ,dept_1_hpr_flag
+      ,dept_1_pc_category
+      ,dept_1_mon_flag
+      ,dept_1_tue_flag
+      ,dept_1_wed_flag
+      ,dept_1_thu_flag
+      ,dept_1_fri_flag
+      ,dept_1_sat_flag
+      ,dept_1_sun_flag
+      ,dept_2_hpr_dept_key
+      ,dept_2_hub_dept_id
+      ,dept_2_cpc_code
+      ,dept_2_parent_dept_name
+      ,dept_2_dept_name
+      ,dept_2_dept_role
+      ,dept_2_ovsr_name
+      ,dept_2_start_date
+      ,dept_2_end_date
+      ,dept_2_temp_flag
+      ,dept_2_primary_flag
+      ,dept_2_split_asgn_flag
+      ,dept_2_split_allocation_pct
+      ,dept_2_hpr_flag
+      ,dept_2_pc_category
+      ,dept_2_mon_flag
+      ,dept_2_tue_flag
+      ,dept_2_wed_flag
+      ,dept_2_thu_flag
+      ,dept_2_fri_flag
+      ,dept_2_sat_flag
+      ,dept_2_sun_flag
+      ,loan_dept_name
+      ,tentative_end_date
+      ,room_site_code
+      ,room_bldg
+      ,room_bldg_code
+      ,room_bldg_desc
+      ,room
+      ,staffing_number_exception_flag
+      ,hpr_volunteer_exception_flag
+      ,cal_dt
+      ,current_flag
+      ,record_type 
+	  ,'Transferring' as enrollment_status
+	from rpt.volunteer_transfer_v 
 
-woodgrove as (
-	select
-		 v.full_name as volunteer_name
-		,v.first_name
-		,v.last_Name
-		,v.gender_code
-		,ms.marital_status_code
-		,v.cong_servant_code
-		,c.midweek_meeting_dow
-		,c.midweek_meeting_time
-		,c.weekend_meeting_dow
-		,c.weekend_meeting_time
-		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-		,v.address
-		,v.city
-		,s.state_code
-		,pc.Postal_Code
-		,v.home_phone
-		,v.mobile_phone
-		,v.HUB_Volunteer_Num
-		,ve1.enrollment_site_code as enrollment_1_site_code
-		,ve1.Enrollment_Code as enrollment_1_code
-		,ve1.Start_Date as enrollment_1_start_date
-		,ve1.end_date as enrollment_1_end_date
-		,ve2.enrollment_site_code as enrollment_2_site_code
-		,ve2.Enrollment_Code as enrollment_2_code
-		,ve2.Start_Date as enrollment_2_start_date
-		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key
-		,vd1.hub_dept_id as dept_1_hub_dept_id
-		,d1.cpc_code as dept_1_cpc_code
-		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
-		,vd1.Dept_Name as dept_1_dept_name
-		,vd1.dept_role as dept_1_dept_role
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
-		,vd1.start_date as dept_1_start_date
-		,vd1.end_date as dept_1_end_date
-		,vd1.temp_flag as dept_1_temp_flag
-		,vd1.primary_flag as dept_1_primary_flag
-		,case when vd1.Primary_Flag = 'N' then 'Y' else 'N' end as dept_1_split_asgn_flag
-		,vd1.split_allocation_pct as dept_1_split_allocation_pct
-		,vd1.hpr_flag as dept_1_hpr_flag
-		,d1.PC_Category as dept_1_pc_category
-		,vd1.mon_flag as dept_1_mon_flag
-		,vd1.tue_flag as dept_1_tue_flag
-		,vd1.wed_flag as dept_1_wed_flag
-		,vd1.thu_flag as dept_1_thu_flag
-		,vd1.fri_flag as dept_1_fri_flag
-		,vd1.sat_flag as dept_1_sat_flag
-		,vd1.sun_flag as dept_1_sun_flag
-		,d2.hpr_dept_key as dept_2_hpr_dept_key
-		,vd2.hub_dept_id as dept_2_hub_dept_id
-		,d2.cpc_code as dept_2_cpc_code
-		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
-		,vd2.Dept_Name as dept_2_dept_name
-		,vd2.dept_role as dept_2_dept_role
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
-		,vd2.start_date as dept_2_start_date
-		,vd2.end_date as dept_2_end_date
-		,vd2.temp_flag as dept_2_temp_flag
-		,vd2.primary_flag as dept_2_primary_flag
-		,case when vd2.Primary_Flag = 'N' then 'Y' else 'N' end as dept_2_split_asgn_flag
-		,vd2.split_allocation_pct as dept_2_split_allocation_pct
-		,vd2.hpr_flag as dept_2_hpr_flag
-		,d2.PC_Category as dept_2_pc_category
-		,vd2.mon_flag as dept_2_mon_flag
-		,vd2.tue_flag as dept_2_tue_flag
-		,vd2.wed_flag as dept_2_wed_flag
-		,vd2.thu_flag as dept_2_thu_flag
-		,vd2.fri_flag as dept_2_fri_flag
-		,vd2.sat_flag as dept_2_sat_flag
-		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date
-		,v.alt_Email as bethel_email
-		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email
-		,v.volunteer_key
-		,v.HUB_Person_ID
-		,v.ba_volunteer_num
-		,v.hub_person_guid
-		,v.mate_hub_person_id as spouse_hub_person_id
-		,mate.hub_volunteer_num as spouse_hub_volunteer_num
-		,mate.alt_email as spouse_bethel_email
-		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
-		,nullif( v.Room_Site_Code, '' ) as room_site_code
-		,nullif( v.Room_Bldg, '' ) as room_bldg
-		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
-		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
-		,nullif( v.Room, '' ) as room
-		,v.staffing_number_exception_flag
-		,'WOODGROVE' as record_type
-	from dbo.volunteer v
-	inner join dbo.marital_status ms
-		on v.marital_status_key = ms.marital_status_key
-	inner join dbo.state s
-		on v.State_Key = s.State_Key
-	inner join dbo.Postal_Code pc
-		on v.Postal_Code_Key = pc.Postal_Code_Key
-	inner join dbo.volunteer_enrollment_rpt ve1
-		on v.volunteer_key = ve1.volunteer_key
-		and ve1.row_num = 1
-	left join dbo.volunteer_enrollment_rpt ve2
-		on v.volunteer_key = ve2.volunteer_key
-		and ve2.row_num = 2
-	inner join dbo.volunteer_dept_rpt vd1
-		on v.volunteer_key = vd1.volunteer_key
-		and vd1.Row_Num = ( select min( row_num ) from dbo.volunteer_dept_rpt x1 where x1.volunteer_key = vd1.volunteer_Key )
-	left join dbo.HPR_Dept d1
-		on vd1.hub_dept_id = d1.hub_dept_id
-		and d1.Active_Flag = 'Y'
-	left join dbo.volunteer_dept_rpt vd2  -- GET 2ND DEPT, IF EXISTS
-		on v.volunteer_key = vd2.volunteer_key
-		and vd2.row_num = ( select max( row_num ) from dbo.volunteer_dept_rpt x2 where x2.volunteer_key = vd2.volunteer_key )
-		and vd2.volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
-	left join dbo.HPR_Dept d2
-		on vd2.hub_dept_id = d2.hub_dept_id
-		and d2.Active_Flag = 'Y'
-	left join dbo.volunteer mate
-		on v.mate_hub_person_id = mate.hub_person_id
-	left join dbo.cong c
-		on v.Cong_Key = c.Cong_Key
-	where 1=1
-		and v.room_site_code = 'RMP'
-		and v.volunteer_key not in ( select volunteer_key from hpr )
-),
-
-guest as (
-	select
-		 v.full_name as volunteer_name
-		,v.first_name
-		,v.last_Name
-		,v.gender_code
-		,ms.marital_status_code
-		,v.cong_servant_code
-		,c.midweek_meeting_dow
-		,c.midweek_meeting_time
-		,c.weekend_meeting_dow
-		,c.weekend_meeting_time
-		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-		,v.address
-		,v.city
-		,s.state_code
-		,pc.Postal_Code
-		,v.home_phone
-		,v.mobile_phone
-		,v.HUB_Volunteer_Num
-		,ve1.enrollment_site_code as enrollment_1_site_code
-		,ve1.Enrollment_Code as enrollment_1_code
-		,ve1.Start_Date as enrollment_1_start_date
-		,ve1.end_date as enrollment_1_end_date
-		,ve2.enrollment_site_code as enrollment_2_site_code
-		,ve2.Enrollment_Code as enrollment_2_code
-		,ve2.Start_Date as enrollment_2_start_date
-		,ve2.end_date as enrollment_2_end_date
-		,d1.hpr_dept_key as dept_1_hpr_dept_key
-		,vd1.hub_dept_id as dept_1_hub_dept_id
-		,d1.cpc_code as dept_1_cpc_code
-		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
-		,vd1.Dept_Name as dept_1_dept_name
-		,vd1.dept_role as dept_1_dept_role
-		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
-		,vd1.start_date as dept_1_start_date
-		,vd1.end_date as dept_1_end_date
-		,vd1.temp_flag as dept_1_temp_flag
-		,vd1.primary_flag as dept_1_primary_flag
-		,case when vd1.Primary_Flag = 'N' then 'Y' else 'N' end as dept_1_split_asgn_flag
-		,vd1.split_allocation_pct as dept_1_split_allocation_pct
-		,vd1.hpr_flag as dept_1_hpr_flag
-		,d1.PC_Category as dept_1_pc_category
-		,vd1.mon_flag as dept_1_mon_flag
-		,vd1.tue_flag as dept_1_tue_flag
-		,vd1.wed_flag as dept_1_wed_flag
-		,vd1.thu_flag as dept_1_thu_flag
-		,vd1.fri_flag as dept_1_fri_flag
-		,vd1.sat_flag as dept_1_sat_flag
-		,vd1.sun_flag as dept_1_sun_flag
-		,d2.hpr_dept_key as dept_2_hpr_dept_key
-		,vd2.hub_dept_id as dept_2_hub_dept_id
-		,d2.cpc_code as dept_2_cpc_code
-		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
-		,vd2.Dept_Name as dept_2_dept_name
-		,vd2.dept_role as dept_2_dept_role
-		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
-		,vd2.start_date as dept_2_start_date
-		,vd2.end_date as dept_2_end_date
-		,vd2.temp_flag as dept_2_temp_flag
-		,vd2.primary_flag as dept_2_primary_flag
-		,case when vd2.Primary_Flag = 'N' then 'Y' else 'N' end as dept_2_split_asgn_flag
-		,vd2.split_allocation_pct as dept_2_split_allocation_pct
-		,vd2.hpr_flag as dept_2_hpr_flag
-		,d2.PC_Category as dept_2_pc_category
-		,vd2.mon_flag as dept_2_mon_flag
-		,vd2.tue_flag as dept_2_tue_flag
-		,vd2.wed_flag as dept_2_wed_flag
-		,vd2.thu_flag as dept_2_thu_flag
-		,vd2.fri_flag as dept_2_fri_flag
-		,vd2.sat_flag as dept_2_sat_flag
-		,vd2.sun_flag as dept_2_sun_flag
-		,v.tentative_end_date
-		,v.alt_Email as bethel_email
-		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email
-		,v.volunteer_key
-		,v.HUB_Person_ID
-		,v.ba_volunteer_num
-		,v.hub_person_guid
-		,v.mate_hub_person_id as spouse_hub_person_id
-		,mate.hub_volunteer_num as spouse_hub_volunteer_num
-		,mate.alt_email as spouse_bethel_email
-		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
-		,nullif( v.Room_Site_Code, '' ) as room_site_code
-		,nullif( v.Room_Bldg, '' ) as room_bldg
-		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
-		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
-		,nullif( v.Room, '' ) as room
-		,v.staffing_number_exception_flag
-		,'GUEST' as record_type
-	from dbo.volunteer v
-	inner join dbo.marital_status ms
-		on v.marital_status_key = ms.marital_status_key
-	left join dbo.state s
-		on v.State_Key = s.State_Key
-	left join dbo.Postal_Code pc
-		on v.Postal_Code_Key = pc.Postal_Code_Key
-	inner join dbo.volunteer_enrollment_rpt ve1
-		on v.volunteer_key = ve1.volunteer_key
-		and ve1.row_num = 1
-	left join dbo.volunteer_enrollment_rpt ve2
-		on v.volunteer_key = ve2.volunteer_key
-		and ve2.row_num = 2
-	left join dbo.volunteer_dept_rpt vd1
-		on v.volunteer_key = vd1.volunteer_key
-		and vd1.Row_Num = ( select min( row_num ) from dbo.volunteer_dept_rpt x1 where x1.volunteer_key = vd1.volunteer_Key )
-	left join dbo.HPR_Dept d1
-		on vd1.hub_dept_id = d1.hub_dept_id
-		and d1.Active_Flag = 'Y'
-	left join dbo.volunteer_dept_rpt vd2  -- GET 2ND DEPT, IF EXISTS
-		on v.volunteer_key = vd2.volunteer_key
-		and vd2.row_num = ( select max( row_num ) from dbo.volunteer_dept_rpt x2 where x2.volunteer_key = vd2.volunteer_key )
-		and vd2.volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
-	left join dbo.HPR_Dept d2
-		on vd2.hub_dept_id = d2.hub_dept_id
-		and d2.Active_Flag = 'Y'
-	left join dbo.volunteer mate
-		on v.mate_hub_person_id = mate.hub_person_id
-	left join dbo.cong c
-		on v.Cong_Key = c.Cong_Key
-	inner join stg.stg_rooming r
-		on v.hub_person_id = r.person_id
-	where 1=1
-		and r.overnight_guest_category is not null
-		and v.volunteer_key not in ( select volunteer_key from hpr )
-		and v.volunteer_key not in ( select volunteer_key from woodgrove )
-		and v.hub_person_id <> 627794
-),
-
-final as (
-	select * from hpr
 	union all
-	select * from woodgrove
-	union all
-	select * from guest
-)
+	
+	select
+	   volunteer_key
+      ,hub_volunteer_num
+      ,hub_person_id
+      ,hub_person_guid
+      ,ba_volunteer_num
+      ,first_name
+      ,last_name
+      ,volunteer_name
+      ,volunteer_name_short
+      ,gender_code
+      ,marital_status_code
+      ,cong_servant_code
+      ,cong_midweek_mt_dow
+      ,cong_midweek_mt_time
+      ,cong_weekend_mt_dow
+      ,cong_weekend_mt_time
+      ,age
+      ,address
+      ,city
+      ,state_code
+      ,postal_code
+      ,home_phone
+      ,mobile_phone
+      ,bethel_email
+      ,jwpub_email
+      ,personal_email
+      ,spouse_hub_person_id
+      ,spouse_hub_volunteer_num
+      ,spouse_bethel_email
+      ,spouse_jwpub_email
+      ,enrollment_code
+      ,enrollment_site_code
+      ,enrollment_start_date
+      ,enrollment_start_date_raw
+      ,enrollment_end_date
+      ,hub_dept_id
+      ,parent_dept_name
+      ,parent_dept_code
+      ,dept_name
+      ,non_hpr_parent_dept_name
+      ,non_hpr_dept_name
+      ,dept_start_date
+      ,dept_end_date
+      ,pc_category
+      ,temp_flag
+      ,primary_flag
+      ,split_asgn_flag
+      ,mon_flag
+      ,tue_flag
+      ,wed_flag
+      ,thu_flag
+      ,fri_flag
+      ,sat_flag
+      ,sun_flag
+      ,enrollment_1_code
+      ,enrollment_1_site_code
+      ,enrollment_1_start_date
+      ,enrollment_1_start_date_raw
+      ,enrollment_1_end_date
+      ,enrollment_2_code
+      ,enrollment_2_site_code
+      ,enrollment_2_start_date
+      ,enrollment_2_start_date_raw
+      ,enrollment_2_end_date
+      ,dept_1_hpr_dept_key
+      ,dept_1_hub_dept_id
+      ,dept_1_cpc_code
+      ,dept_1_parent_dept_name
+      ,dept_1_dept_name
+      ,dept_1_dept_role
+      ,dept_1_ovsr_name
+      ,dept_1_start_date
+      ,dept_1_end_date
+      ,dept_1_temp_flag
+      ,dept_1_primary_flag
+      ,dept_1_split_asgn_flag
+      ,dept_1_split_allocation_pct
+      ,dept_1_hpr_flag
+      ,dept_1_pc_category
+      ,dept_1_mon_flag
+      ,dept_1_tue_flag
+      ,dept_1_wed_flag
+      ,dept_1_thu_flag
+      ,dept_1_fri_flag
+      ,dept_1_sat_flag
+      ,dept_1_sun_flag
+      ,dept_2_hpr_dept_key
+      ,dept_2_hub_dept_id
+      ,dept_2_cpc_code
+      ,dept_2_parent_dept_name
+      ,dept_2_dept_name
+      ,dept_2_dept_role
+      ,dept_2_ovsr_name
+      ,dept_2_start_date
+      ,dept_2_end_date
+      ,dept_2_temp_flag
+      ,dept_2_primary_flag
+      ,dept_2_split_asgn_flag
+      ,dept_2_split_allocation_pct
+      ,dept_2_hpr_flag
+      ,dept_2_pc_category
+      ,dept_2_mon_flag
+      ,dept_2_tue_flag
+      ,dept_2_wed_flag
+      ,dept_2_thu_flag
+      ,dept_2_fri_flag
+      ,dept_2_sat_flag
+      ,dept_2_sun_flag
+      ,loan_dept_name
+      ,tentative_end_date
+      ,room_site_code
+      ,room_bldg
+      ,room_bldg_code
+      ,room_bldg_desc
+      ,room
+      ,staffing_number_exception_flag
+      ,hpr_volunteer_exception_flag
+      ,cal_dt
+      ,current_flag
+      ,record_type 	
+	  ,'Invited' as enrollment_status
+	 from rpt.volunteer_arrival_v ) x
+go
 
+
+if object_id('rpt.Volunteer_All_v', 'V') is not null
+	drop view rpt.Volunteer_All_v
+go
+create view rpt.Volunteer_All_v
+as
+with base_raw as (
+	select 
+		*
+		,case 
+			when enrollment_status = 'Transferring' then 1
+			when enrollment_status = 'Invited' then 2 
+			else 3 
+		 end as rn
+	from rpt.volunteer_v 
+),
+
+find_min as ( 
+	select volunteer_key, min( rn ) as min_rn
+	group by volunteer_key
+),
+
+base_prep as (
+	select b.*
+	from base_raw b
+	inner join find_min m 
+		on b.volunteer_key = m.volunteer_key
+		and b.rn = m.min_rn 
+), 
+
+base as (
+	select
+		 *
+		,case
+			when enrollment_1_code in ( 'BBB', 'BBF', 'BBR', 'BCF', 'BCL', 'BCS', 'BCV', 'BRS' ) then 5
+			when enrollment_1_code in ( 'BBO', 'BOC' ) then 0
+			else
+				( case when dept_1_mon_flag = 'Y' then 1 else 0 end ) +
+				( case when dept_1_tue_flag = 'Y' then 1 else 0 end ) +
+				( case when dept_1_wed_flag = 'Y' then 1 else 0 end ) +
+				( case when dept_1_thu_flag = 'Y' then 1 else 0 end ) +
+				( case when dept_1_fri_flag = 'Y' then 1 else 0 end ) +
+				( case when dept_1_sat_flag = 'Y' then 1 else 0 end ) +
+				( case when dept_1_sun_flag = 'Y' then 1 else 0 end )
+		 end as work_days
+		,case when record_type in ( 'HPR', 'EXCEPTION', 'TRANSFER' ) then 'Y' else 'N' end as hpr_flag
+		,upper( left( first_name, 1 ) +
+		 substring( cast( hub_volunteer_num as varchar(30) ), 3, 1 ) +
+		 substring( first_name, 2, 1 ) +
+		 right( cast( hub_volunteer_num as varchar(30) ), 1 ) +
+		 right( last_name, 1 ) ) as base_helmet_id
+	from base_prep
+),
+
+helmet as (
+	select
+		volunteer_key
+		,row_number() over ( partition by base_helmet_id order by enrollment_1_start_date ) as rownum
+	from base )
+
+select
+	 base.volunteer_key
+	,base.hub_volunteer_num
+	,base.hub_person_id
+	,base.hub_person_guid
+	,base.ba_volunteer_num
+	,base.first_name
+	,base.last_name
+	,base.volunteer_name
+	,base.volunteer_name_short
+	,base.gender_code
+	,base.marital_status_code
+	,base.cong_servant_code
+	,base.cong_midweek_mt_dow
+	,base.cong_midweek_mt_time
+	,base.cong_weekend_mt_dow
+	,base.cong_weekend_mt_time
+	,base.age
+	,base.address
+	,base.city
+	,base.state_code
+	,base.postal_code
+	,base.home_phone
+	,base.mobile_phone
+	,base.bethel_email
+	,base.jwpub_email
+	,base.personal_email
+	,base.spouse_hub_person_id
+	,base.spouse_hub_volunteer_num
+	,base.spouse_bethel_email
+	,base.spouse_jwpub_email
+	,base.enrollment_code
+	,base.enrollment_site_code
+	,base.enrollment_start_date
+	,base.enrollment_start_date_raw
+	,base.enrollment_end_date
+	,base.hub_dept_id
+	,base.parent_dept_name
+	,base.parent_dept_code
+	,base.dept_name
+	,base.non_hpr_parent_dept_name
+	,base.non_hpr_dept_name
+	,base.dept_start_date
+	,base.dept_end_date
+	,base.pc_category
+	,base.temp_flag
+	,base.primary_flag
+	,base.split_asgn_flag
+	,base.mon_flag
+	,base.tue_flag
+	,base.wed_flag
+	,base.thu_flag
+	,base.fri_flag
+	,base.sat_flag
+	,base.sun_flag
+	,base.enrollment_1_code
+	,base.enrollment_1_site_code
+	,base.enrollment_1_start_date
+	,base.enrollment_1_start_date_raw
+	,base.enrollment_1_end_date
+	,base.enrollment_2_code
+	,base.enrollment_2_site_code
+	,base.enrollment_2_start_date
+	,base.enrollment_2_start_date_raw
+	,base.enrollment_2_end_date
+	,base.dept_1_hpr_dept_key
+	,base.dept_1_hub_dept_id
+	,base.dept_1_cpc_code
+	,base.dept_1_parent_dept_name
+	,base.dept_1_dept_name
+	,base.dept_1_dept_role
+	,base.dept_1_ovsr_name
+	,base.dept_1_start_date
+	,base.dept_1_end_date
+	,base.dept_1_temp_flag
+	,base.dept_1_primary_flag
+	,base.dept_1_split_asgn_flag
+	,base.dept_1_split_allocation_pct
+	,base.dept_1_hpr_flag
+	,base.dept_1_pc_category
+	,base.dept_1_mon_flag
+	,base.dept_1_tue_flag
+	,base.dept_1_wed_flag
+	,base.dept_1_thu_flag
+	,base.dept_1_fri_flag
+	,base.dept_1_sat_flag
+	,base.dept_1_sun_flag
+	,base.dept_2_hpr_dept_key
+	,base.dept_2_hub_dept_id
+	,base.dept_2_cpc_code
+	,base.dept_2_parent_dept_name
+	,base.dept_2_dept_name
+	,base.dept_2_dept_role
+	,base.dept_2_ovsr_name
+	,base.dept_2_start_date
+	,base.dept_2_end_date
+	,base.dept_2_temp_flag
+	,base.dept_2_primary_flag
+	,base.dept_2_split_asgn_flag
+	,base.dept_2_split_allocation_pct
+	,base.dept_2_hpr_flag
+	,base.dept_2_pc_category
+	,base.dept_2_mon_flag
+	,base.dept_2_tue_flag
+	,base.dept_2_wed_flag
+	,base.dept_2_thu_flag
+	,base.dept_2_fri_flag
+	,base.dept_2_sat_flag
+	,base.dept_2_sun_flag
+	,base.loan_dept_name
+	,base.tentative_end_date
+	,base.room_site_code
+	,base.room_bldg
+	,base.room_bldg_code
+	,base.room_bldg_desc
+	,base.room
+	,base.staffing_number_exception_flag
+	,base.record_type 
+	,base.work_days
+	,base.hpr_flag
+	,base.base_helmet_id
+	,helmet.rownum
+	,case
+		when helmet.rownum = 1 then base.base_helmet_id
+		when helmet.rownum between 2 and 27 then base.base_helmet_id + char( 64 + helmet.rownum )	-- a=65, so 64+2=a, up to z=90
+		else base.base_helmet_id + '_' + cast( helmet.rownum as varchar )							-- fallback if more than 26 duplicates
+	 end as helmet_id
+	,case when enrollment_1_start_date > getdate() then 'INVITED' else 'ARRIVED' end as enrollment_status
+from base
+inner join helmet
+	on base.volunteer_key = helmet.volunteer_key
+go
+
+
+if object_id('rpt.Volunteer_Rpt_v', 'V') is not null
+	drop view rpt.Volunteer_Rpt_v
+go
+create view rpt.Volunteer_Rpt_v
+as
+select *
+from rpt.Volunteer_v
+where record_type in ( 'HPR', 'EXCEPTION', 'TRANSFER' )
+	and enrollment_status in ( 'Arrived', 'Transferring' )
+go
+
+
+if object_id('rpt.Volunteer_Arrival_v', 'V') is not null
+	drop view rpt.Volunteer_Arrival_v
+go
+create view rpt.Volunteer_Arrival_v
+as
+select 
+	 v.volunteer_key
+	,v.hub_volunteer_num
+	,v.hub_person_id
+	,v.hub_person_guid
+	,v.ba_volunteer_num
+	,v.first_name
+	,v.last_name
+	,v.volunteer_name
+	,v.volunteer_name_short
+	,v.gender_code
+	,v.marital_status_code
+	,v.cong_servant_code
+	,v.cong_midweek_mt_dow
+	,v.cong_midweek_mt_time
+	,v.cong_weekend_mt_dow
+	,v.cong_weekend_mt_time
+	,v.age
+	,v.address
+	,v.city
+	,v.state_code
+	,v.postal_code
+	,v.home_phone
+	,v.mobile_phone
+	,v.bethel_email
+	,v.jwpub_email
+	,v.personal_email
+	,v.spouse_hub_person_id
+	,v.spouse_hub_volunteer_num
+	,v.spouse_bethel_email
+	,v.spouse_jwpub_email
+	,v.enrollment_code
+	,v.enrollment_site_code
+	,v.enrollment_start_date
+	,v.enrollment_start_date_raw
+	,v.enrollment_end_date
+	,v.hub_dept_id
+	,v.parent_dept_name
+	,v.parent_dept_code
+	,v.dept_name
+	,v.non_hpr_parent_dept_name
+	,v.non_hpr_dept_name
+	,v.dept_start_date
+	,v.dept_end_date
+	,v.pc_category
+	,v.temp_flag
+	,v.primary_flag
+	,v.split_asgn_flag
+	,v.mon_flag
+	,v.tue_flag
+	,v.wed_flag
+	,v.thu_flag
+	,v.fri_flag
+	,v.sat_flag
+	,v.sun_flag
+	,v.enrollment_1_code
+	,v.enrollment_1_site_code
+	,v.enrollment_1_start_date
+	,v.enrollment_1_start_date_raw
+	,v.enrollment_1_end_date
+	,v.enrollment_2_code
+	,v.enrollment_2_site_code
+	,v.enrollment_2_start_date
+	,v.enrollment_2_start_date_raw
+	,v.enrollment_2_end_date
+	,v.dept_1_hpr_dept_key
+	,v.dept_1_hub_dept_id
+	,v.dept_1_cpc_code
+	,v.dept_1_parent_dept_name
+	,v.dept_1_dept_name
+	,v.dept_1_dept_role
+	,v.dept_1_ovsr_name
+	,v.dept_1_start_date
+	,v.dept_1_end_date
+	,v.dept_1_temp_flag
+	,v.dept_1_primary_flag
+	,v.dept_1_split_asgn_flag
+	,v.dept_1_split_allocation_pct
+	,v.dept_1_hpr_flag
+	,v.dept_1_pc_category
+	,v.dept_1_mon_flag
+	,v.dept_1_tue_flag
+	,v.dept_1_wed_flag
+	,v.dept_1_thu_flag
+	,v.dept_1_fri_flag
+	,v.dept_1_sat_flag
+	,v.dept_1_sun_flag
+	,v.dept_2_hpr_dept_key
+	,v.dept_2_hub_dept_id
+	,v.dept_2_cpc_code
+	,v.dept_2_parent_dept_name
+	,v.dept_2_dept_name
+	,v.dept_2_dept_role
+	,v.dept_2_ovsr_name
+	,v.dept_2_start_date
+	,v.dept_2_end_date
+	,v.dept_2_temp_flag
+	,v.dept_2_primary_flag
+	,v.dept_2_split_asgn_flag
+	,v.dept_2_split_allocation_pct
+	,v.dept_2_hpr_flag
+	,v.dept_2_pc_category
+	,v.dept_2_mon_flag
+	,v.dept_2_tue_flag
+	,v.dept_2_wed_flag
+	,v.dept_2_thu_flag
+	,v.dept_2_fri_flag
+	,v.dept_2_sat_flag
+	,v.dept_2_sun_flag
+	,v.loan_dept_name
+	,v.tentative_end_date
+	,v.room_site_code
+	,v.room_bldg
+	,v.room_bldg_code
+	,v.room_bldg_desc
+	,v.room
+	,v.staffing_number_exception_flag
+	,v.hpr_volunteer_exception_flag
+	,v.cal_dt
+	,v.current_flag
+	,v.record_type
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+from dbo.Volunteer_Fact_Actual v
+inner join 
+	( select volunteer_key, min( cal_dt ) as cal_dt
+	  from dbo.Volunteer_Fact_Actual
+	  where 1=1
+		and cal_dt > cast( getdate() as date ) -- FUTURE RECORDS
+		-- ENROLLMENT STARTING IN NEXT 30 DAYS
+		and ( enrollment_1_start_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) 
+			or enrollment_2_start_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date )
+			)
+	  group by volunteer_key ) d
+	on v.volunteer_key = d.volunteer_key
+	and v.cal_dt = d.cal_dt
+	and enrollment_code not in ( 'BBB' ); -- NOT BBB ENROLLMENTS
+go
+
+
+if object_id('rpt.Volunteer_Departure_v', 'V') is not null
+	drop view rpt.Volunteer_Departure_v
+go
+create view rpt.Volunteer_Departure_v
+as
+select 
+	 v.volunteer_key
+	,v.hub_volunteer_num
+	,v.hub_person_id
+	,v.hub_person_guid
+	,v.ba_volunteer_num
+	,v.first_name
+	,v.last_name
+	,v.volunteer_name
+	,v.volunteer_name_short
+	,v.gender_code
+	,v.marital_status_code
+	,v.cong_servant_code
+	,v.cong_midweek_mt_dow
+	,v.cong_midweek_mt_time
+	,v.cong_weekend_mt_dow
+	,v.cong_weekend_mt_time
+	,v.age
+	,v.address
+	,v.city
+	,v.state_code
+	,v.postal_code
+	,v.home_phone
+	,v.mobile_phone
+	,v.bethel_email
+	,v.jwpub_email
+	,v.personal_email
+	,v.spouse_hub_person_id
+	,v.spouse_hub_volunteer_num
+	,v.spouse_bethel_email
+	,v.spouse_jwpub_email
+	,v.enrollment_code
+	,v.enrollment_site_code
+	,v.enrollment_start_date
+	,v.enrollment_start_date_raw
+	,v.enrollment_end_date
+	,v.hub_dept_id
+	,v.parent_dept_name
+	,v.parent_dept_code
+	,v.dept_name
+	,v.non_hpr_parent_dept_name
+	,v.non_hpr_dept_name
+	,v.dept_start_date
+	,v.dept_end_date
+	,v.pc_category
+	,v.temp_flag
+	,v.primary_flag
+	,v.split_asgn_flag
+	,v.mon_flag
+	,v.tue_flag
+	,v.wed_flag
+	,v.thu_flag
+	,v.fri_flag
+	,v.sat_flag
+	,v.sun_flag
+	,v.enrollment_1_code
+	,v.enrollment_1_site_code
+	,v.enrollment_1_start_date
+	,v.enrollment_1_start_date_raw
+	,v.enrollment_1_end_date
+	,v.enrollment_2_code
+	,v.enrollment_2_site_code
+	,v.enrollment_2_start_date
+	,v.enrollment_2_start_date_raw
+	,v.enrollment_2_end_date
+	,v.dept_1_hpr_dept_key
+	,v.dept_1_hub_dept_id
+	,v.dept_1_cpc_code
+	,v.dept_1_parent_dept_name
+	,v.dept_1_dept_name
+	,v.dept_1_dept_role
+	,v.dept_1_ovsr_name
+	,v.dept_1_start_date
+	,v.dept_1_end_date
+	,v.dept_1_temp_flag
+	,v.dept_1_primary_flag
+	,v.dept_1_split_asgn_flag
+	,v.dept_1_split_allocation_pct
+	,v.dept_1_hpr_flag
+	,v.dept_1_pc_category
+	,v.dept_1_mon_flag
+	,v.dept_1_tue_flag
+	,v.dept_1_wed_flag
+	,v.dept_1_thu_flag
+	,v.dept_1_fri_flag
+	,v.dept_1_sat_flag
+	,v.dept_1_sun_flag
+	,v.dept_2_hpr_dept_key
+	,v.dept_2_hub_dept_id
+	,v.dept_2_cpc_code
+	,v.dept_2_parent_dept_name
+	,v.dept_2_dept_name
+	,v.dept_2_dept_role
+	,v.dept_2_ovsr_name
+	,v.dept_2_start_date
+	,v.dept_2_end_date
+	,v.dept_2_temp_flag
+	,v.dept_2_primary_flag
+	,v.dept_2_split_asgn_flag
+	,v.dept_2_split_allocation_pct
+	,v.dept_2_hpr_flag
+	,v.dept_2_pc_category
+	,v.dept_2_mon_flag
+	,v.dept_2_tue_flag
+	,v.dept_2_wed_flag
+	,v.dept_2_thu_flag
+	,v.dept_2_fri_flag
+	,v.dept_2_sat_flag
+	,v.dept_2_sun_flag
+	,v.loan_dept_name
+	,v.tentative_end_date
+	,v.room_site_code
+	,v.room_bldg
+	,v.room_bldg_code
+	,v.room_bldg_desc
+	,v.room
+	,v.staffing_number_exception_flag
+	,v.hpr_volunteer_exception_flag
+	,v.cal_dt
+	,v.current_flag
+	,v.record_type
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+	,'Departing' as enrollment_status
+from dbo.Volunteer_Fact_Actual v
+inner join 
+	( select volunteer_key, max( cal_dt ) as cal_dt
+	  from dbo.Volunteer_Fact_Actual
+	  where 1=1
+		and cal_dt > cast( getdate() as date ) -- FUTURE RECORDS
+		-- ENROLLMENT ENDING IN NEXT 30 DAYS
+		and (
+			( enrollment_1_start_date < cast( getdate() as date )
+				and enrollment_1_end_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) ) or
+			( enrollment_2_start_date < cast( getdate() as date )
+				and enrollment_2_end_date between cast( getdate() + 1 as date ) and cast( getdate() + 30 as date ) )
+			)
+	  group by volunteer_key ) d
+	on v.volunteer_key = d.volunteer_key
+	and v.cal_dt = d.cal_dt
+
+union all
+
+select 
+	 v.volunteer_key
+	,v.hub_volunteer_num
+	,v.hub_person_id
+	,v.hub_person_guid
+	,v.ba_volunteer_num
+	,v.first_name
+	,v.last_name
+	,v.volunteer_name
+	,v.volunteer_name_short
+	,v.gender_code
+	,v.marital_status_code
+	,v.cong_servant_code
+	,v.cong_midweek_mt_dow
+	,v.cong_midweek_mt_time
+	,v.cong_weekend_mt_dow
+	,v.cong_weekend_mt_time
+	,v.age
+	,v.address
+	,v.city
+	,v.state_code
+	,v.postal_code
+	,v.home_phone
+	,v.mobile_phone
+	,v.bethel_email
+	,v.jwpub_email
+	,v.personal_email
+	,v.spouse_hub_person_id
+	,v.spouse_hub_volunteer_num
+	,v.spouse_bethel_email
+	,v.spouse_jwpub_email
+	,v.enrollment_code
+	,v.enrollment_site_code
+	,v.enrollment_start_date
+	,v.enrollment_start_date_raw
+	,v.enrollment_end_date
+	,v.hub_dept_id
+	,v.parent_dept_name
+	,v.parent_dept_code
+	,v.dept_name
+	,v.non_hpr_parent_dept_name
+	,v.non_hpr_dept_name
+	,v.dept_start_date
+	,v.dept_end_date
+	,v.pc_category
+	,v.temp_flag
+	,v.primary_flag
+	,v.split_asgn_flag
+	,v.mon_flag
+	,v.tue_flag
+	,v.wed_flag
+	,v.thu_flag
+	,v.fri_flag
+	,v.sat_flag
+	,v.sun_flag
+	,v.enrollment_1_code
+	,v.enrollment_1_site_code
+	,v.enrollment_1_start_date
+	,v.enrollment_1_start_date_raw
+	,v.enrollment_1_end_date
+	,v.enrollment_2_code
+	,v.enrollment_2_site_code
+	,v.enrollment_2_start_date
+	,v.enrollment_2_start_date_raw
+	,v.enrollment_2_end_date
+	,v.dept_1_hpr_dept_key
+	,v.dept_1_hub_dept_id
+	,v.dept_1_cpc_code
+	,v.dept_1_parent_dept_name
+	,v.dept_1_dept_name
+	,v.dept_1_dept_role
+	,v.dept_1_ovsr_name
+	,v.dept_1_start_date
+	,v.dept_1_end_date
+	,v.dept_1_temp_flag
+	,v.dept_1_primary_flag
+	,v.dept_1_split_asgn_flag
+	,v.dept_1_split_allocation_pct
+	,v.dept_1_hpr_flag
+	,v.dept_1_pc_category
+	,v.dept_1_mon_flag
+	,v.dept_1_tue_flag
+	,v.dept_1_wed_flag
+	,v.dept_1_thu_flag
+	,v.dept_1_fri_flag
+	,v.dept_1_sat_flag
+	,v.dept_1_sun_flag
+	,v.dept_2_hpr_dept_key
+	,v.dept_2_hub_dept_id
+	,v.dept_2_cpc_code
+	,v.dept_2_parent_dept_name
+	,v.dept_2_dept_name
+	,v.dept_2_dept_role
+	,v.dept_2_ovsr_name
+	,v.dept_2_start_date
+	,v.dept_2_end_date
+	,v.dept_2_temp_flag
+	,v.dept_2_primary_flag
+	,v.dept_2_split_asgn_flag
+	,v.dept_2_split_allocation_pct
+	,v.dept_2_hpr_flag
+	,v.dept_2_pc_category
+	,v.dept_2_mon_flag
+	,v.dept_2_tue_flag
+	,v.dept_2_wed_flag
+	,v.dept_2_thu_flag
+	,v.dept_2_fri_flag
+	,v.dept_2_sat_flag
+	,v.dept_2_sun_flag
+	,v.loan_dept_name
+	,v.tentative_end_date
+	,v.room_site_code
+	,v.room_bldg
+	,v.room_bldg_code
+	,v.room_bldg_desc
+	,v.room
+	,v.staffing_number_exception_flag
+	,v.hpr_volunteer_exception_flag
+	,v.cal_dt
+	,v.current_flag
+	,v.record_type
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+	,'Departed' as enrollment_status
+from dbo.Volunteer_Fact_Actual v
+inner join 
+	( select volunteer_key, max( cal_dt ) as cal_dt
+	  from dbo.Volunteer_Fact_Actual
+	  where 1=1
+		and cal_dt < cast( getdate() as date ) -- HISTORICAL RECORDS
+		-- ENROLLMENT ENDED IN LAST 30 DAYS
+		and (
+			( enrollment_1_start_date < cast( getdate() as date )
+				and enrollment_1_end_date between cast( getdate() - 30 as date ) and cast( getdate() - 1 as date ) ) or
+			( enrollment_2_start_date < cast( getdate() as date )
+				and enrollment_2_end_date between cast( getdate() - 30 as date ) and cast( getdate() - 1 as date ) )
+			)
+	  group by volunteer_key ) d
+	on v.volunteer_key = d.volunteer_key
+	and v.cal_dt = d.cal_dt
+go
+
+
+if object_id('rpt.Volunteer_Training_v', 'V') is not null
+	drop view rpt.Volunteer_Training_v
+go
+create view rpt.Volunteer_Training_v
+as
+select
+	 v.hub_volunteer_num as volunteer_number
+	,v.volunteer_name
+	,v.bethel_email
+	,v.dept_1_cpc_code as parent_dept_code
+	,v.dept_1_parent_dept_name as parent_dept_name
+	,v.dept_1_dept_name as dept_name
+	,v.enrollment_1_code as enrollment_code
+	,v.enrollment_1_start_date as enrollment_start_date
+	,v.enrollment_1_end_date as enrollment_end_date
+	,t.class_number
+	,t.class_name
+	,t.host_branch_code
+	,t.course_type
+	,t.course_name
+	,t.course_desc
+	,t.assign_date
+	,t.complete_date
+	,t.attendance_status
+	,t.active_flag
+	,v.volunteer_key
+from rpt.volunteer_rpt_v v
+left join dbo.Volunteer_Training t
+	on v.volunteer_key = t.volunteer_key
+where 1=1
+go
+
+
+if object_id('rpt.Volunteer_Transfer_v', 'V') is not null
+	drop view rpt.Volunteer_Transfer_v
+go
+create view rpt.Volunteer_Transfer_v
+as
 select
 	 volunteer_key
  	,hub_volunteer_num
@@ -3302,10 +3911,10 @@ select
 	,gender_code
 	,marital_status_code
 	,cong_servant_code
-	,cong_midweek_mt_dow
-	,cong_midweek_mt_time
-	,cong_weekend_mt_dow
-	,cong_weekend_mt_time
+	,midweek_meeting_dow as cong_midweek_mt_dow
+	,midweek_meeting_time as cong_midweek_mt_time
+	,weekend_meeting_dow as cong_weekend_mt_dow
+	,weekend_meeting_time as cong_weekend_mt_time
 	,age
 	,address
 	,city
@@ -3320,7 +3929,7 @@ select
 	,spouse_hub_volunteer_num
 	,spouse_bethel_email
 	,spouse_jwpub_email
-	-- BACKWARDS COMPATIBILITY ------
+	---- BACKWARDS COMPATIBILITY ------
 	,enrollment_1_code as enrollment_code
 	,coalesce( enrollment_1_site_code, 'UNK' ) as enrollment_site_code
 	,case when enrollment_1_start_date < dept_1_start_date then enrollment_1_start_date else dept_1_start_date end as enrollment_start_date
@@ -3348,7 +3957,7 @@ select
 	,dept_1_fri_flag as fri_flag
 	,dept_1_sat_flag as sat_flag
 	,dept_1_sun_flag as sun_flag
-	---------------------------------
+	-----------------------------------
 	,enrollment_1_code
 	,coalesce( enrollment_1_site_code, 'UNK' ) as enrollment_1_site_code
 	--,case when enrollment_1_start_date < dept_1_start_date then enrollment_1_start_date else dept_1_start_date end as enrollment_1_start_date
@@ -3418,128 +4027,23 @@ select
 	,room_bldg_desc
 	,room
 	,staffing_number_exception_flag
+	,hpr_volunteer_exception_flag
+	,cal_dt
+	,current_flag
 	,record_type
-from final
-go
-
-
-if object_id('rpt.Volunteer_All_v', 'V') is not null
-	drop view rpt.Volunteer_All_v
-go
-create view rpt.Volunteer_All_v
-as
-with base as (
-	select
-		 *
-		,case
-			when enrollment_1_code in ( 'BBB', 'BBF', 'BBR', 'BCF', 'BCL', 'BCS', 'BCV', 'BRS' ) then 5
-			when enrollment_1_code in ( 'BBO', 'BOC' ) then 0
-			else
-				( case when dept_1_mon_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_tue_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_wed_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_thu_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_fri_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_sat_flag = 'Y' then 1 else 0 end ) +
-				( case when dept_1_sun_flag = 'Y' then 1 else 0 end )
-		 end as work_days
-		,case when record_type in ( 'HPR', 'EXCEPTION' ) then 'Y' else 'N' end as hpr_flag
-		,upper( left( first_name, 1 ) +
-		 substring( cast( hub_volunteer_num as varchar(30) ), 3, 1 ) +
-		 substring( first_name, 2, 1 ) +
-		 right( cast( hub_volunteer_num as varchar(30) ), 1 ) +
-		 right( last_name, 1 ) ) as base_helmet_id
-	from dbo.Volunteer_v_snp ),
-
-helmet as (
-	select
-		volunteer_key
-		,row_number() over ( partition by base_helmet_id order by enrollment_1_start_date ) as rownum
-	from base )
-
-select
-	 base.*
-	,helmet.rownum
-	,case
-		when helmet.rownum = 1 then base.base_helmet_id
-		when helmet.rownum between 2 and 27 then base.base_helmet_id + char( 64 + helmet.rownum )	-- a=65, so 64+2=a, up to z=90
-		else base.base_helmet_id + '_' + cast( helmet.rownum as varchar )							-- fallback if more than 26 duplicates
-	 end as helmet_id
-	,case when enrollment_1_start_date > getdate() then 'INVITED' else 'ARRIVED' end as enrollment_status
-from base
-inner join helmet
-	on base.volunteer_key = helmet.volunteer_key
-go
-
-
-if object_id('rpt.Volunteer_Rpt_v', 'V') is not null
-	drop view rpt.Volunteer_Rpt_v
-go
-create view rpt.Volunteer_Rpt_v
-as
-select *
-from dbo.Volunteer_v_snp
-where record_type in ( 'HPR', 'EXCEPTION' )
-go
-
-
-if object_id('rpt.Volunteer_Departure_v', 'V') is not null
-	drop view rpt.Volunteer_Departure_v
-go
-create view rpt.Volunteer_Departure_v
-as
-select
-	 volunteer_key
- 	,hub_volunteer_num
- 	,hub_person_id
- 	,hub_person_guid
-	,cast( ba_volunteer_num as varchar(10) ) as ba_volunteer_num
-	,first_name
-	,last_name
-	,volunteer_name
-	,gender_code
-	,marital_status_code
-	,age
-	,address
-	,city
-	,state_code
-	,postal_code
-	,home_phone
-	,mobile_phone
-	,coalesce( enrollment_site_code, 'UNK' ) as enrollment_site_code
-	,enrollment_code
-	,case when enrollment_start_date < dept_start_date then enrollment_start_date else dept_start_date end as enrollment_start_date
-	,enrollment_end_date
-	,parent_dept_name
-	,parent_dept_code
-	,dept_name
-	,dept_pc_code
-	,temp_parent_dept_name + ' > ' + temp_dept_name as loan_dept_name
-	,pc_category
-	,bethel_email
-	,jwpub_email
-	,personal_email
-	,spouse_hub_volunteer_num
-	,spouse_bethel_email
-	,spouse_jwpub_email
-	,primary_flag
-	,temp_flag
-	,split_asgn_flag
-	,mon_flag
-	,tue_flag
-	,wed_flag
-	,thu_flag
-	,fri_flag
-	,sat_flag
-	,sun_flag
-from (
-	-- CORE
-	select distinct
+	,cast( '' as varchar(100) ) as dept_pc_code -- LEGACY DONT WANT TO REPLICATE
+from 
+	( select
 		 v.full_name as volunteer_name
 		,v.first_name
 		,v.last_Name
 		,v.gender_code
 		,ms.marital_status_code
+		,v.cong_servant_code
+		,c.midweek_meeting_dow
+		,c.midweek_meeting_time
+		,c.weekend_meeting_dow
+		,c.weekend_meeting_time
 		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
 		,v.address
 		,v.city
@@ -3548,198 +4052,118 @@ from (
 		,v.home_phone
 		,v.mobile_phone
 		,v.HUB_Volunteer_Num
-		,ve.Site_Code as enrollment_site_code
-		,e.Enrollment_Code as enrollment_code
-		,ve.Start_Date as enrollment_start_date
-		,ve.end_date as enrollment_end_date
-		,vd.Parent_Dept_Name as parent_dept_name
-		,d.cpc_code as parent_dept_code
-		,vd.Dept_Name as dept_name
-		,d.PC_Code_Full as dept_pc_code
-		,tmp.Parent_Dept_Name as temp_parent_dept_name
-		,tmp.Dept_Name as temp_dept_name
+		,ve1.enrollment_site_code as enrollment_1_site_code
+		,ve1.Enrollment_Code as enrollment_1_code
+		,ve1.Start_Date as enrollment_1_start_date
+		,ve1.end_date as enrollment_1_end_date
+		,ve2.enrollment_site_code as enrollment_2_site_code
+		,ve2.Enrollment_Code as enrollment_2_code
+		,ve2.Start_Date as enrollment_2_start_date
+		,ve2.end_date as enrollment_2_end_date
+		,d1.hpr_dept_key as dept_1_hpr_dept_key
+		,vd1.hub_dept_id as dept_1_hub_dept_id
+		,d1.cpc_code as dept_1_cpc_code
+		,vd1.Parent_Dept_Name as dept_1_parent_dept_name
+		,vd1.Dept_Name as dept_1_dept_name
+		,vd1.dept_role as dept_1_dept_role
+		,coalesce( d1.work_group_ovsr, d1.dept_ovsr ) as dept_1_ovsr_name
+		,vd1.start_date as dept_1_start_date
+		,vd1.end_date as dept_1_end_date
+		,vd1.temp_flag as dept_1_temp_flag
+		,vd1.primary_flag as dept_1_primary_flag
+		,case when vd1.Primary_Flag = 'N' then 'Y' else 'N' end as dept_1_split_asgn_flag
+		,vd1.split_allocation_pct as dept_1_split_allocation_pct
+		,vd1.hpr_flag as dept_1_hpr_flag
+		,d1.PC_Category as dept_1_pc_category
+		,vd1.mon_flag as dept_1_mon_flag
+		,vd1.tue_flag as dept_1_tue_flag
+		,vd1.wed_flag as dept_1_wed_flag
+		,vd1.thu_flag as dept_1_thu_flag
+		,vd1.fri_flag as dept_1_fri_flag
+		,vd1.sat_flag as dept_1_sat_flag
+		,vd1.sun_flag as dept_1_sun_flag
+		,d2.hpr_dept_key as dept_2_hpr_dept_key
+		,vd2.hub_dept_id as dept_2_hub_dept_id
+		,d2.cpc_code as dept_2_cpc_code
+		,vd2.Parent_Dept_Name as dept_2_parent_dept_name
+		,vd2.Dept_Name as dept_2_dept_name
+		,vd2.dept_role as dept_2_dept_role
+		,coalesce( d2.work_group_ovsr, d2.dept_ovsr ) as dept_2_ovsr_name
+		,vd2.start_date as dept_2_start_date
+		,vd2.end_date as dept_2_end_date
+		,vd2.temp_flag as dept_2_temp_flag
+		,vd2.primary_flag as dept_2_primary_flag
+		,case when vd2.Primary_Flag = 'N' then 'Y' else 'N' end as dept_2_split_asgn_flag
+		,vd2.split_allocation_pct as dept_2_split_allocation_pct
+		,vd2.hpr_flag as dept_2_hpr_flag
+		,d2.PC_Category as dept_2_pc_category
+		,vd2.mon_flag as dept_2_mon_flag
+		,vd2.tue_flag as dept_2_tue_flag
+		,vd2.wed_flag as dept_2_wed_flag
+		,vd2.thu_flag as dept_2_thu_flag
+		,vd2.fri_flag as dept_2_fri_flag
+		,vd2.sat_flag as dept_2_sat_flag
+		,vd2.sun_flag as dept_2_sun_flag
+		,v.tentative_end_date
 		,v.alt_Email as bethel_email
 		,v.jw_username + '@jwpub.org' as jwpub_email
 		,v.Email as personal_email
-		,vd.Start_Date as dept_start_date
-		,vd.Primary_Flag as primary_flag
-		,vd.Temp_Flag as temp_flag
-		,case when vd.Primary_Flag = 'N' then 'Y' else 'N' end as split_asgn_flag
-		,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
-		,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
-		,case when ( vd.wed_AM_Flag = 'Y' or vd.wed_PM_Flag = 'Y' ) then 'Y' else 'N' end as wed_flag
-		,case when ( vd.thu_AM_Flag = 'Y' or vd.thu_PM_Flag = 'Y' ) then 'Y' else 'N' end as thu_flag
-		,case when ( vd.fri_AM_Flag = 'Y' or vd.fri_PM_Flag = 'Y' ) then 'Y' else 'N' end as fri_flag
-		,case when ( vd.sat_AM_Flag = 'Y' or vd.sat_PM_Flag = 'Y' ) then 'Y' else 'N' end as sat_flag
-		,case when ( vd.sun_AM_Flag = 'Y' or vd.sun_PM_Flag = 'Y' ) then 'Y' else 'N' end as sun_flag
-		,d.PC_Category as pc_category
 		,v.volunteer_key
 		,v.HUB_Person_ID
 		,v.ba_volunteer_num
 		,v.hub_person_guid
+		,v.mate_hub_person_id as spouse_hub_person_id
 		,mate.hub_volunteer_num as spouse_hub_volunteer_num
 		,mate.alt_email as spouse_bethel_email
 		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
-	from dbo.volunteer v
-	inner join dbo.marital_status ms
+		,nullif( v.Room_Site_Code, '' ) as room_site_code
+		,nullif( v.Room_Bldg, '' ) as room_bldg
+		,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
+		,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
+		,nullif( v.Room, '' ) as room
+		,v.staffing_number_exception_flag
+		,v.hpr_volunteer_exception_flag
+		,cast( getdate() as date ) as cal_dt
+		,'Y' as current_flag
+		,'TRANSFER' as record_type
+	  from dbo.volunteer v
+	  inner join dbo.marital_status ms
 		on v.marital_status_key = ms.marital_status_key
-	inner join dbo.state s
+	  left join dbo.state s
 		on v.State_Key = s.State_Key
-	inner join dbo.Postal_Code pc
+	  left join dbo.Postal_Code pc
 		on v.Postal_Code_Key = pc.Postal_Code_Key
-	inner join dbo.volunteer_enrollment ve
-		on v.volunteer_key = ve.Volunteer_Key
-		and ve.active_flag = 'N'
-		and ve.start_Date < cast( getdate() as date )
-		and ve.end_date >= cast( getdate() - 30 as date )
-		--and ve.Geo_Name = 'USA'
-	inner join dbo.enrollment e
-		on ve.Enrollment_Key = e.Enrollment_Key
-		and ( e.Bethel_Flag = 'Y'
-			or e.enrollment_code in ( 'BCC', 'BCF', 'BCL', 'BCS', 'BCV', 'BOC', 'BBO' ) )
-	inner join dbo.volunteer_dept vd
-		on v.volunteer_key = vd.Volunteer_Key
-		and vd.active_flag = 'N'
-		and vd.start_Date < cast( getdate() as date )
-		and vd.end_date >= cast( getdate() - 30 as date )
-		--and vd.Parent_Dept_Name like 'HPR%'
-		--and vd.Enrollment_Code = e.Enrollment_Code   -- REMOVING FOR NOW, NEED TO RE-EVALUATE
-	inner join dbo.HPR_Dept d
-		on vd.hub_dept_id = d.hub_dept_id
-		and d.Active_Flag = 'Y'
-		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
-	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept
-				 where hub_dept_id in ( select hub_dept_id from dbo.HPR_Dept where active_flag = 'Y' ) and ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi
-		on v.volunteer_key = multi.volunteer_key
-		and 'Y' = case when multi.cnt = 1 then 'Y' else vd.primary_flag end
-	left join dbo.volunteer_dept tmp
-		on v.volunteer_key = tmp.Volunteer_Key
-		and tmp.active_flag = 'N'
-		and tmp.start_Date < cast( getdate() as date )
-		and tmp.end_date >= cast( getdate() - 30 as date )
-		and tmp.Enrollment_Code = e.Enrollment_Code
-		and tmp.Temp_Flag = 'Y'
-	left join dbo.volunteer mate
+	  inner join dbo.volunteer_enrollment_rpt ve1
+		on v.volunteer_key = ve1.volunteer_key
+		and ve1.row_num = 1
+	  left join dbo.volunteer_enrollment_rpt ve2
+		on v.volunteer_key = ve2.volunteer_key
+		and ve2.row_num = 2
+	  left join dbo.volunteer_dept_rpt vd1
+		on v.volunteer_key = vd1.volunteer_key
+		and vd1.Row_Num = ( select min( row_num ) from dbo.volunteer_dept_rpt x1 where x1.volunteer_key = vd1.volunteer_Key )
+	  left join dbo.HPR_Dept d1
+		on vd1.hub_dept_id = d1.hub_dept_id
+		and d1.Active_Flag = 'Y'
+	  left join dbo.volunteer_dept_rpt vd2  -- GET 2ND DEPT, IF EXISTS
+		on v.volunteer_key = vd2.volunteer_key
+		and vd2.row_num = ( select max( row_num ) from dbo.volunteer_dept_rpt x2 where x2.volunteer_key = vd2.volunteer_key )
+		and vd2.volunteer_key in ( select volunteer_key from dbo.volunteer_dept_rpt group by volunteer_key having count(*) > 1 )
+	  left join dbo.HPR_Dept d2
+		on vd2.hub_dept_id = d2.hub_dept_id
+		and d2.Active_Flag = 'Y'
+	  left join dbo.volunteer mate
 		on v.mate_hub_person_id = mate.hub_person_id
-	where 1=1
-		and v.volunteer_key not in ( select volunteer_key from dbo.Volunteer_v_snp )
-
-	union all
-
-	-- EXCEPTIONS
-	select distinct
-		 v.full_name as volunteer_name
-		,v.first_name
-		,v.last_Name
-		,v.gender_code
-		,ms.marital_status_code
-		,cast( round( ( datediff( day, v.birth_date, getdate() ) / 365.25 ), 1 ) as decimal(4,1) ) as age
-		,v.address
-		,v.city
-		,s.state_code
-		,pc.Postal_Code
-		,v.home_phone
-		,v.mobile_phone
-		,v.HUB_Volunteer_Num
-		,ve.Site_Code as enrollment_site_code
-		,e.Enrollment_Code as enrollment_code
-		,ve.Start_Date as enrollment_start_date
-		,ve.end_date as enrollment_end_date
-		,vd.Parent_Dept_Name as parent_dept_name
-		,'PCC' as parent_dept_code
-		,vd.Dept_Name as dept_name
-		,d.PC_Code_Full as dept_pc_code
-		,null as temp_parent_dept_name
-		,null as temp_dept_name
-		,v.alt_Email as bethel_email
-		,v.jw_username + '@jwpub.org' as jwpub_email
-		,v.Email as personal_email
-		,vd.Start_Date as dept_start_date
-		,vd.Primary_Flag as primary_flag
-		,vd.Temp_Flag as temp_flag
-		,case when vd.Primary_Flag = 'N' then 'Y' else 'N' end as split_asgn_flag
-		,case when ( vd.Mon_AM_Flag = 'Y' or vd.Mon_PM_Flag = 'Y' ) then 'Y' else 'N' end as mon_flag
-		,case when ( vd.tue_AM_Flag = 'Y' or vd.tue_PM_Flag = 'Y' ) then 'Y' else 'N' end as tue_flag
-		,case when ( vd.wed_AM_Flag = 'Y' or vd.wed_PM_Flag = 'Y' ) then 'Y' else 'N' end as wed_flag
-		,case when ( vd.thu_AM_Flag = 'Y' or vd.thu_PM_Flag = 'Y' ) then 'Y' else 'N' end as thu_flag
-		,case when ( vd.fri_AM_Flag = 'Y' or vd.fri_PM_Flag = 'Y' ) then 'Y' else 'N' end as fri_flag
-		,case when ( vd.sat_AM_Flag = 'Y' or vd.sat_PM_Flag = 'Y' ) then 'Y' else 'N' end as sat_flag
-		,case when ( vd.sun_AM_Flag = 'Y' or vd.sun_PM_Flag = 'Y' ) then 'Y' else 'N' end as sun_flag
-		,'Support' as pc_category
-		,v.volunteer_key
-		,v.HUB_Person_ID
-		,v.ba_volunteer_num
-		,v.hub_person_guid
-		,mate.hub_volunteer_num as spouse_hub_volunteer_num
-		,mate.alt_email as spouse_bethel_email
-		,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
-	from dbo.volunteer v
-	inner join dbo.marital_status ms
-		on v.marital_status_key = ms.marital_status_key
-	inner join dbo.state s
-		on v.State_Key = s.State_Key
-	inner join dbo.Postal_Code pc
-		on v.Postal_Code_Key = pc.Postal_Code_Key
-	inner join dbo.volunteer_enrollment ve
-		on v.volunteer_key = ve.Volunteer_Key
-		and ve.active_flag = 'N'
-		and ve.start_Date < cast( getdate() as date )
-		and ve.end_date >= cast( getdate() - 30 as date )
-		--and ve.Geo_Name = 'USA'
-	inner join dbo.enrollment e
-		on ve.Enrollment_Key = e.Enrollment_Key
-		and ( e.Bethel_Flag = 'Y'
-			or e.enrollment_code in ( 'BCC', 'BCF', 'BCL', 'BCS', 'BCV', 'BOC', 'BBO' ) )
-	inner join dbo.volunteer_dept vd
-		on v.volunteer_key = vd.Volunteer_Key
-		and vd.active_flag = 'N'
-		and vd.start_Date < cast( getdate() as date )
-		and vd.end_date >= cast( getdate() - 30 as date )
-		--and vd.Parent_Dept_Name like 'HPR%'
-	inner join ( select volunteer_key, count(*) as cnt from dbo.volunteer_dept
-				 where ( end_date is not null and end_date >= cast( getdate() - 30 as date ) ) group by volunteer_key ) multi
-		on v.volunteer_key = multi.volunteer_key
-		and 'Y' = case when multi.cnt = 1 then 'Y' else vd.primary_flag end
-	inner join dbo.HPR_Dept d
-		on vd.hub_dept_id = d.hub_dept_id
-		and d.Active_Flag = 'Y'
-		and d.cpc_code in ( 'CO', 'DD', 'PCC', 'CI', 'PS', 'VD', 'BC' )
-	left join dbo.volunteer mate
-		on v.mate_hub_person_id = mate.hub_person_id
-	where v.hpr_volunteer_exception_flag = 'Y' ) core
-go
-
-
-if object_id('rpt.Volunteer_Training_v', 'V') is not null
-	drop view rpt.Volunteer_Training_v
-go
-create view rpt.Volunteer_Training_v
-as
-select
-	 v.hub_volunteer_num as volunteer_number
-	,v.volunteer_name
-	,v.bethel_email
-	,v.dept_1_cpc_code as parent_dept_code
-	,v.dept_1_parent_dept_name as parent_dept_name
-	,v.dept_1_dept_name as dept_name
-	,v.enrollment_1_code as enrollment_code
-	,v.enrollment_1_start_date as enrollment_start_date
-	,v.enrollment_1_end_date as enrollment_end_date
-	,t.class_number
-	,t.class_name
-	,t.host_branch_code
-	,t.course_type
-	,t.course_name
-	,t.course_desc
-	,t.assign_date
-	,t.complete_date
-	,t.attendance_status
-	,t.active_flag
-	,v.volunteer_key
-from rpt.volunteer_rpt_v v
-left join dbo.Volunteer_Training t
-	on v.volunteer_key = t.volunteer_key
-where 1=1
+	  left join dbo.cong c
+		on v.Cong_Key = c.Cong_Key
+	  where 1=1
+		and vd2.Parent_Dept_Name not like '%WHQ Computer%'
+		and vd2.Parent_Dept_Name not like '%Purchasing%'
+		and d1.cpc_code is null -- NOT HPR
+		and vd1.end_date is not null -- NON HPR DEPT HAS AN END DATE
+		and d2.cpc_code is not null -- DEPT 2 IS HPR
+		and vd2.start_date > cast(getdate() as date) -- DEPT 2 IS FUTURE
+	) x
 go
 
 

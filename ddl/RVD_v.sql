@@ -1242,6 +1242,7 @@ select
 	,vd.wrk_crew
 	,vd.wrk_role
 	,vd.wrk_priv
+	,vd.hub_dept_id
   from dbo.volunteer_dept vd
   inner join dbo.volunteer v
   	on vd.volunteer_key = v.volunteer_key
@@ -1839,6 +1840,7 @@ select
 	,v.hub_person_id
 	,v.hub_volunteer_num
 	,v.hub_volunteer_id
+	,v.hub_person_guid
 	,v.hub_tracking_flag
 	,v.jw_username
 	,v.avail_short_notice_flag
@@ -1856,6 +1858,10 @@ select
 	,cong.cong_fullname as cong_name
 	,v.cong_relocation_date
 	,cong.circuit
+	,cong.midweek_meeting_dow as cong_midweek_mt_dow
+	,cong.midweek_meeting_time as cong_midweek_mt_time
+	,cong.weekend_meeting_dow as cong_weekend_mt_dow
+	,cong.weekend_meeting_time as cong_weekend_mt_time
 	,v.a8_approved_flag
 	,v.a8_app_status_key
 	,v.a19_approved_flag
@@ -1876,6 +1882,13 @@ select
 	,mate.full_name as spouse_name
 	,mate.HUB_Volunteer_Num AS spouse_hub_vol_num
  	,mate.HUB_Person_ID AS spouse_hub_person_id
+	,mate.alt_email as spouse_bethel_email
+	,mate.jw_username + '@jwpub.org' as spouse_jwpub_email
+	,nullif( v.Room_Site_Code, '' ) as room_site_code
+	,nullif( v.Room_Bldg, '' ) as room_bldg
+	,nullif( v.Room_Bldg_Code, '' ) as room_bldg_code
+	,nullif( left( v.room, charindex( '-', v.room ) - 1 ), '' ) as room_bldg_desc
+	,nullif( v.Room, '' ) as room
 	,v.load_date
 	,v.update_date
 from dbo.volunteer v
