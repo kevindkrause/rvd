@@ -6632,6 +6632,194 @@ go
 
 
 /***********************************************************
+**				 VOLUNTEER FACT PROJECTED
+***********************************************************/
+if object_id('dbo.ETL_Volunteer_Fact_Projected_proc') is null
+    exec( 'create procedure dbo.ETL_Volunteer_Fact_Projected_proc as set nocount on;' )
+go
+
+ALTER procedure [dbo].[ETL_Volunteer_Fact_Projected_proc]
+as
+begin
+	set nocount on
+
+	declare
+		@Table nvarchar(150) = 'Volunteer Fact Projected',
+		@Ins integer = 0,
+		@Upd integer = 0,
+		@Del integer = 0,
+		@Start datetime = getdate(),
+		@End datetime
+
+	begin try
+
+		-- DELETE EXISTING DATA
+		truncate table dbo.Volunteer_Fact_Projected
+
+		set @Del = @Del + @@rowcount;
+
+		-- INSERT NEW DATA
+		INSERT INTO dbo.Volunteer_Fact_Projected
+		SELECT	 VP.volunteer_key
+				,V.hub_volunteer_num
+				,VP.hub_person_id
+				,V.hub_person_guid
+				,V.ba_volunteer_num
+				,V.first_name
+				,V.last_name
+				,VP.volunteer_name
+				,VP.volunteer_name_short
+				,V.gender_code
+				,M.marital_status_code
+				,V.cong_servant_code
+				,C.Midweek_Meeting_DOW AS cong_midweek_mt_dow
+				,C.Midweek_Meeting_Time AS cong_midweek_mt_time
+				,C.Weekend_Meeting_DOW AS cong_weekend_mt_dow
+				,C.Weekend_Meeting_Time AS cong_weekend_mt_time
+				,CAST(ROUND(DATEDIFF(day, v.Birth_Date, GETDATE()) / 365.25, 1) AS decimal(4 , 1)) AS age
+				,V.address
+				,V.city
+				,S.state_code
+				,P.postal_code
+				,V.home_phone
+				,V.mobile_phone
+				,v.alt_Email as bethel_email
+				,v.jw_username + '@jwpub.org' as jwpub_email
+				,v.Email as personal_email
+				,SP.HUB_Person_ID AS spouse_hub_person_id
+				,SP.HUB_Volunteer_Num AS spouse_hub_volunteer_num
+				,SP.alt_Email AS spouse_bethel_email
+				,SP.jw_username + '@jwpub.org' AS spouse_jwpub_email
+				,VP.enrollment_code
+				,'RMP' AS enrollment_site_code
+				,VP.enrollment_1_start_date AS enrollment_start_date
+				,VP.enrollment_1_start_date AS enrollment_start_date_raw
+				,VP.enrollment_1_end_date AS enrollment_end_date
+				,VP.dept_1_hub_dept_id AS hub_dept_id
+				,D.Level_01 AS parent_dept_name
+				,D.CPC_Code AS parent_dept_code
+				,D.dept_name
+				,NULL AS non_hpr_parent_dept_name
+				,NULL AS non_hpr_dept_name
+				,VP.enrollment_1_start_date AS dept_start_date
+				,VP.enrollment_1_end_date AS dept_end_date
+				,D.PC_Category
+				,'N' AS temp_flag
+				,'Y' AS primary_flag
+				,'N' split_asgn_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL') THEN 'Y' ELSE 'N' END AS mon_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL') THEN 'Y' ELSE 'N' END AS tue_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL') THEN 'Y' ELSE 'N' END AS wed_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL') THEN 'Y' ELSE 'N' END AS thu_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL') THEN 'Y' ELSE 'N' END AS fri_flag
+				,'N' AS sat_flag
+				,'N' AS sun_flag
+				,VP.enrollment_code AS enrollment_1_code
+				,'RMP' AS enrollment_1_site_code
+				,VP.enrollment_1_start_date
+				,VP.enrollment_1_start_date AS enrollment_1_start_date_raw
+				,VP.enrollment_1_end_date
+				,NULL AS enrollment_2_code
+				,NULL AS enrollment_2_site_code
+				,NULL AS enrollment_2_start_date
+				,NULL AS enrollment_2_start_date_raw
+				,NULL AS enrollment_2_end_date
+				,VP.dept_1_hpr_dept_key
+				,VP.dept_1_hub_dept_id
+				,VP.dept_1_cpc_code
+				,VP.dept_1_parent_dept_name
+				,VP.dept_1_dept_name
+				,VP.dept_role
+				,D.Dept_Ovsr AS dept_1_ovsr_name
+				,VP.dept_1_start_date
+				,VP.dept_1_end_date
+				,'N' AS dept_1_temp_flag
+				,'Y' AS dept_1_primary_flag
+				,'N' AS dept_1_split_asgn_flag
+				,NULL AS dept_1_split_allocation_pct
+				,VP.dept_1_hpr_flag
+				,D.PC_Category AS dept_1_pc_category
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL', 'BBR', 'BRS', 'BCC', 'BCF') THEN 'Y' ELSE 'N' END AS dept_1_mon_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL', 'BBR', 'BRS', 'BCC', 'BCF') THEN 'Y' ELSE 'N' END AS dept_1_tue_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL', 'BBR', 'BRS', 'BCC', 'BCF') THEN 'Y' ELSE 'N' END AS dept_1_wed_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL', 'BBR', 'BRS', 'BCC', 'BCF') THEN 'Y' ELSE 'N' END AS dept_1_thu_flag
+				,CASE WHEN VP.enrollment_code IN ('BCS', 'BCV', 'BCL', 'BBR', 'BRS', 'BCC', 'BCF') THEN 'Y' ELSE 'N' END AS dept_1_fri_flag
+				,'N' AS dept_1_sat_flag
+				,'N' AS dept_1_sun_flag
+				,NULL AS dept_2_hpr_dept_key
+				,NULL AS dept_2_hub_dept_id
+				,NULL AS dept_2_cpc_code
+				,NULL AS dept_2_parent_dept_name
+				,NULL AS dept_2_dept_name
+				,NULL AS dept_2_dept_role
+				,NULL AS dept_2_ovsr_name
+				,NULL AS dept_2_start_date
+				,NULL AS dept_2_end_date
+				,NULL AS dept_2_temp_flag
+				,NULL AS dept_2_primary_flag
+				,NULL AS dept_2_split_asgn_flag
+				,NULL AS dept_2_split_allocation_pct
+				,NULL AS dept_2_hpr_flag
+				,NULL AS dept_2_pc_category
+				,NULL AS dept_2_mon_flag
+				,NULL AS dept_2_tue_flag
+				,NULL AS dept_2_wed_flag
+				,NULL AS dept_2_thu_flag
+				,NULL AS dept_2_fri_flag
+				,NULL AS dept_2_sat_flag
+				,NULL AS dept_2_sun_flag
+				,NULL AS loan_dept_name
+				,NULL AS tentative_end_date
+				,NULL AS room_site_code
+				,NULL AS room_bldg
+				,NULL AS room_bldg_code
+				,NULL AS room_bldg_desc
+				,NULL AS room
+				,'N' AS staffing_number_exception_flag
+				,'N' AS hpr_volunteer_exception_flag
+				,VP.cal_dt
+				,'N' AS current_flag
+				,VP.record_type
+				,VP.Dept_Role_Key
+				,VP.role_start_date
+				,VP.role_end_date
+		FROM rpt.volunteer_projected_v VP 
+				left outer join dbo.Volunteer V on V.volunteer_key = VP.volunteer_key
+				left outer join dbo.HPR_Dept D on D.HPR_Dept_Key = VP.dept_1_hub_dept_id
+				left outer join dbo.Marital_Status M on M.Marital_Status_Key = V.Marital_Status_Key
+				left outer join dbo.ConG C on C.Cong_Key = V.Cong_Key
+				left outer join dbo.[State] S on S.State_Key = V.State_Key
+				left outer join dbo.Postal_Code P on P.Postal_Code_Key = V.Postal_Code_Key
+				left outer join dbo.Volunteer SP on SP.HUB_Person_ID = V.Mate_HUB_Person_ID
+
+
+		set @Ins = @Ins+ @@rowcount
+
+		set @End = getdate()
+
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End
+	end try
+
+	begin catch
+		execute dbo.ETL_Table_Run_proc
+			@Table_Name = @Table,
+			@Rows_Inserted = @Ins,
+			@Rows_Updated = @Upd,
+			@Rows_Deleted = @Del,
+			@Start_Time = @Start,
+			@End_Time = @End,
+			@Status_Code = 'F'
+	end catch
+end
+GO
+
+/***********************************************************
 **				   REPORTING SNAPSHOTS
 ***********************************************************/
 if object_id('dbo.ETL_Reporting_Snapshots_proc') is null
@@ -7228,6 +7416,7 @@ begin
 	exec dbo.ETL_Bad_Data_Cleanup_proc
 	exec dbo.ETL_Status_Update_Process_Roles
 	exec dbo.ETL_Volunteer_Fact_Actual_proc
+	exec dbo.ETL_Volunteer_Fact_Projected_proc
 	exec dbo.ETL_Reporting_Snapshots_proc
 end
 go
