@@ -3232,7 +3232,7 @@ with base_raw as (
 		*
 		,case 
 			when enrollment_status = 'Transferring' then 1
-			when enrollment_status = 'Invited' then 2 
+			when enrollment_status = 'Arrived' then 2 
 			else 3 
 		 end as rn
 	from rpt.volunteer_v 
@@ -3240,6 +3240,7 @@ with base_raw as (
 
 find_min as ( 
 	select volunteer_key, min( rn ) as min_rn
+	from base_raw
 	group by volunteer_key
 ),
 

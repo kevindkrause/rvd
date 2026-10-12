@@ -44,9 +44,9 @@ select * from dbo.Volunteer_v_snp where volunteer_key in ( 968295 )
 
 select * from rpt.Volunteer_Rpt_v where volunteer_key in ( 817485 )
 
-select * from rpt.Volunteer_All_v where volunteer_key = 817485
+select count(*) from rpt.Volunteer_All_v where dept_1_hpr_flag = 'Y'
 
-select hpr_flag, * from rpt.PCC_Project_Volunteer_v where volunteer_key in ( 817485 )
+select count(*) from rpt.PCC_Project_Volunteer_v where hpr_flag = 'Y'
 
 select * from rpt.Staffing_Tool_v where volunteer_key in ( 369548 )
 
